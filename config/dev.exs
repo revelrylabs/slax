@@ -26,3 +26,7 @@ config :slax, Slax.Repo,
   adapter: Ecto.Adapters.Postgres,
   url: {:system, "DATABASE_URL"}
 
+config :slax, :github,
+  client_id: System.get_env("GITHUB_CLIENT_ID"),
+  client_secret: System.get_env("GITHUB_CLIENT_SECRET")
+

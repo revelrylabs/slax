@@ -1,11 +1,9 @@
 defmodule Slax.Router do
   use Slax.Web, :router
 
-  pipeline :api do
-    plug :accepts, ["json"]
-  end
-
-  scope "/api", Slax do
-    pipe_through :api
+  scope "/", Slax do
+    post "/auth", AuthController, :start
+    get "/auth/github_redirect", AuthController, :github_redirect
+    get "/auth/github_callback", AuthController, :github_callback
   end
 end
