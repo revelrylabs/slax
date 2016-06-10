@@ -5,6 +5,8 @@ defmodule Slax.AuthController do
 
   def start(conn, %{"user_id" => user_id, "text" => text}) do
     case text do
+      "" ->
+        text conn, "*AuthBot services:*\n\n/auth github"
       "github" ->
         text conn, auth_url(conn, :github_redirect, %{state: user_id})
       _ ->
