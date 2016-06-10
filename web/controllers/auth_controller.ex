@@ -3,6 +3,8 @@ defmodule Slax.AuthController do
 
   alias Slax.{Repo, User}
 
+  plug Slax.Plugs.VerifySlackToken, :auth
+
   def start(conn, %{"user_id" => user_id, "text" => text}) do
     case text do
       "" ->
