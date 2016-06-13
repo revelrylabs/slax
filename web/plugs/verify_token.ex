@@ -1,5 +1,6 @@
 defmodule Slax.Plugs.VerifySlackToken do
-  import Phoenix.Controller
+  import Phoenix.Controller, only: [text: 2]
+  import Plug.Conn, only: [halt: 1]
 
   def init(app_var) do
     Application.get_env(:slax, :slack_tokens)
@@ -11,7 +12,7 @@ defmodule Slax.Plugs.VerifySlackToken do
       true ->
         conn
       false ->
-        text conn, "Invalid slack token."
+        text(conn, "Invalid slack token.") |> halt
     end
   end
 
