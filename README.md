@@ -2,8 +2,8 @@
 
 A Phoenix app that supports the following slash commands from Slack:
 
-  * /auth <service>
-  * /issue <org/repo> <title> [\nbody]
+  * /auth \<service\>
+  * /issue \<org/repo\> \<title\> [\nbody]
 
 To start your Phoenix app:
 
