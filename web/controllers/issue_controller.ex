@@ -12,23 +12,26 @@ defmodule Slax.IssueController do
   end
 
   def start(conn, %{"text" => text}) do
-    [_, repo, title, body] = Regex.run(~r/(.+\/[^ ]+) (.*)\n?(.*)?/, text)
+    cond do
+      [_, repo, title, body] = Regex.run(~r/(.+\/[^ ]+) (.*)\n?(.*)?/, text) ->
+        github_response = Github.create_issue(%{
+          title: title,
+          body: body,
+          repo: repo,
+          access_token: conn.assigns.current_user.github_access_token
+        })
 
-    github_response = Github.create_issue(%{
-      title: title,
-      body: body,
-      repo: repo,
-      access_token: conn.assigns.current_user.github_access_token
-    })
+        response = case github_response do
+          {:ok, issue_link} -> "Issue created: #{issue_link}"
+          {:error, message} -> "Uh oh! #{message}"
+        end
 
-    response = case github_response do
-      {:ok, issue_link} -> "Issue created: #{issue_link}"
-      {:error, message} -> "Uh oh! #{message}"
+        json conn, %{
+          response_type: "in_channel",
+          text: response
+        }
+      true ->
+        text conn, "Invalid parameters, org/repo combo and title is required"
     end
-
-    json conn, %{
-      response_type: "in_channel",
-      text: response
-    }
   end
 end
