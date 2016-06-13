@@ -14,4 +14,8 @@ defmodule Slax.Plugs.VerifySlackToken do
         text conn, "Invalid slack token."
     end
   end
+
+  def call(conn, _) do
+    conn
+  end
 end

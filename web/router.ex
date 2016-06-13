@@ -5,5 +5,7 @@ defmodule Slax.Router do
     post "/auth", AuthController, :start
     get "/auth/github_redirect", AuthController, :github_redirect
     get "/auth/github_callback", AuthController, :github_callback
+
+    post "/issue", IssueController, :start
   end
 end
