@@ -37,7 +37,7 @@ defmodule Slax.Mixfile do
       {:postgrex, ">= 0.0.0"},
       {:gettext, "~> 0.11"},
       {:cowboy, "~> 1.0"},
-      {:httpotion, "~> 2.2"},
+      {:httpotion, "~> 3.0.0"},
    ]
   end
 
