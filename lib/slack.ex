@@ -1,5 +1,3 @@
-require IEx
-
 defmodule Slack do
   @moduledoc """
   Functions for workig with the Github API
