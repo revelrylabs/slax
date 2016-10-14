@@ -22,6 +22,20 @@ config :logger, :console,
   format: "$time $metadata[$level] $message\n",
   metadata: [:request_id]
 
+# Configure your database
+config :slax, Slax.Repo,
+  adapter: Ecto.Adapters.Postgres,
+  url: {:system, "DATABASE_URL"}
+
+config :slax, :github,
+  client_id: System.get_env("GITHUB_CLIENT_ID"),
+  client_secret: System.get_env("GITHUB_CLIENT_SECRET")
+
+config :slax, :slack_tokens,
+  issue: System.get_env("ISSUE_SLACK_TOKEN"),
+  auth: System.get_env("AUTH_SLACK_TOKEN"),
+  tarpon: System.get_env("TARPON_SLACK_TOKEN")
+
 # Import environment specific config. This must remain at the bottom
 # of this file so it overrides the configuration defined above.
 import_config "#{Mix.env}.exs"

@@ -21,16 +21,3 @@ config :logger, :console, format: "[$level] $message\n"
 # in production as building large stacktraces may be expensive.
 config :phoenix, :stacktrace_depth, 20
 
-# Configure your database
-config :slax, Slax.Repo,
-  adapter: Ecto.Adapters.Postgres,
-  url: {:system, "DATABASE_URL"}
-
-config :slax, :github,
-  client_id: System.get_env("GITHUB_CLIENT_ID"),
-  client_secret: System.get_env("GITHUB_CLIENT_SECRET")
-
-config :slax, :slack_tokens,
-  issue: System.get_env("ISSUE_SLACK_TOKEN"),
-  auth: System.get_env("AUTH_SLACK_TOKEN")
-

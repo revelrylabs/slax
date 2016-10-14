@@ -14,20 +14,6 @@ config :slax, Slax.Endpoint,
 # Do not print debug messages in production
 config :logger, level: :info
 
-# Configure your database
-config :slax, Slax.Repo,
-  adapter: Ecto.Adapters.Postgres,
-  url: {:system, "DATABASE_URL"}
-
-config :slax, :github,
-  client_id: System.get_env("GITHUB_CLIENT_ID"),
-  client_secret: System.get_env("GITHUB_CLIENT_SECRET")
-
-config :slax, :slack_tokens,
-  issue: System.get_env("ISSUE_SLACK_TOKEN"),
-  auth: System.get_env("AUTH_SLACK_TOKEN")
-
-
 # ## SSL Support
 #
 # To get SSL working, you will need to add the `https` key
