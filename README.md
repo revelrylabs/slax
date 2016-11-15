@@ -18,7 +18,7 @@ Example: `/auth github`
 
 Create an issue on any Github repository that the authenticated user has access to. If the user is not authenticated, he or she will be directed to use `/auth github` to authenticate. If a new line is present in the message, everything after it will be considered part of the body. After creating the issue it will give you a link to it.
 
-Usage: `/issue \<org/repo\> \<title\> [\nbody]`
+Usage: `/issue <org/repo> <title> [\nbody]`
 
 Example: `/issue revelrylabs/slax New Issue!`
 
