@@ -36,9 +36,9 @@ defmodule Slax.Project do
 
   defp create_slack_channel(%{ project_name: project_name } = results) do
     case Slack.create_channel(String.lower(project_name)) do
-      {:ok, channel_name} ->
-        Map.put(results, :slack_channel, channel_name)
-        |> Map.update(:success, %{}, fn(x) -> Map.put(x, :slack_channel, "Channel Created: ##{channel_name}") end)
+      {:ok, channel} ->
+        Map.put(results, :slack_channel, channel["name"])
+        |> Map.update(:success, %{}, fn(x) -> Map.put(x, :slack_channel, "Channel Created: ##{channel["name"]}") end)
       {:error, message} ->
         Map.update(results, :errors, %{}, fn(x) -> Map.put(x, :slack_channel, message) end)
     end

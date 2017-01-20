@@ -24,7 +24,7 @@ defmodule Slack do
   end
 
   @doc """
-  Add a reaction to a message designated by channel id and timestamp
+  Add a channel
   """
   def create_channel(name) do
     request = URI.encode_query([
@@ -40,7 +40,7 @@ defmodule Slack do
     body = Poison.decode!(response.body)
 
     case body["ok"] do
-      true -> {:ok, body["channel"]["name"]}
+      true -> {:ok, body["channel"]}
       false -> {:error, body["error"]}
     end
 
