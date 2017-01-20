@@ -77,6 +77,59 @@ defmodule Github do
     Poison.decode!(response.body)
   end
 
+
+  @doc """
+  Creates a repo
+  """
+  def create_repo(params) do
+    org = "revelrylabs"
+
+    {:ok, request} = Poison.encode(%{
+          name: params[:name],
+          private: true
+                                   })
+
+    response = HTTPotion.post "#{@api_url}/orgs/#{org}/repos", [
+      headers: request_headers(params[:access_token]),
+      body: request
+    ]
+
+    case response.status_code do
+      201 -> {:ok, Poison.decode!(response.body) |> Map.get("html_url")}
+      _ -> {:error, Poison.decode!(response.body) |> Map.get("message")}
+    end
+  end
+
+  @doc """
+  Creates a webhook
+  """
+  def create_webhook(params) do
+    org = "revelrylabs"
+    repo = params[:repo]
+
+    {:ok, request} = Poison.encode(%{
+          name: "web",
+          active: true,
+          events: params[:events],
+          config: %{
+            url: params[:url],
+            content_type: "json",
+            secret: params[:secret]
+          }
+                                   })
+
+    response = HTTPotion.post "#{@api_url}/orgs/#{org}/repos", [
+      headers: request_headers(params[:access_token]),
+      body: request
+    ]
+
+    case response.status_code do
+      201 -> {:ok, Poison.decode!(response.body) |> Map.get("id")}
+      _ -> {:error, Poison.decode!(response.body) |> Map.get("message")}
+    end
+  end
+
+
   defp request_headers(access_token) do
     [
       "Authorization": "token #{access_token}",

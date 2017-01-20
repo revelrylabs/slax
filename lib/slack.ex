@@ -22,4 +22,27 @@ defmodule Slack do
       body: request
     ])
   end
+
+  @doc """
+  Add a reaction to a message designated by channel id and timestamp
+  """
+  def create_channel(name) do
+    request = URI.encode_query([
+      token: @api_token,
+      name: name
+    ])
+
+    response = HTTPotion.post("#{@api_url}/channels.create", [
+          headers: ["Content-Type": "application/x-www-form-urlencoded"],
+          body: request
+        ])
+
+    body = Poison.decode!(response.body)
+
+    case body["ok"] do
+      true -> {:ok, body["channel"]["name"]}
+      false -> {:error, body["error"]}
+    end
+
+  end
 end

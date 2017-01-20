@@ -36,6 +36,14 @@ config :slax, :slack_tokens,
   auth: System.get_env("AUTH_SLACK_TOKEN"),
   tarpon: System.get_env("TARPON_SLACK_TOKEN")
 
+config :slax, :lintron,
+  secret: System.get_env("LINTRON_SECRET"),
+  url: System.get_env("LINTRON_URL")
+
+config :slax, :board_checker,
+  secret: System.get_env("BOARD_CHECKER_SECRET"),
+  url: System.get_env("BOARD_CHECKER_URL")
+
 # Import environment specific config. This must remain at the bottom
 # of this file so it overrides the configuration defined above.
 import_config "#{Mix.env}.exs"
