@@ -29,12 +29,14 @@ config :slax, Slax.Repo,
 
 config :slax, :github,
   client_id: System.get_env("GITHUB_CLIENT_ID"),
-  client_secret: System.get_env("GITHUB_CLIENT_SECRET")
+  client_secret: System.get_env("GITHUB_CLIENT_SECRET"),
+  org_name: System.get_env("GITHUB_ORG_NAME")
 
 config :slax, :slack_tokens,
   issue: System.get_env("ISSUE_SLACK_TOKEN"),
   auth: System.get_env("AUTH_SLACK_TOKEN"),
-  tarpon: System.get_env("TARPON_SLACK_TOKEN")
+  tarpon: System.get_env("TARPON_SLACK_TOKEN"),
+  project: System.get_env("PROJECT_SLACK_TOKEN")
 
 config :slax, :lintron,
   secret: System.get_env("LINTRON_SECRET"),

@@ -1,7 +1,7 @@
 defmodule Slax.ProjectController do
   use Slax.Web, :controller
 
-  plug Slax.Plugs.VerifySlackToken, :issue
+  plug Slax.Plugs.VerifySlackToken, :project
   plug Slax.Plugs.VerifyUser
 
   def start(conn, %{"text" => ""}) do

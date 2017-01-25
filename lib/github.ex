@@ -5,6 +5,7 @@ defmodule Github do
 
   @api_url "https://api.github.com"
   @oauth_url "https://github.com/login/oauth"
+  @org_name Application.get_env(:slax, :github)[:org_name]
 
   @doc """
   URL to send a user to authorize your application.
@@ -82,21 +83,24 @@ defmodule Github do
   Creates a repo
   """
   def create_repo(params) do
-    org = "revelrylabs"
 
     {:ok, request} = Poison.encode(%{
           name: params[:name],
           private: true
                                    })
 
-    response = HTTPotion.post "#{@api_url}/orgs/#{org}/repos", [
+    response = HTTPotion.post "#{@api_url}/orgs/#{@org_name}/repos", [
       headers: request_headers(params[:access_token]),
       body: request
     ]
 
     case response.status_code do
-      201 -> {:ok, Poison.decode!(response.body) |> Map.get("html_url")}
-      _ -> {:error, Poison.decode!(response.body) |> Map.get("message")}
+      201 ->
+        body = Poison.decode!(response.body)
+        {:ok, body |> Map.get("html_url")}
+      _ ->
+        body = Poison.decode!(response.body)
+        {:error, body |> Map.get("message")}
     end
   end
 
@@ -104,11 +108,10 @@ defmodule Github do
   Creates a webhook
   """
   def create_webhook(params) do
-    org = "revelrylabs"
     repo = params[:repo]
 
     {:ok, request} = Poison.encode(%{
-          name: "web",
+          name: params[:name],
           active: true,
           events: params[:events],
           config: %{
@@ -118,14 +121,18 @@ defmodule Github do
           }
                                    })
 
-    response = HTTPotion.post "#{@api_url}/orgs/#{org}/repos", [
+    response = HTTPotion.post "#{@api_url}/repos/#{@org_name}/#{repo}/hooks", [
       headers: request_headers(params[:access_token]),
       body: request
     ]
 
     case response.status_code do
-      201 -> {:ok, Poison.decode!(response.body) |> Map.get("id")}
-      _ -> {:error, Poison.decode!(response.body) |> Map.get("message")}
+      201 ->
+        body = Poison.decode!(response.body)
+        {:ok, body |> Map.get("id")}
+      _ ->
+        body = Poison.decode!(response.body)
+        {:error, body |> Map.get("message")}
     end
   end
 
