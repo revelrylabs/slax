@@ -19,7 +19,7 @@ defmodule Slax.Mixfile do
   def application do
     [mod: {Slax, []},
      applications: [:phoenix, :phoenix_pubsub, :cowboy, :logger, :gettext,
-                    :phoenix_ecto, :postgrex, :httpotion]]
+                    :phoenix_ecto, :postgrex, :httpotion, :yaml_front_matter]]
   end
 
   # Specifies which paths to compile per environment.
@@ -38,6 +38,7 @@ defmodule Slax.Mixfile do
       {:gettext, "~> 0.11"},
       {:cowboy, "~> 1.0"},
       {:httpotion, "~> 3.0.0"},
+      {:yaml_front_matter, "~> 0.2.0"}
    ]
   end
 

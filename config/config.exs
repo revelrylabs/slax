@@ -46,6 +46,13 @@ config :slax, :board_checker,
   secret: System.get_env("BOARD_CHECKER_SECRET"),
   url: System.get_env("BOARD_CHECKER_URL")
 
+config :slax, :reusable_stories, System.get_env("REUSABLE_STORIES_REPO")
+
+config :slax, :reusable_stories_paths,
+  prework: "stories/pre-work",
+  registration: "stories/registration",
+  startproject: "stories/start-project"
+
 # Import environment specific config. This must remain at the bottom
 # of this file so it overrides the configuration defined above.
 import_config "#{Mix.env}.exs"

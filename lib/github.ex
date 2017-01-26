@@ -5,7 +5,6 @@ defmodule Github do
 
   @api_url "https://api.github.com"
   @oauth_url "https://github.com/login/oauth"
-  @org_name Application.get_env(:slax, :github)[:org_name]
 
   @doc """
   URL to send a user to authorize your application.
@@ -38,7 +37,8 @@ defmodule Github do
   def create_issue(params) do
     {:ok, request} = Poison.encode(%{
       title: params[:title],
-      body: params[:body]
+      body: params[:body],
+      labels: Map.get(params, :labels, [])
     })
 
     response = HTTPotion.post "#{@api_url}/repos/#{params[:repo]}/issues", [
@@ -83,13 +83,14 @@ defmodule Github do
   Creates a repo
   """
   def create_repo(params) do
+    org_name = params[:org_name]
 
     {:ok, request} = Poison.encode(%{
           name: params[:name],
           private: true
                                    })
 
-    response = HTTPotion.post "#{@api_url}/orgs/#{@org_name}/repos", [
+    response = HTTPotion.post "#{@api_url}/orgs/#{org_name}/repos", [
       headers: request_headers(params[:access_token]),
       body: request
     ]
@@ -121,7 +122,7 @@ defmodule Github do
           }
                                    })
 
-    response = HTTPotion.post "#{@api_url}/repos/#{@org_name}/#{repo}/hooks", [
+    response = HTTPotion.post "#{@api_url}/repos/#{repo}/hooks", [
       headers: request_headers(params[:access_token]),
       body: request
     ]
@@ -133,6 +134,55 @@ defmodule Github do
       _ ->
         body = Poison.decode!(response.body)
         {:error, body |> Map.get("message")}
+    end
+  end
+
+
+  @doc """
+  Gets the tree for the given repo
+  """
+  def fetch_tree(params) do
+    repo = params[:repo]
+
+    response = HTTPotion.get "#{@api_url}/repos/#{repo}/git/trees/master?recursive=1", [
+      headers: request_headers(params[:access_token])
+    ]
+
+    case handle_response(response) do
+      {:ok, _} = ok ->
+        ok
+      {:error, data} ->
+        {:error, data["message"]}
+    end
+  end
+
+
+  @doc """
+  Gets the specified blob
+  """
+  def fetch_blob(params) do
+    repo = params[:repo]
+    sha = params[:sha]
+
+    response = HTTPotion.get "#{@api_url}/repos/#{repo}/git/blobs/#{sha}", [
+      headers: request_headers(params[:access_token])
+    ]
+
+    case handle_response(response) do
+      {:ok, _} = ok ->
+        ok
+      {:error, data} ->
+        {:error, data["message"]}
+    end
+  end
+
+  defp handle_response(response) do
+    body = Poison.decode!(response.body)
+    case response.status_code do
+      ok when ok in 200..299 ->
+        {:ok, body}
+      _ ->
+        {:error, body}
     end
   end
 
