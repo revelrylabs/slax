@@ -49,7 +49,7 @@ defmodule Slax.Project do
     end
   end
 
-  defp create_github_repo(results, _) do
+  defp create_github_repo(results, _, _) do
     results
   end
 
@@ -67,7 +67,7 @@ defmodule Slax.Project do
     end
   end
 
-  defp create_slack_channel(results, _) do
+  defp create_slack_channel(results) do
     results
   end
 
@@ -95,7 +95,7 @@ defmodule Slax.Project do
     end
   end
 
-  defp add_lintron(results, _) do
+  defp add_lintron(results, _, _) do
     results
   end
 
@@ -109,7 +109,7 @@ defmodule Slax.Project do
     end
   end
 
-  defp add_board_checker(results, _) do
+  defp add_board_checker(results, _, _) do
     results
   end
 
@@ -155,7 +155,7 @@ defmodule Slax.Project do
         end
 
         results = if length(issue_ids) > 0 do
-          results = Map.put(results, :reusable_stories, true)
+          Map.put(results, :reusable_stories, true)
           |> Map.update(:success, %{}, fn(x) -> Map.put(x, :resuseable_stories, "Reuseable Stories Created") end)
         else
           results
@@ -223,6 +223,10 @@ defmodule Slax.Project do
     end)
   end
 
+  @doc"""
+  Formats results map to be displayed nicely within Slack
+  """
+  @spec format_results(map) :: binary
   def format_results(results) do
     @steps
     |> Enum.map(&format_result(results, &1))
