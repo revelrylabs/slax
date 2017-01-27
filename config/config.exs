@@ -53,6 +53,10 @@ config :slax, :reusable_stories_paths,
   registration: "stories/registration",
   startproject: "stories/start-project"
 
+config :slax, :ten_thousand_feet,
+  api_endpoint: System.get_env("TEN_THOUSAND_FEET_API_ENDPOINT"),
+  auth_token: System.get_env("TEN_THOUSAND_FEET_AUTH_TOKEN")
+
 # Import environment specific config. This must remain at the bottom
 # of this file so it overrides the configuration defined above.
 import_config "#{Mix.env}.exs"
