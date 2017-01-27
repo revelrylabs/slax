@@ -1,4 +1,8 @@
 defmodule Slax.Project do
+  @moduledoc """
+  Automates creation of a new project
+  """
+
   @steps [
     :project_name,
     :github_repo,
@@ -9,6 +13,19 @@ defmodule Slax.Project do
     :ten_thousand_feet
   ]
 
+  @doc """
+  Automates creating a new project.
+  This includes:
+  * Add private GitHub repo
+  * Create Slack channel
+  * Create 10000ft project
+  * Add general issues to GitHub Repo
+  * Adds Lintron webhook to GitHub Repo
+  * Adds Board Checker to GitHub Repo
+
+  If some steps fail, others will still try to complete, unless they depend on previous steps
+  """
+  @spec new_project(binary, binary) :: map
   def new_project(name, github_access_token) do
     org_name = Application.get_env(:slax, :github)[:org_name]
     story_repo = Application.get_env(:slax, :reusable_stories)
@@ -17,6 +34,12 @@ defmodule Slax.Project do
     new_project(org_name, name, github_access_token, story_repo, story_paths)
   end
 
+  @doc """
+  Automates creating a new project.
+
+  See new_project/2
+  """
+  @spec new_project(binary, binary, binary, binary, keyword(binary)) :: map
   def new_project(org_name, name, github_access_token, story_repo, story_paths) do
     %{errors: %{}, success: %{}}
     |> parse_project_name(name)
