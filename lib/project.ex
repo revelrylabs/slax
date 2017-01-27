@@ -214,7 +214,7 @@ defmodule Slax.Project do
 
 
   def format_results(results) do
-    @parts
+    @steps
     |> Enum.map(&format_result(results, &1))
     |> Enum.join("\n")
   end
