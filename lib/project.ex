@@ -110,7 +110,6 @@ defmodule Slax.Project do
 
         errors = tree_errors ++ parse_errors ++ github_errors
 
-
         results = if length(errors) > 0 do
           errors = Enum.map(errors, fn({:error, path, message}) -> "#{path}: #{message}" end )
           |> Enum.join("\n")
@@ -134,11 +133,11 @@ defmodule Slax.Project do
   end
 
   defp process_tree(data, story_repo, story_paths, github_access_token) do
-    data
+    Map.get(data, "tree", [])
     |> Enum.filter(fn(x) -> x["type"] == "blob" && String.ends_with?(x["path"], ".md") end)
     |> Enum.filter(fn(x) -> String.starts_with?(x["path"], Keyword.values(story_paths) ) end)
     |> Enum.map(fn(x) ->
-      case Github.fetch_tree(%{ access_token: github_access_token, repo: story_repo, sha: x["sha"]}) do
+      case Github.fetch_blob(%{ access_token: github_access_token, repo: story_repo, sha: x["sha"]}) do
         {:ok, data} ->
           {:ok, x["path"], data["content"]}
         {:error, message} ->
@@ -154,7 +153,7 @@ defmodule Slax.Project do
   defp decode_blobs(blobs) do
     blobs
     |> Enum.map(fn({:ok, path, content}) ->
-      with {:ok, issue} <- Base.decode64(content),
+      with {:ok, issue} <- Base.decode64(content |> String.replace("\n", "")),
       {:ok, front_matter, body} <- YamlFrontMatter.parse(issue)
         do
         {:ok, path, front_matter, body}
@@ -187,7 +186,6 @@ defmodule Slax.Project do
       ({:error, _}) -> false
     end)
   end
-
 
   def format_results(results) do
     [:project_name, :github_repo, :slack_channel, :lintron, :board_checker, :resuseable_stories]
