@@ -20,7 +20,7 @@ defmodule Slax.ProjectController do
 
   def start(conn, _) do
     text conn, """
-    *New project commands:*
+    *Project commands:*
     /project new <project_name>
     """
   end
