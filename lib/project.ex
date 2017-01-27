@@ -43,7 +43,7 @@ defmodule Slax.Project do
     case Github.create_repo(%{name: project_name, access_token: github_access_token, org_name: org_name}) do
       {:ok, repo_url} ->
         Map.put(results, :github_repo, repo_url)
-        |> Map.update(:success, %{}, fn(x) -> Map.put(x, :github_repo, "Github Repo Created: #{repo_url}") end)
+        |> Map.update(:success, %{}, fn(x) -> Map.put(x, :github_repo, "Github Repo Created: <#{repo_url}>") end)
       {:error, message} ->
         Map.update(results, :errors, %{}, fn(x) -> Map.put(x, :github_repo, message) end)
     end
