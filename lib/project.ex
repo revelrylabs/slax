@@ -1,13 +1,31 @@
 defmodule Slax.Project do
+  @steps [
+    :project_name,
+    :github_repo,
+    :slack_channel,
+    :lintron,
+    :board_checker,
+    :resuseable_stories,
+    :ten_thousand_feet
+  ]
+
+  def new_project(name, github_access_token) do
+    org_name = Application.get_env(:slax, :github)[:org_name]
+    story_repo = Application.get_env(:slax, :reusable_stories)
+    story_paths = Application.get_env(:slax, :reusable_stories_paths)
+
+    new_project(org_name, name, github_access_token, story_repo, story_paths)
+  end
 
   def new_project(org_name, name, github_access_token, story_repo, story_paths) do
     %{errors: %{}, success: %{}}
     |> parse_project_name(name)
     |> create_github_repo(github_access_token, org_name)
     |> create_slack_channel
+    |> create_10000ft_project
+    |> create_reusable_stories(github_access_token, org_name, story_repo, story_paths)
     |> add_lintron(github_access_token, org_name)
     |> add_board_checker(github_access_token, org_name)
-    |> create_reusable_stories(github_access_token, org_name, story_repo, story_paths)
   end
 
   defp parse_project_name(results, text) do
@@ -49,13 +67,27 @@ defmodule Slax.Project do
     results
   end
 
+  defp create_10000ft_project(%{ project_name: project_name } = results) do
+    case TenThousandFeet.create_project(project_name) do
+      :ok ->
+        Map.put(results, :ten_thousand_feet, true)
+        |> Map.update(:success, %{}, fn(x) -> Map.put(x, :ten_thousand_feet, "10000ft Project Created: #{project_name}") end)
+      {:error, message} ->
+        Map.update(results, :errors, %{}, fn(x) -> Map.put(x, :ten_thousand_feet, message) end)
+    end
+  end
+
+  defp create_10000ft_project(results) do
+    results
+  end
+
   defp add_lintron(%{ project_name: project_name, github_repo: _ } = results, github_access_token, org_name) do
     case Github.create_webhook(lintron_params(project_name, github_access_token, org_name)) do
       {:ok, _} ->
         Map.put(results, :lintron, true)
         |> Map.update(:success, %{}, fn(x) -> Map.put(x, :lintron, "Lintron Created") end)
-      {:error, _} ->
-        Map.update(results, :errors, %{}, fn(x) -> Map.put(x, :lintron, "Unable to add Lintron") end)
+      {:error, message} ->
+        Map.update(results, :errors, %{}, fn(x) -> Map.put(x, :lintron, message) end)
     end
   end
 
@@ -68,8 +100,8 @@ defmodule Slax.Project do
       {:ok, _} ->
         Map.put(results, :board_checker, true)
         |> Map.update(:success, %{}, fn(x) -> Map.put(x, :lintron, "Board Checker Created") end)
-      {:error, _} ->
-        Map.update(results, :errors, %{}, fn(x) -> Map.put(x, :board_checker, "Unable to add Board Checker") end)
+      {:error, message} ->
+        Map.update(results, :errors, %{}, fn(x) -> Map.put(x, :board_checker, message) end)
     end
   end
 
@@ -174,7 +206,7 @@ defmodule Slax.Project do
     issues
     |> Enum.map(fn({:ok, path, front_matter, body}) ->
       params = %{ access_token: github_access_token, repo: repo, title: front_matter["title"], labels: List.wrap(Map.get(front_matter, "labels", [])), body: body }
-      case Github.create_issue do
+      case Github.create_issue(params) do
         {:ok, data} ->
           {:ok, path, data}
         {:error, message} ->
@@ -188,7 +220,7 @@ defmodule Slax.Project do
   end
 
   def format_results(results) do
-    [:project_name, :github_repo, :slack_channel, :lintron, :board_checker, :resuseable_stories]
+    @steps
     |> Enum.map(&format_result(results, &1))
     |> Enum.join("\n")
   end
@@ -218,6 +250,8 @@ defmodule Slax.Project do
         "Board Checker"
       :resuseable_stories ->
         "Reuseable Stories"
+      :ten_thousand_feet ->
+        "10000ft"
       _ ->
         ""
     end
