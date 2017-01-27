@@ -9,15 +9,23 @@ defmodule Slax.Project do
     :ten_thousand_feet
   ]
 
+  def new_project(name, github_access_token) do
+    org_name = Application.get_env(:slax, :github)[:org_name]
+    story_repo = Application.get_env(:slax, :reusable_stories)
+    story_paths = Application.get_env(:slax, :reusable_stories_paths)
+
+    new_project(org_name, name, github_access_token, story_repo, story_paths)
+  end
+
   def new_project(org_name, name, github_access_token, story_repo, story_paths) do
     %{errors: %{}, success: %{}}
     |> parse_project_name(name)
     |> create_github_repo(github_access_token, org_name)
     |> create_slack_channel
     |> create_10000ft_project
+    |> create_reusable_stories(github_access_token, org_name, story_repo, story_paths)
     |> add_lintron(github_access_token, org_name)
     |> add_board_checker(github_access_token, org_name)
-    |> create_reusable_stories(github_access_token, org_name, story_repo, story_paths)
   end
 
   defp parse_project_name(results, text) do
@@ -78,8 +86,8 @@ defmodule Slax.Project do
       {:ok, _} ->
         Map.put(results, :lintron, true)
         |> Map.update(:success, %{}, fn(x) -> Map.put(x, :lintron, "Lintron Created") end)
-      {:error, _} ->
-        Map.update(results, :errors, %{}, fn(x) -> Map.put(x, :lintron, "Unable to add Lintron") end)
+      {:error, message} ->
+        Map.update(results, :errors, %{}, fn(x) -> Map.put(x, :lintron, message) end)
     end
   end
 
@@ -92,8 +100,8 @@ defmodule Slax.Project do
       {:ok, _} ->
         Map.put(results, :board_checker, true)
         |> Map.update(:success, %{}, fn(x) -> Map.put(x, :lintron, "Board Checker Created") end)
-      {:error, _} ->
-        Map.update(results, :errors, %{}, fn(x) -> Map.put(x, :board_checker, "Unable to add Board Checker") end)
+      {:error, message} ->
+        Map.update(results, :errors, %{}, fn(x) -> Map.put(x, :board_checker, message) end)
     end
   end
 
