@@ -69,7 +69,7 @@ defmodule Slax.Project do
     end
   end
 
-  defp create_10000ft_project(results, _) do
+  defp create_10000ft_project(results) do
     results
   end
 

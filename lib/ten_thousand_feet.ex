@@ -5,7 +5,7 @@ defmodule TenThousandFeet do
   def create_project(name) do
     {:ok, request} = Poison.encode(%{ name: name })
 
-    response = HTTPotion.post @api_url <> "/projects", [
+    response = HTTPotion.post "#{@api_url}/projects", [
       headers: request_headers(@auth_token),
       body: request
     ]
