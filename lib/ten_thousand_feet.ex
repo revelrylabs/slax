@@ -3,6 +3,14 @@ defmodule TenThousandFeet do
   @auth_token Application.get_env(:slax, :ten_thousand_feet)[:auth_token]
 
   def create_project(name) do
+    if is_nil(@api_url) or is_nil(@auth_token) do
+      {:error, "10000ft not configured"}
+    else
+      handle_request(name)
+    end
+  end
+
+  defp handle_request(name) do
     {:ok, request} = Poison.encode(%{ name: name })
 
     response = HTTPotion.post "#{@api_url}/projects", [
