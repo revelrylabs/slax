@@ -5,6 +5,7 @@ defmodule Github do
 
   @api_url "https://api.github.com"
   @oauth_url "https://github.com/login/oauth"
+  @timeout_length 10_000
 
   @doc """
   URL to send a user to authorize your application.
@@ -92,7 +93,8 @@ defmodule Github do
 
     response = HTTPotion.post "#{@api_url}/orgs/#{org_name}/repos", [
       headers: request_headers(params[:access_token]),
-      body: request
+      body: request,
+      timeout: @timeout_length
     ]
 
     case response.status_code do
@@ -124,7 +126,8 @@ defmodule Github do
 
     response = HTTPotion.post "#{@api_url}/repos/#{repo}/hooks", [
       headers: request_headers(params[:access_token]),
-      body: request
+      body: request,
+      timeout: @timeout_length
     ]
 
     case response.status_code do
@@ -145,7 +148,8 @@ defmodule Github do
     repo = params[:repo]
 
     response = HTTPotion.get "#{@api_url}/repos/#{repo}/git/trees/master?recursive=1", [
-      headers: request_headers(params[:access_token])
+      headers: request_headers(params[:access_token]),
+      timeout: @timeout_length
     ]
 
     case handle_response(response) do
@@ -165,7 +169,24 @@ defmodule Github do
     sha = params[:sha]
 
     response = HTTPotion.get "#{@api_url}/repos/#{repo}/git/blobs/#{sha}", [
-      headers: request_headers(params[:access_token])
+      headers: request_headers(params[:access_token]),
+      timeout: @timeout_length
+    ]
+
+    case handle_response(response) do
+      {:ok, _} = ok ->
+        ok
+      {:error, data} ->
+        {:error, data["message"]}
+    end
+  end
+
+  def list_teams(params) do
+    org = params[:org]
+
+    response = HTTPotion.get "#{@api_url}/orgs/#{org}/teams", [
+      headers: request_headers(params[:access_token]),
+      timeout: @timeout_length
     ]
 
     case handle_response(response) do
@@ -184,16 +205,19 @@ defmodule Github do
       permission: "push"
     })
 
-    response = HTTPotion.post "#{@api_url}/teams/#{team}/repos/#{repo}", [
+    response = HTTPotion.put "#{@api_url}/teams/#{team}/repos/#{repo}", [
       headers: request_headers(params[:access_token]),
-      body: request
+      body: request,
+      timeout: @timeout_length
     ]
 
-    case handle_response(response) do
-      {:ok, _} = ok ->
-        ok
+    case response.status_code do
+      ok when ok in 200..299 ->
+        {:ok, "Created"}
       _ ->
-        {:error, data["message"]}
+        body = Poison.decode!(response.body)
+        {:error, body["message"]}
+    end
   end
 
   defp handle_response(response) do

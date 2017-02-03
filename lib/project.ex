@@ -23,6 +23,7 @@ defmodule Slax.Project do
   * Add general issues to GitHub Repo
   * Adds Lintron webhook to GitHub Repo
   * Adds Board Checker to GitHub Repo
+  * Adds Teams to GitHub Repo
 
   If some steps fail, others will still try to complete, unless they depend on previous steps
   """
