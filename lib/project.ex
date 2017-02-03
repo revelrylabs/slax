@@ -315,7 +315,7 @@ defmodule Slax.Project do
     case key do
       :project_name ->
         "Project Name"
-      :repo_url ->
+      :github_repo ->
         "Github"
       :github_org_teams ->
         "Github Teams"
