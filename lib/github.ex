@@ -176,6 +176,26 @@ defmodule Github do
     end
   end
 
+  def add_team_to_repo(params) do
+    repo = params[:repo]
+    team = params[:team]
+
+    {:ok, request} = Poison.encode(%{
+      permission: "push"
+    })
+
+    response = HTTPotion.post "#{@api_url}/teams/#{team}/repos/#{repo}", [
+      headers: request_headers(params[:access_token]),
+      body: request
+    ]
+
+    case handle_response(response) do
+      {:ok, _} = ok ->
+        ok
+      _ ->
+        {:error, data["message"]}
+  end
+
   defp handle_response(response) do
     body = Poison.decode!(response.body)
     case response.status_code do
