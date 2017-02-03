@@ -6,6 +6,7 @@ defmodule Slax.Project do
   @steps [
     :project_name,
     :github_repo,
+    :github_org_teams,
     :slack_channel,
     :lintron,
     :board_checker,
@@ -28,10 +29,11 @@ defmodule Slax.Project do
   @spec new_project(binary, binary) :: map
   def new_project(name, github_access_token) do
     org_name = Application.get_env(:slax, :github)[:org_name]
+    org_teams = Application.get_env(:slax, :github)[:org_teams]
     story_repo = Application.get_env(:slax, :reusable_stories)
     story_paths = Application.get_env(:slax, :reusable_stories_paths)
 
-    new_project(org_name, name, github_access_token, story_repo, story_paths)
+    new_project(org_name, name, github_access_token, story_repo, story_paths, org_teams)
   end
 
   @doc """
@@ -39,14 +41,15 @@ defmodule Slax.Project do
 
   See new_project/2
   """
-  @spec new_project(binary, binary, binary, binary, keyword(binary)) :: map
-  def new_project(org_name, name, github_access_token, story_repo, story_paths) do
+  @spec new_project(binary, binary, binary, binary, keyword(binary), binary) :: map
+  def new_project(org_name, name, github_access_token, story_repo, story_paths, org_teams) do
     %{errors: %{}, success: %{}}
     |> parse_project_name(name)
     |> create_github_repo(github_access_token, org_name)
     |> create_slack_channel
     |> create_10000ft_project
     |> create_reusable_stories(github_access_token, org_name, story_repo, story_paths)
+    |> add_org_teams(github_access_token, org_name, org_teams)
     |> add_lintron(github_access_token, org_name)
     |> add_board_checker(github_access_token, org_name)
   end
@@ -106,6 +109,47 @@ defmodule Slax.Project do
 
   defp create_10000ft_project(results) do
     results
+  end
+
+  defp add_org_teams(%{ project_name: project_name, github_repo: _ } = results, github_access_token, org_name, org_teams) do
+    repo = "#{org_name}/#{project_name}"
+
+    { team_ids, errors } = send_org_teams_to_github(repo, org_teams, github_access_token)
+
+    results = if length(errors) > 0 do
+      errors = Enum.map(errors, fn({:error, team, message}) -> "#{team}: #{message}" end)
+      |> Enum.join("\n")
+      Map.update(results, :errors, %{}, fn(x) -> Map.put(x, :github_org_teams, errors) end)
+    else
+      results
+    end
+
+    results = if length(team_ids) > 0 do
+      Map.put(results, :github_org_teams, true)
+      |> Map.update(:success, %{}, fn(x) -> Map.put(x, :github_org_teams, "Github Teams Added") end)
+    else
+      results
+    end
+
+    results
+  end
+
+  defp send_org_teams_to_github(repo, teams, github_access_token) do
+     teams
+     |> String.split([",", " "], trim: true)
+     |> Enum.map(fn(team) ->
+       params = %{ access_token: github_access_token, repo: repo, team: team }
+       case Github.add_team_to_repo(params) do
+         {:ok, _} ->
+           {:ok, team, "team added"}
+         {:error, message} ->
+           {:error, team, message}
+       end
+     end)
+     |> Enum.split_with(fn
+       ({:ok, _, _}) -> true
+       ({:error, _}) -> false
+     end)
   end
 
   defp add_lintron(%{ project_name: project_name, github_repo: _ } = results, github_access_token, org_name) do
@@ -271,8 +315,10 @@ defmodule Slax.Project do
     case key do
       :project_name ->
         "Project Name"
-      :repo_url ->
+      :github_repo ->
         "Github"
+      :github_org_teams ->
+        "Github Teams"
       :slack_channel ->
         "Slack"
       :lintron ->
