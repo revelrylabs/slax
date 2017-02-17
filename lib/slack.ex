@@ -43,6 +43,18 @@ defmodule Slack do
       true -> {:ok, body["channel"]}
       false -> {:error, body["error"]}
     end
-
   end
+
+  @doc """
+  Sends a message to slack with the given url
+  """
+  def send_message(url, message) do
+    request = Poison.encode!(message)
+
+    response = HTTPotion.post(url, [
+          headers: ["Content-Type": "application/json"],
+          body: request
+        ])
+  end
+
 end
