@@ -8,5 +8,6 @@ defmodule Slax.Router do
 
     post "/issue", IssueController, :start
     post "/tarpon", TarponController, :start
+    post "/project", ProjectController, :start
   end
 end

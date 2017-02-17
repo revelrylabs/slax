@@ -29,12 +29,34 @@ config :slax, Slax.Repo,
 
 config :slax, :github,
   client_id: System.get_env("GITHUB_CLIENT_ID"),
-  client_secret: System.get_env("GITHUB_CLIENT_SECRET")
+  client_secret: System.get_env("GITHUB_CLIENT_SECRET"),
+  org_name: System.get_env("GITHUB_ORG_NAME"),
+  org_teams: System.get_env("GITHUB_ORG_TEAMS")
 
 config :slax, :slack_tokens,
   issue: System.get_env("ISSUE_SLACK_TOKEN"),
   auth: System.get_env("AUTH_SLACK_TOKEN"),
-  tarpon: System.get_env("TARPON_SLACK_TOKEN")
+  tarpon: System.get_env("TARPON_SLACK_TOKEN"),
+  project: System.get_env("PROJECT_SLACK_TOKEN")
+
+config :slax, :lintron,
+  secret: System.get_env("LINTRON_SECRET"),
+  url: System.get_env("LINTRON_URL")
+
+config :slax, :board_checker,
+  secret: System.get_env("BOARD_CHECKER_SECRET"),
+  url: System.get_env("BOARD_CHECKER_URL")
+
+config :slax, :reusable_stories, System.get_env("REUSABLE_STORIES_REPO")
+
+config :slax, :reusable_stories_paths,
+  prework: "stories/pre-work",
+  registration: "stories/registration",
+  startproject: "stories/start-project"
+
+config :slax, :ten_thousand_feet,
+  api_endpoint: System.get_env("TEN_THOUSAND_FEET_API_ENDPOINT"),
+  auth_token: System.get_env("TEN_THOUSAND_FEET_AUTH_TOKEN")
 
 # Import environment specific config. This must remain at the bottom
 # of this file so it overrides the configuration defined above.
