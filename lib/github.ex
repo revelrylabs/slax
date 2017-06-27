@@ -54,6 +54,25 @@ defmodule Github do
   end
 
   @doc """
+  Create a comment on an issue
+  """
+  def create_comment(params) do
+    {:ok, request} = Poison.encode(%{
+      body: params[:body],
+    })
+
+    response = HTTPotion.post "#{@api_url}/repos/#{params[:org]}/#{params[:repo]}/issues/#{params[:issue_number]}/comments", [
+      headers: request_headers(params[:access_token]),
+      body: request
+    ]
+
+    case response.status_code do
+      201 -> {:ok, Poison.decode!(response.body) |> Map.get("html_url")}
+      _ -> {:error, Poison.decode!(response.body) |> Map.get("message")}
+    end
+  end
+
+  @doc """
   Fetch information about the currently authenticated user
   """
   def current_user_info(params) do
