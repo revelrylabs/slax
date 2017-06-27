@@ -34,6 +34,7 @@ config :slax, :github,
   org_teams: System.get_env("GITHUB_ORG_TEAMS")
 
 config :slax, :slack_tokens,
+  comment: System.get_env("COMMENT_SLACK_TOKEN"),
   issue: System.get_env("ISSUE_SLACK_TOKEN"),
   auth: System.get_env("AUTH_SLACK_TOKEN"),
   tarpon: System.get_env("TARPON_SLACK_TOKEN"),
