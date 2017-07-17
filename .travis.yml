@@ -1,2 +1,6 @@
 language: elixir
 dist: trusty
+elixir:
+  - 1.4.5
+otp_release:
+  - 20.0
