@@ -1,5 +1,7 @@
 # Slax
 
+Master status: ![TravisCI Build Status](https://travis-ci.org/revelrylabs/slax.svg)
+
 A Phoenix app that supports the following slash commands from Slack:
 
 ## Commands
