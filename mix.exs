@@ -10,7 +10,8 @@ defmodule Slax.Mixfile do
      build_embedded: Mix.env == :prod,
      start_permanent: Mix.env == :prod,
      aliases: aliases(),
-     deps: deps()]
+     deps: deps(),
+     test_coverage: [tool: Coverex.Task]]
   end
 
   # Configuration for the OTP application.
@@ -38,7 +39,9 @@ defmodule Slax.Mixfile do
       {:gettext, "~> 0.11"},
       {:cowboy, "~> 1.0"},
       {:httpotion, "~> 3.0.0"},
-      {:yaml_front_matter, "~> 0.2.0"}
+      {:yaml_front_matter, "~> 0.2.0"},
+      {:ex_doc, "~> 0.14", only: :dev, runtime: false},
+      {:coverex, "~> 1.4.10", only: :test}
    ]
   end
 

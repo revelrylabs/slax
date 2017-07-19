@@ -15,3 +15,5 @@ erl_crash.dump
 # variables.
 /config/prod.secret.exs
 /.env
+/doc/*
+/cover/*
