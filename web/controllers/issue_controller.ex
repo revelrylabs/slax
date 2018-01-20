@@ -12,7 +12,7 @@ defmodule Slax.IssueController do
   end
 
   def start(conn, %{"text" => text}) do
-    case Regex.run(~r/(.+\/[^ ]+) (.*)\n?([\s\S]*)?/, text) do
+    case Regex.run(~r/(.+?\/[^ ]+) (.*)\n?([\s\S]*)?/, text) do
       [_, repo, title, body] ->
         github_response = Github.create_issue(%{
           title: title,
