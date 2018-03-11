@@ -1,4 +1,4 @@
-defmodule Slax.Project do
+defmodule Slax.Commands.NewProject do
   @moduledoc """
   Automates creation of a new project
   """

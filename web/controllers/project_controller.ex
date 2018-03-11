@@ -4,6 +4,8 @@ defmodule Slax.ProjectController do
   plug Slax.Plugs.VerifySlackToken, :project
   plug Slax.Plugs.VerifyUser
 
+  alias Slax.Commands.NewProject
+
   def start(conn, %{"response_url" => response_url, "text" => "new " <> repo}) do
     Task.start_link(
       __MODULE__,
@@ -22,8 +24,8 @@ defmodule Slax.ProjectController do
   end
 
   def handle_new_project_request(github_access_token, repo, response_url) do
-    formatted_response = Slax.Project.new_project(String.trim(repo), github_access_token)
-    |> Slax.Project.format_results
+    formatted_response = NewProject.new_project(String.trim(repo), github_access_token)
+    |> NewProject.format_results
 
     Slack.send_message(response_url, %{
       response_type: "in_channel",
