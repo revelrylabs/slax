@@ -5,6 +5,8 @@ defmodule Slax.Schema do
 
       import Ecto.Changeset
 
+      alias __MODULE__
+
       @timestamps_opts inserted_at: :created_at
     end
   end

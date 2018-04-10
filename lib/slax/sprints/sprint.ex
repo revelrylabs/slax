@@ -1,45 +1,23 @@
 defmodule Slax.Sprint do
   @moduledoc false
 
-  require Logger
-  use Ecto.Schema
-  import Ecto.Changeset, warn: false
-  alias Comeonin.Bcrypt
+  use Slax.Schema
 
   @type t :: %__MODULE__{}
   schema "sprints" do
-    field(:start_date, Ecto.Date)
-    field(:end_date, Ecto.Date)
-    field(:project_id, :integer)
-    field(:milestone_url, :string)
-
-    timestamps()
+    #field(:start_date, :date)
+    #field(:end_date, :date)
+    belongs_to :project_repo, Slax.ProjectRepo
+    field(:issues, {:array, :integer}, default: [])
+    field(:milestone_id, :integer)
   end
 
-  def create_changeset(model, params \\ %{}) do
-    required_fields = [
-      :email,
-      :new_password,
-      :new_password_confirmation,
-      :first_name,
-      :last_name,
-      :phone_number,
-      :role_id
-    ]
+  @fields ~w(project_repo_id milestone_id issues)a
 
-    optional_fields = [
-      :cdl_number,
-      :company_name,
-      :device_token,
-      :confirmation_code,
-      :available,
-      :platform,
-      :truck_number,
-      :customer_id
-    ]
-
-    model
-    |> cast(params, required_fields ++ optional_fields)
-    |> validate_required(required_fields)
+  @doc false
+  def changeset(%Sprint{} = sprint, attrs) do
+    sprint
+    |> cast(attrs, @fields)
+    |> validate_required(@fields)
   end
 end
