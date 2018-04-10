@@ -5,8 +5,6 @@ defmodule Slax.Sprint do
 
   @type t :: %__MODULE__{}
   schema "sprints" do
-    #field(:start_date, :date)
-    #field(:end_date, :date)
     belongs_to :project_repo, Slax.ProjectRepo
     field(:issues, {:array, :integer}, default: [])
     field(:milestone_id, :integer)

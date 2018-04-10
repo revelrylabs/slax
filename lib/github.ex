@@ -98,6 +98,75 @@ defmodule Github do
     Poison.decode!(response.body)
   end
 
+  @doc """
+  Fetch a single issue
+  """
+  def fetch_issue(params) do
+    response = HTTPotion.get("#{@api_url}/repos/#{params[:repo]}/issues/#{params[:number]}", [
+      headers: request_headers(params[:access_token])
+    ])
+
+    Poison.decode!(response.body)
+  end
+
+  @doc """
+  Fetch all milestones for a repo
+  """
+  def fetch_milestones(params) do
+    query_string = URI.encode_query(%{
+      state: Map.get(params, :state, "open"),
+      sort: Map.get(params, :sort, "due_on"),
+      direction: Map.get(params, :direction, "asc"),
+    })
+
+    HTTPotion.get("#{@api_url}/repos/#{params[:repo]}/milestones?#{query_string}", [
+      headers: request_headers(params[:access_token])
+    ])
+    |> case do
+      %{status_code: 404} -> {:error, :not_found}
+      %{body: body} -> {:ok, Poison.decode!(body)}
+    end
+  end
+
+
+  @doc """
+  Create a milestone for a repo
+  """
+  def create_milestone(params) do
+    {:ok, request} = Poison.encode(%{
+      title: params[:title],
+      description: params[:description],
+    })
+
+    response = HTTPotion.post "#{@api_url}/repos/#{params[:repo]}/milestones", [
+      headers: request_headers(params[:access_token]),
+      body: request
+    ]
+
+    case response.status_code do
+      201 -> {:ok, Poison.decode!(response.body)}
+      _ -> {:error, Poison.decode!(response.body) |> Map.get("message")}
+    end
+  end
+
+  @doc """
+  Add a single issue to a milestone
+  """
+  def add_issue_to_milestone(params) do
+    {:ok, request} = Poison.encode(%{
+      milestone: params[:milestone_number]
+    })
+
+    response = HTTPotion.patch "#{@api_url}/repos/#{params[:repo]}/issues/#{params[:issue_number]}", [
+      headers: request_headers(params[:access_token]),
+      body: request
+    ]
+
+    case response.status_code do
+      200 -> {:ok, Poison.decode!(response.body)}
+      _ -> {:error, Poison.decode!(response.body) |> Map.get("message")}
+    end
+  end
 
   @doc """
   Creates a repo

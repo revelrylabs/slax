@@ -38,7 +38,8 @@ config :slax, :slack_tokens,
   issue: System.get_env("ISSUE_SLACK_TOKEN"),
   auth: System.get_env("AUTH_SLACK_TOKEN"),
   tarpon: System.get_env("TARPON_SLACK_TOKEN"),
-  project: System.get_env("PROJECT_SLACK_TOKEN")
+  project: System.get_env("PROJECT_SLACK_TOKEN"),
+  sprint: System.get_env("SPRINT_SLACK_TOKEN")
 
 config :slax, :lintron,
   secret: System.get_env("LINTRON_SECRET"),
