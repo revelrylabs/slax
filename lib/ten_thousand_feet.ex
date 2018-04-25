@@ -11,12 +11,14 @@ defmodule TenThousandFeet do
   end
 
   defp handle_request(name) do
-    {:ok, request} = Poison.encode(%{ name: name })
+    {:ok, request} = Poison.encode(%{name: name})
 
-    response = HTTPotion.post "#{@api_url}/projects", [
-      headers: request_headers(@auth_token),
-      body: request
-    ]
+    response =
+      HTTPotion.post(
+        "#{@api_url}/projects",
+        headers: request_headers(@auth_token),
+        body: request
+      )
 
     case response.status_code do
       status when status in 200..299 -> :ok
@@ -26,7 +28,7 @@ defmodule TenThousandFeet do
 
   defp request_headers(access_token) do
     [
-      "auth": "#{access_token}",
+      auth: "#{access_token}",
       "Content-Type": "application/json"
     ]
   end
