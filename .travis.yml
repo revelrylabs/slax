@@ -15,7 +15,6 @@ services:
 before_script:
   - cp config/test.exs.travis config/test.exs
 install:
-  - mkdir -p priv/repo/migrations
   - mix local.hex --force
   - mix local.rebar --force
   - mix deps.get
