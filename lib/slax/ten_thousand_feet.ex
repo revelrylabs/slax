@@ -1,9 +1,18 @@
-defmodule TenThousandFeet do
-  @api_url Application.get_env(:slax, :ten_thousand_feet)[:api_endpoint]
-  @auth_token Application.get_env(:slax, :ten_thousand_feet)[:auth_token]
+defmodule Slax.TenThousandFeet do
+  defp config() do
+    Application.get_env(:slax, __MODULE__)
+  end
+
+  defp api_url() do
+    config()[:api_endpoint]
+  end
+
+  defp auth_token() do
+    config()[:auth_token]
+  end
 
   def create_project(name) do
-    if is_nil(@api_url) or is_nil(@auth_token) do
+    if is_nil(api_url()) or is_nil(auth_token()) do
       {:error, "10000ft not configured"}
     else
       handle_request(name)
@@ -15,8 +24,8 @@ defmodule TenThousandFeet do
 
     response =
       HTTPotion.post(
-        "#{@api_url}/projects",
-        headers: request_headers(@auth_token),
+        "#{api_url()}/projects",
+        headers: request_headers(auth_token()),
         body: request
       )
 

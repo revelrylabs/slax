@@ -14,5 +14,5 @@ config :slax, Slax.Repo,
   adapter: Ecto.Adapters.Postgres,
   database: "slax_test",
   hostname: "localhost",
-  port: 15432,
+  port: 5432,
   pool: Ecto.Adapters.SQL.Sandbox

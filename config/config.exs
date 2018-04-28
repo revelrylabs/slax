@@ -6,16 +6,14 @@
 use Mix.Config
 
 # General application configuration
-config :slax,
-  ecto_repos: [Slax.Repo]
+config :slax, ecto_repos: [Slax.Repo]
 
 # Configures the endpoint
 config :slax, Slax.Endpoint,
   url: [host: "localhost"],
   secret_key_base: "N4gXL4rdXzHD9kNbCBAaEKShN+mxlgX0biU+eMpc766DF1TYFf2o9kkDLvHNfv1Y",
   render_errors: [view: Slax.ErrorView, accepts: ~w(json)],
-  pubsub: [name: Slax.PubSub,
-           adapter: Phoenix.PubSub.PG2]
+  pubsub: [name: Slax.PubSub, adapter: Phoenix.PubSub.PG2]
 
 # Configures Elixir's Logger
 config :logger, :console,
@@ -56,10 +54,10 @@ config :slax, :reusable_stories_paths,
   registration: "stories/registration",
   startproject: "stories/start-project"
 
-config :slax, :ten_thousand_feet,
+config :slax, Slax.TenThousandFeet,
   api_endpoint: System.get_env("TEN_THOUSAND_FEET_API_ENDPOINT"),
   auth_token: System.get_env("TEN_THOUSAND_FEET_AUTH_TOKEN")
 
 # Import environment specific config. This must remain at the bottom
 # of this file so it overrides the configuration defined above.
-import_config "#{Mix.env}.exs"
+import_config "#{Mix.env()}.exs"
