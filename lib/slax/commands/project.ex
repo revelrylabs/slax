@@ -368,9 +368,6 @@ defmodule Slax.Commands.NewProject do
       :resuseable_stories ->
         "Reuseable Stories"
 
-      :ten_thousand_feet ->
-        "10000ft"
-
       _ ->
         ""
     end

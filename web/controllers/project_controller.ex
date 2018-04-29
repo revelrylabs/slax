@@ -8,7 +8,7 @@ defmodule Slax.ProjectController do
 
   def start(conn, %{"response_url" => response_url, "text" => "new " <> repo}) do
     Task.start_link(__MODULE__, :handle_new_project_request, [
-      conn.assigns.current_user.github_access_token,
+      conn.assigns.current_user,
       repo,
       response_url
     ])
@@ -23,10 +23,9 @@ defmodule Slax.ProjectController do
     """)
   end
 
-  def handle_new_project_request(github_access_token, repo, response_url) do
-    formatted_response =
-      NewProject.new_project(String.trim(repo), github_access_token)
-      |> NewProject.format_results()
+  def handle_new_project_request(current_user, repo, response_url) do
+    {:ok, formatted_response} =
+      Slax.CommandRouter.route(current_user, ["project", "new", String.trim(repo)])
 
     Slack.send_message(response_url, %{
       response_type: "in_channel",
