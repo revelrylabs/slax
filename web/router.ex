@@ -10,5 +10,6 @@ defmodule Slax.Router do
     post "/comment", CommentController, :start
     post "/tarpon", TarponController, :start
     post "/project", ProjectController, :start
+    post "/sprint", SprintController, :start
   end
 end
