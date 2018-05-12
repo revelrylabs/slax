@@ -30,8 +30,8 @@ defmodule Slax.Commands.NewProject do
   def new_project(name, github_access_token) do
     org_name = Application.get_env(:slax, Slax.Github)[:org_name]
     org_teams = Application.get_env(:slax, Slax.Github)[:org_teams]
-    story_repo = Application.get_env(:slax, :reusable_stories)
-    story_paths = Application.get_env(:slax, :reusable_stories_paths)
+    story_repo = Application.get_env(:slax, :reusable_stories)[:repo]
+    story_paths = Application.get_env(:slax, :reusable_stories)[:paths]
 
     new_project(org_name, name, github_access_token, story_repo, story_paths, org_teams)
   end

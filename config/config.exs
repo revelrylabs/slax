@@ -39,12 +39,13 @@ config :slax, :board_checker,
   secret: System.get_env("BOARD_CHECKER_SECRET"),
   url: System.get_env("BOARD_CHECKER_URL")
 
-config :slax, :reusable_stories, System.get_env("REUSABLE_STORIES_REPO")
-
-config :slax, :reusable_stories_paths,
-  prework: "stories/pre-work",
-  registration: "stories/registration",
-  startproject: "stories/start-project"
+config :slax, :reusable_stories,
+  repo: System.get_env("REUSABLE_STORIES_REPO"),
+  paths: [
+    prework: "stories/pre-work",
+    registration: "stories/registration",
+    startproject: "stories/start-project"
+  ]
 
 config :slax, Slax.TenThousandFeet,
   api_endpoint: System.get_env("TEN_THOUSAND_FEET_API_ENDPOINT"),
