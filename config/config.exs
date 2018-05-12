@@ -9,10 +9,10 @@ use Mix.Config
 config :slax, ecto_repos: [Slax.Repo]
 
 # Configures the endpoint
-config :slax, Slax.Endpoint,
+config :slax, SlaxWeb.Endpoint,
   url: [host: "localhost"],
   secret_key_base: "N4gXL4rdXzHD9kNbCBAaEKShN+mxlgX0biU+eMpc766DF1TYFf2o9kkDLvHNfv1Y",
-  render_errors: [view: Slax.ErrorView, accepts: ~w(json)],
+  render_errors: [view: SlaxWeb.ErrorView, accepts: ~w(json)],
   pubsub: [name: Slax.PubSub, adapter: Phoenix.PubSub.PG2]
 
 # Configures Elixir's Logger
@@ -21,9 +21,7 @@ config :logger, :console,
   metadata: [:request_id]
 
 # Configure your database
-config :slax, Slax.Repo,
-  adapter: Ecto.Adapters.Postgres,
-  url: {:system, "DATABASE_URL"}
+config :slax, Slax.Repo, adapter: Ecto.Adapters.Postgres
 
 config :slax, :github,
   client_id: System.get_env("GITHUB_CLIENT_ID"),
@@ -57,6 +55,14 @@ config :slax, :reusable_stories_paths,
 config :slax, Slax.TenThousandFeet,
   api_endpoint: System.get_env("TEN_THOUSAND_FEET_API_ENDPOINT"),
   auth_token: System.get_env("TEN_THOUSAND_FEET_AUTH_TOKEN")
+
+config :slax, Slax.Github,
+  api_url: "https://api.github.com",
+  oauth_url: "https://github.com/login/oauth"
+
+config :slax, Slax.Slack,
+  api_url: "https://slack.com/api",
+  api_token: System.get_env("SLACK_TOKEN")
 
 # Import environment specific config. This must remain at the bottom
 # of this file so it overrides the configuration defined above.

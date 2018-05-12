@@ -1,4 +1,4 @@
-defmodule Slax.ErrorHelpers do
+defmodule SlaxWeb.ErrorHelpers do
   @moduledoc """
   Conveniences for translating and building error messages.
   """
@@ -21,9 +21,9 @@ defmodule Slax.ErrorHelpers do
     #     dgettext "errors", "is invalid"
     #
     if count = opts[:count] do
-      Gettext.dngettext(Slax.Gettext, "errors", msg, msg, count, opts)
+      Gettext.dngettext(SlaxWeb.GetText, "errors", msg, msg, count, opts)
     else
-      Gettext.dgettext(Slax.Gettext, "errors", msg, opts)
+      Gettext.dgettext(SlaxWeb.GetText, "errors", msg, opts)
     end
   end
 end

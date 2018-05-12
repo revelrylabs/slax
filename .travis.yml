@@ -1,9 +1,9 @@
 language: elixir
 dist: trusty
 elixir:
-  - 1.4.5
+  - 1.6.5
 otp_release:
-  - 20.0
+  - 20.3
 cache:
   directories:
     - _build
@@ -12,8 +12,6 @@ addons:
   postgresql: "9.5"
 services:
   - postgresql
-before_script:
-  - cp config/test.exs.travis config/test.exs
 install:
   - mix local.hex --force
   - mix local.rebar --force

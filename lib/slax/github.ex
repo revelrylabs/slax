@@ -1,10 +1,20 @@
-defmodule Github do
+defmodule Slax.Github do
   @moduledoc """
   Functions for working with the Github API
   """
 
-  @api_url "https://api.github.com"
-  @oauth_url "https://github.com/login/oauth"
+  defp config() do
+    Application.get_env(:slax, __MODULE__)
+  end
+
+  defp api_url() do
+    config()[:api_url]
+  end
+
+  defp oauth_url() do
+    config()[:oauth_url]
+  end
+
   @timeout_length 10_000
 
   @doc """
@@ -15,7 +25,7 @@ defmodule Github do
   def authorize_url(params) do
     query_string = URI.encode_query(params)
 
-    "#{@oauth_url}/authorize?#{query_string}"
+    "#{oauth_url()}/authorize?#{query_string}"
   end
 
   @doc """
@@ -26,7 +36,7 @@ defmodule Github do
 
     response =
       HTTPotion.post(
-        "#{@oauth_url}/access_token",
+        "#{oauth_url()}/access_token",
         body: request_body,
         headers: [Accept: "application/json"]
       )
@@ -47,7 +57,7 @@ defmodule Github do
 
     response =
       HTTPotion.post(
-        "#{@api_url}/repos/#{params[:repo]}/issues",
+        "#{api_url()}/repos/#{params[:repo]}/issues",
         headers: request_headers(params[:access_token]),
         body: request
       )
@@ -69,7 +79,7 @@ defmodule Github do
 
     response =
       HTTPotion.post(
-        "#{@api_url}/repos/#{params[:org]}/#{params[:repo]}/issues/#{params[:issue_number]}/comments",
+        "#{api_url()}/repos/#{params[:org]}/#{params[:repo]}/issues/#{params[:issue_number]}/comments",
         headers: request_headers(params[:access_token]),
         body: request
       )
@@ -84,7 +94,7 @@ defmodule Github do
   Fetch information about the currently authenticated user
   """
   def current_user_info(params) do
-    response = HTTPotion.get("#{@api_url}/user", headers: request_headers(params[:access_token]))
+    response = HTTPotion.get("#{api_url()}/user", headers: request_headers(params[:access_token]))
 
     Poison.decode!(response.body)
   end
@@ -100,7 +110,7 @@ defmodule Github do
 
     response =
       HTTPotion.get(
-        "#{@api_url}/repos/#{params[:repo]}/issues?#{query_string}",
+        "#{api_url()}/repos/#{params[:repo]}/issues?#{query_string}",
         headers: request_headers(params[:access_token])
       )
 
@@ -113,7 +123,7 @@ defmodule Github do
   def fetch_issue(params) do
     response =
       HTTPotion.get(
-        "#{@api_url}/repos/#{params[:repo]}/issues/#{params[:number]}",
+        "#{api_url()}/repos/#{params[:repo]}/issues/#{params[:number]}",
         headers: request_headers(params[:access_token])
       )
 
@@ -132,7 +142,7 @@ defmodule Github do
       })
 
     HTTPotion.get(
-      "#{@api_url}/repos/#{params[:repo]}/milestones?#{query_string}",
+      "#{api_url()}/repos/#{params[:repo]}/milestones?#{query_string}",
       headers: request_headers(params[:access_token])
     )
     |> case do
@@ -153,7 +163,7 @@ defmodule Github do
 
     response =
       HTTPotion.post(
-        "#{@api_url}/repos/#{params[:repo]}/milestones",
+        "#{api_url()}/repos/#{params[:repo]}/milestones",
         headers: request_headers(params[:access_token]),
         body: request
       )
@@ -175,7 +185,7 @@ defmodule Github do
 
     response =
       HTTPotion.patch(
-        "#{@api_url}/repos/#{params[:repo]}/issues/#{params[:issue_number]}",
+        "#{api_url()}/repos/#{params[:repo]}/issues/#{params[:issue_number]}",
         headers: request_headers(params[:access_token]),
         body: request
       )
@@ -217,7 +227,7 @@ defmodule Github do
 
     response =
       HTTPotion.post(
-        "#{@api_url}/orgs/#{org_name}/repos",
+        "#{api_url()}/orgs/#{org_name}/repos",
         headers: request_headers(params[:access_token]),
         body: request,
         timeout: @timeout_length
@@ -243,7 +253,7 @@ defmodule Github do
 
     response =
       HTTPotion.get(
-        "#{@api_url}/repos/#{org_name}/#{name}",
+        "#{api_url()}/repos/#{org_name}/#{name}",
         headers: request_headers(params[:access_token]),
         timeout: @timeout_length
       )
@@ -282,7 +292,7 @@ defmodule Github do
 
     response =
       HTTPotion.post(
-        "#{@api_url}/repos/#{repo}/hooks",
+        "#{api_url()}/repos/#{repo}/hooks",
         headers: request_headers(params[:access_token]),
         body: request,
         timeout: @timeout_length
@@ -307,7 +317,7 @@ defmodule Github do
 
     response =
       HTTPotion.get(
-        "#{@api_url}/repos/#{repo}/git/trees/master?recursive=1",
+        "#{api_url()}/repos/#{repo}/git/trees/master?recursive=1",
         headers: request_headers(params[:access_token]),
         timeout: @timeout_length
       )
@@ -330,7 +340,7 @@ defmodule Github do
 
     response =
       HTTPotion.get(
-        "#{@api_url}/repos/#{repo}/git/blobs/#{sha}",
+        "#{api_url()}/repos/#{repo}/git/blobs/#{sha}",
         headers: request_headers(params[:access_token]),
         timeout: @timeout_length
       )
@@ -349,7 +359,7 @@ defmodule Github do
 
     response =
       HTTPotion.get(
-        "#{@api_url}/orgs/#{org}/teams",
+        "#{api_url()}/orgs/#{org}/teams",
         headers: request_headers(params[:access_token]),
         timeout: @timeout_length
       )
@@ -374,7 +384,7 @@ defmodule Github do
 
     response =
       HTTPotion.put(
-        "#{@api_url}/teams/#{team}/repos/#{repo}",
+        "#{api_url()}/teams/#{team}/repos/#{repo}",
         headers: request_headers(params[:access_token]),
         body: request,
         timeout: @timeout_length

@@ -6,7 +6,7 @@ use Mix.Config
 #
 # You should also configure the url host to something
 # meaningful, we use this information when generating URLs.
-config :slax, Slax.Endpoint,
+config :slax, SlaxWeb.Endpoint,
   http: [port: {:system, "PORT"}],
   url: [scheme: "https", host: System.get_env("SITE_URL"), port: 443],
   secret_key_base: System.get_env("SECRET_KEY_BASE")
@@ -19,7 +19,7 @@ config :logger, level: :info
 # To get SSL working, you will need to add the `https` key
 # to the previous section and set your `:url` port to 443:
 #
-#     config :slax, Slax.Endpoint,
+#     config :slax, SlaxWeb.Endpoint,
 #       ...
 #       url: [host: "example.com", port: 443],
 #       https: [port: 443,
@@ -33,7 +33,7 @@ config :logger, level: :info
 # We also recommend setting `force_ssl`, ensuring no data is
 # ever sent via http, always redirecting to https:
 #
-#     config :slax, Slax.Endpoint,
+#     config :slax, SlaxWeb.Endpoint,
 #       force_ssl: [hsts: true]
 #
 # Check `Plug.SSL` for all available options in `force_ssl`.
@@ -48,10 +48,9 @@ config :logger, level: :info
 # Alternatively, you can configure exactly which server to
 # start per endpoint:
 #
-#     config :slax, Slax.Endpoint, server: true
+#     config :slax, SlaxWeb.Endpoint, server: true
 #
 # You will also need to set the application root to `.` in order
 # for the new static assets to be served after a hot upgrade:
 #
-#     config :slax, Slax.Endpoint, root: "."
-
+#     config :slax, SlaxWeb.Endpoint, root: "."

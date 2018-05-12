@@ -1,5 +1,6 @@
-defmodule Slax.ProjectController do
-  use Slax.Web, :controller
+defmodule SlaxWeb.ProjectController do
+  use SlaxWeb, :controller
+  alias Slax.Slack
 
   plug(Slax.Plugs.VerifySlackToken, :project)
   plug(Slax.Plugs.VerifyUser)

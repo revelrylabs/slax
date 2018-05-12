@@ -1,5 +1,5 @@
-defmodule Slax.SprintController do
-  use Slax.Web, :controller
+defmodule SlaxWeb.SprintController do
+  use SlaxWeb, :controller
 
   plug(Slax.Plugs.VerifySlackToken, :sprint)
   plug(Slax.Plugs.VerifyUser)

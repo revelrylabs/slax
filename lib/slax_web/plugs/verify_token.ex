@@ -11,6 +11,7 @@ defmodule Slax.Plugs.VerifySlackToken do
     case token == local_token do
       true ->
         conn
+
       false ->
         text(conn, "Invalid slack token.") |> halt
     end

@@ -1,4 +1,4 @@
-defmodule Slax.ChannelCase do
+defmodule SlaxWeb.ChannelCase do
   @moduledoc """
   This module defines the test case to be used by
   channel tests.
@@ -25,9 +25,8 @@ defmodule Slax.ChannelCase do
       import Ecto.Changeset
       import Ecto.Query
 
-
       # The default endpoint for testing
-      @endpoint Slax.Endpoint
+      @endpoint SlaxWeb.Endpoint
     end
   end
 

@@ -1,12 +1,12 @@
 defmodule Slax.User do
-  use Slax.Web, :model
+  use SlaxWeb, :model
 
   schema "users" do
-    field :slack_id, :string
-    field :github_username, :string
-    field :github_access_token, :string
+    field(:slack_id, :string)
+    field(:github_username, :string)
+    field(:github_access_token, :string)
 
-    timestamps
+    timestamps()
   end
 
   @required_fields ~w(slack_id)
