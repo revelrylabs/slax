@@ -3,8 +3,8 @@ defmodule Slax.Plugs.VerifySlackToken do
   import Plug.Conn, only: [halt: 1]
 
   def init(app_var) do
-    Application.get_env(:slax, :slack_tokens)
-    |> Keyword.get(app_var)
+    tokens = Application.get_env(:slax, Slax.Slack)[:tokens]
+    Keyword.get(tokens, app_var)
   end
 
   def call(%Plug.Conn{params: %{"token" => token}} = conn, local_token) do

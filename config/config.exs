@@ -23,14 +23,6 @@ config :logger, :console,
 # Configure your database
 config :slax, Slax.Repo, adapter: Ecto.Adapters.Postgres
 
-config :slax, :slack_tokens,
-  comment: System.get_env("COMMENT_SLACK_TOKEN"),
-  issue: System.get_env("ISSUE_SLACK_TOKEN"),
-  auth: System.get_env("AUTH_SLACK_TOKEN"),
-  tarpon: System.get_env("TARPON_SLACK_TOKEN"),
-  project: System.get_env("PROJECT_SLACK_TOKEN"),
-  sprint: System.get_env("SPRINT_SLACK_TOKEN")
-
 config :slax, :lintron,
   secret: System.get_env("LINTRON_SECRET"),
   url: System.get_env("LINTRON_URL")
@@ -61,7 +53,15 @@ config :slax, Slax.Github,
 
 config :slax, Slax.Slack,
   api_url: "https://slack.com/api",
-  api_token: System.get_env("SLACK_TOKEN")
+  api_token: System.get_env("SLACK_TOKEN"),
+  tokens: [
+    comment: System.get_env("COMMENT_SLACK_TOKEN"),
+    issue: System.get_env("ISSUE_SLACK_TOKEN"),
+    auth: System.get_env("AUTH_SLACK_TOKEN"),
+    tarpon: System.get_env("TARPON_SLACK_TOKEN"),
+    project: System.get_env("PROJECT_SLACK_TOKEN"),
+    sprint: System.get_env("SPRINT_SLACK_TOKEN")
+  ]
 
 # Import environment specific config. This must remain at the bottom
 # of this file so it overrides the configuration defined above.
