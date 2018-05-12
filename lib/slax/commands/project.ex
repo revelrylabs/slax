@@ -28,8 +28,8 @@ defmodule Slax.Commands.NewProject do
   """
   @spec new_project(binary, binary) :: map
   def new_project(name, github_access_token) do
-    org_name = Application.get_env(:slax, :github)[:org_name]
-    org_teams = Application.get_env(:slax, :github)[:org_teams]
+    org_name = Application.get_env(:slax, Slax.Github)[:org_name]
+    org_teams = Application.get_env(:slax, Slax.Github)[:org_teams]
     story_repo = Application.get_env(:slax, :reusable_stories)
     story_paths = Application.get_env(:slax, :reusable_stories_paths)
 

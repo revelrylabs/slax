@@ -23,12 +23,6 @@ config :logger, :console,
 # Configure your database
 config :slax, Slax.Repo, adapter: Ecto.Adapters.Postgres
 
-config :slax, :github,
-  client_id: System.get_env("GITHUB_CLIENT_ID"),
-  client_secret: System.get_env("GITHUB_CLIENT_SECRET"),
-  org_name: System.get_env("GITHUB_ORG_NAME"),
-  org_teams: System.get_env("GITHUB_ORG_TEAMS")
-
 config :slax, :slack_tokens,
   comment: System.get_env("COMMENT_SLACK_TOKEN"),
   issue: System.get_env("ISSUE_SLACK_TOKEN"),
@@ -58,7 +52,11 @@ config :slax, Slax.TenThousandFeet,
 
 config :slax, Slax.Github,
   api_url: "https://api.github.com",
-  oauth_url: "https://github.com/login/oauth"
+  oauth_url: "https://github.com/login/oauth",
+  client_id: System.get_env("GITHUB_CLIENT_ID"),
+  client_secret: System.get_env("GITHUB_CLIENT_SECRET"),
+  org_name: System.get_env("GITHUB_ORG_NAME"),
+  org_teams: System.get_env("GITHUB_ORG_TEAMS")
 
 config :slax, Slax.Slack,
   api_url: "https://slack.com/api",

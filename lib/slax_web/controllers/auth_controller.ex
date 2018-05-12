@@ -20,7 +20,7 @@ defmodule SlaxWeb.AuthController do
 
   def github_redirect(conn, %{"state" => state}) do
     client_id =
-      Application.get_env(:slax, :github)
+      Application.get_env(:slax, Slax.Github)
       |> Keyword.get(:client_id)
 
     authorization_url =
@@ -34,7 +34,7 @@ defmodule SlaxWeb.AuthController do
   end
 
   def github_callback(conn, %{"state" => state, "code" => code}) do
-    github_creds = Application.get_env(:slax, :github)
+    github_creds = Application.get_env(:slax, Slax.Github)
 
     access_token =
       Github.fetch_access_token(%{
