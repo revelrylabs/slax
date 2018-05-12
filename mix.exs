@@ -45,10 +45,10 @@ defmodule Slax.Mixfile do
       {:phoenix_pubsub, "~> 1.0.0"},
       {:phoenix_ecto, "~> 3.3"},
       {:postgrex, ">= 0.0.0"},
-      {:gettext, "~> 0.11"},
+      {:gettext, "~> 0.15"},
       {:cowboy, "~> 1.0"},
-      {:httpotion, "~> 3.0.0"},
-      {:yaml_front_matter, "~> 0.2.0"},
+      {:httpotion, "~> 3.0"},
+      {:yaml_front_matter, "~> 0.3.0"},
       {:ex_doc, "~> 0.18", only: :dev, runtime: false},
       {:excoveralls, "~> 0.7", only: :test},
       {:bypass, "~> 0.8.1", only: :test}
