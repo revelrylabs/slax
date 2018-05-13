@@ -23,6 +23,10 @@ config :logger, :console,
 # Configure your database
 config :slax, Slax.Repo, adapter: Ecto.Adapters.Postgres
 
+config :slax, :integrations,
+  github: Slax.Github,
+  slack: Slax.Slack
+
 config :slax, :lintron,
   secret: System.get_env("LINTRON_SECRET"),
   url: System.get_env("LINTRON_URL")

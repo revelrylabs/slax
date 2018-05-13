@@ -1,3 +1,6 @@
 ExUnit.start()
 Application.ensure_all_started(:bypass)
+Mox.defmock(Slax.SlackMock, for: Slax.SlackBehaviour)
+Mox.defmock(Slax.GithubMock, for: Slax.GithubBehaviour)
+Application.put_env(:slax, :integrations, slack: Slax.SlackMock, github: Slax.GithubMock)
 Ecto.Adapters.SQL.Sandbox.mode(Slax.Repo, :manual)

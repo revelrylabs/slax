@@ -16,3 +16,14 @@ config :slax, Slax.Repo,
   hostname: "localhost",
   port: 5432,
   pool: Ecto.Adapters.SQL.Sandbox
+
+config :slax, Slax.Slack,
+  api_token: "token",
+  tokens: [
+    comment: "token",
+    issue: "token",
+    auth: "token",
+    tarpon: "token",
+    project: "token",
+    sprint: "token"
+  ]
