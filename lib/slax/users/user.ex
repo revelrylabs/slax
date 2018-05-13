@@ -12,14 +12,8 @@ defmodule Slax.User do
   @required_fields ~w(slack_id)
   @optional_fields ~w(github_username github_access_token)
 
-  @doc """
-  Creates a changeset based on the `model` and `params`.
-
-  If no params are provided, an invalid changeset is returned
-  with no validation performed.
-  """
-  def changeset(model, params \\ :empty) do
-    model
+  def changeset(user, params \\ %{}) do
+    user
     |> cast(params, @required_fields, @optional_fields)
   end
 end

@@ -1,7 +1,7 @@
 defmodule SlaxWeb.AuthController do
   use SlaxWeb, :controller
 
-  alias Slax.{Repo, User, Integrations}
+  alias Slax.{Users, Integrations}
 
   plug(Slax.Plugs.VerifySlackToken, :auth)
 
@@ -49,15 +49,12 @@ defmodule SlaxWeb.AuthController do
         access_token: access_token
       })
 
-    case Repo.get_by(User, slack_id: state) do
-      nil -> %User{slack_id: state}
-      user -> user
-    end
-    |> User.changeset(%{
+    params = %{
       github_username: github_username,
       github_access_token: access_token
-    })
-    |> Repo.insert_or_update()
+    }
+
+    Users.create_or_update_user(state, params)
 
     text(conn, "Authentication successful! You can close this window.")
   end

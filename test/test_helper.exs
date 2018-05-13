@@ -1,3 +1,4 @@
+ExUnit.configure(exclude: [skip: true])
 ExUnit.start()
 Application.ensure_all_started(:bypass)
 Mox.defmock(Slax.SlackMock, for: Slax.SlackBehaviour)

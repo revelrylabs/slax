@@ -7,7 +7,7 @@ defmodule Slax.Plugs.VerifyUser do
   end
 
   def call(%Plug.Conn{params: %{"user_id" => user_id}} = conn, _) do
-    case Slax.Repo.get_by(Slax.User, slack_id: user_id) do
+    case Slax.Users.get_user(user_id) do
       nil -> text(conn, "You need to authenticate! use `/auth github`") |> halt
       user -> assign(conn, :current_user, user)
     end
