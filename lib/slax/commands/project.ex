@@ -2,7 +2,7 @@ defmodule Slax.Commands.NewProject do
   @moduledoc """
   Automates creation of a new project
   """
-  alias Slax.{Github, Slack}
+  alias Slax.Integrations
 
   @steps [
     :project_name,
@@ -75,7 +75,7 @@ defmodule Slax.Commands.NewProject do
   end
 
   defp create_github_repo(%{project_name: project_name} = results, github_access_token, org_name) do
-    case Github.find_or_create_repo(%{
+    case Integrations.github().find_or_create_repo(%{
            name: project_name,
            access_token: github_access_token,
            org_name: org_name
@@ -96,7 +96,7 @@ defmodule Slax.Commands.NewProject do
   end
 
   defp create_slack_channel(%{project_name: project_name} = results) do
-    case Slack.create_channel(String.downcase(project_name)) do
+    case Integrations.slack().create_channel(String.downcase(project_name)) do
       {:ok, channel} ->
         channel_name = channel["name"]
         channel_id = channel["id"]
@@ -156,7 +156,7 @@ defmodule Slax.Commands.NewProject do
     |> Enum.map(fn team ->
       params = %{access_token: github_access_token, repo: repo, team: team}
 
-      case Github.add_team_to_repo(params) do
+      case Integrations.github().add_team_to_repo(params) do
         {:ok, _} ->
           {:ok, team, "team added"}
 
@@ -176,7 +176,7 @@ defmodule Slax.Commands.NewProject do
          webhook_key,
          success_message
        ) do
-    case Github.create_webhook(params) do
+    case Integrations.github().create_webhook(params) do
       {:ok, _} ->
         Map.put(results, webhook_key, true)
         |> Map.update(:success, %{}, fn x -> Map.put(x, webhook_key, success_message) end)
@@ -221,7 +221,7 @@ defmodule Slax.Commands.NewProject do
        ) do
     repo = "#{org_name}/#{project_name}"
 
-    case Github.fetch_tree(%{access_token: github_access_token, repo: story_repo}) do
+    case Integrations.github().fetch_tree(%{access_token: github_access_token, repo: story_repo}) do
       {:ok, data} ->
         {blobs, tree_errors} = process_tree(data, story_repo, story_paths, github_access_token)
         {parsed_issues, parse_errors} = decode_blobs(blobs)
@@ -264,7 +264,11 @@ defmodule Slax.Commands.NewProject do
     |> Enum.filter(fn x -> x["type"] == "blob" && String.ends_with?(x["path"], ".md") end)
     |> Enum.filter(fn x -> String.starts_with?(x["path"], Keyword.values(story_paths)) end)
     |> Enum.map(fn x ->
-      case Github.fetch_blob(%{access_token: github_access_token, repo: story_repo, sha: x["sha"]}) do
+      case Integrations.github().fetch_blob(%{
+             access_token: github_access_token,
+             repo: story_repo,
+             sha: x["sha"]
+           }) do
         {:ok, data} ->
           {:ok, x["path"], data["content"]}
 
@@ -309,7 +313,7 @@ defmodule Slax.Commands.NewProject do
         body: body
       }
 
-      case Github.create_issue(params) do
+      case Integrations.github().create_issue(params) do
         {:ok, data} ->
           {:ok, path, data}
 

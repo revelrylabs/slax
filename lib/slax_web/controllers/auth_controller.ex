@@ -1,7 +1,7 @@
 defmodule SlaxWeb.AuthController do
   use SlaxWeb, :controller
 
-  alias Slax.{Repo, User, Github}
+  alias Slax.{Repo, User, Integrations}
 
   plug(Slax.Plugs.VerifySlackToken, :auth)
 
@@ -24,7 +24,7 @@ defmodule SlaxWeb.AuthController do
       |> Keyword.get(:client_id)
 
     authorization_url =
-      Github.authorize_url(%{
+      Integrations.github().authorize_url(%{
         client_id: client_id,
         scope: "repo",
         state: state
@@ -37,7 +37,7 @@ defmodule SlaxWeb.AuthController do
     github_creds = Application.get_env(:slax, Slax.Github)
 
     access_token =
-      Github.fetch_access_token(%{
+      Integrations.github().fetch_access_token(%{
         client_id: github_creds[:client_id],
         client_secret: github_creds[:client_secret],
         code: code,
@@ -45,7 +45,7 @@ defmodule SlaxWeb.AuthController do
       })
 
     %{"login" => github_username} =
-      Github.current_user_info(%{
+      Integrations.github().current_user_info(%{
         access_token: access_token
       })
 

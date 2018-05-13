@@ -2,7 +2,7 @@ defmodule SlaxWeb.CommentController do
   @moduledoc """
   Entry point to create Github comments
   """
-  alias Slax.Github
+  alias Slax.Integrations
 
   use SlaxWeb, :controller
 
@@ -23,7 +23,7 @@ defmodule SlaxWeb.CommentController do
     case Regex.run(~r/#{issue_number_pattern}\s+([\s\S]+)/, text) do
       [_, org, repo, issue_number, comment_body] ->
         github_response =
-          Github.create_comment(%{
+          Integrations.github().create_comment(%{
             org: org,
             repo: repo,
             issue_number: issue_number,

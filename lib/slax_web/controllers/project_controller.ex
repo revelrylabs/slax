@@ -1,6 +1,6 @@
 defmodule SlaxWeb.ProjectController do
   use SlaxWeb, :controller
-  alias Slax.Slack
+  alias Slax.Integrations
 
   plug(Slax.Plugs.VerifySlackToken, :project)
   plug(Slax.Plugs.VerifyUser)
@@ -29,7 +29,7 @@ defmodule SlaxWeb.ProjectController do
       NewProject.new_project(String.trim(repo), github_access_token)
       |> NewProject.format_results()
 
-    Slack.send_message(response_url, %{
+    Integrations.slack().send_message(response_url, %{
       response_type: "in_channel",
       text: formatted_response
     })
