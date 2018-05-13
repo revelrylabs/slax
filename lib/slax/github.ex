@@ -114,7 +114,8 @@ defmodule Slax.Github do
         headers: request_headers(params[:access_token])
       )
 
-    Poison.decode!(response.body)
+    response.body
+    |> Poison.decode!()
   end
 
   @doc """
