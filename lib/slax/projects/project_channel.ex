@@ -12,4 +12,3 @@ defmodule Slax.ProjectChannel do
     timestamps()
   end
 end
-

@@ -2,7 +2,7 @@ use Mix.Config
 
 # We don't run a server during test. If one is required,
 # you can enable the server option below.
-config :slax, Slax.Endpoint,
+config :slax, SlaxWeb.Endpoint,
   http: [port: 4001],
   server: false
 
@@ -16,3 +16,14 @@ config :slax, Slax.Repo,
   hostname: "localhost",
   port: 5432,
   pool: Ecto.Adapters.SQL.Sandbox
+
+config :slax, Slax.Slack,
+  api_token: "token",
+  tokens: [
+    comment: "token",
+    issue: "token",
+    auth: "token",
+    tarpon: "token",
+    project: "token",
+    sprint: "token"
+  ]

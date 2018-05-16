@@ -10,7 +10,7 @@ A Phoenix app that supports the following slash commands from Slack:
 git clone https://github.com/revelrylabs/slax
 mix deps.get
 mix ecto.create && mix ecto.migrate
-mix phoenix.server
+mix phx.server
 ```
 
 ## Configuration
@@ -59,4 +59,3 @@ Bug reports and pull requests are welcome on GitHub at https://github.com/revelr
 
 Everyone is welcome to participate in the project. We expect contributors to
 adhere the Contributor Covenant Code of Conduct (see [CODE_OF_CONDUCT.md](https://github.com/revelrylabs/slax/blob/master/CODE_OF_CONDUCT.md)).
-

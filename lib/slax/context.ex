@@ -7,4 +7,3 @@ defmodule Slax.Context do
     end
   end
 end
-

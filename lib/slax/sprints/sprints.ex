@@ -5,7 +5,7 @@ defmodule Slax.Sprints do
 
   use Slax.Context
 
-  alias Slax.{ProjectRepo, Sprint}
+  alias Slax.{Sprint, Github}
 
   @doc """
   Create a new sprint commitment based on a list of GitHub issue numbers
@@ -25,7 +25,7 @@ defmodule Slax.Sprints do
     repo = "#{repo.org_name}/#{repo.repo_name}"
 
     issue_numbers
-    |> Enum.reduce({:ok, [], nil}, fn number, {_, messages, _} = acc ->
+    |> Enum.reduce({:ok, [], nil}, fn number, {_, messages, _} ->
       %{repo: repo, number: number, access_token: user.github_access_token}
       |> Github.fetch_issue()
       |> case do
@@ -71,11 +71,11 @@ defmodule Slax.Sprints do
 
         {:ok, Map.get(milestone, "number"), params}
 
-      milestone ->
-        {:ok, Map.get(milestone, "number"), params}
-
       {:error, _} ->
         {:error, "Could not fetch milestones for the repo", params}
+
+      milestone ->
+        {:ok, Map.get(milestone, "number"), params}
     end
   end
 

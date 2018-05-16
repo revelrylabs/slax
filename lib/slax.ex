@@ -8,24 +8,16 @@ defmodule Slax do
 
     # Define workers and child supervisors to be supervised
     children = [
-      # Start the Ecto repository
       supervisor(Slax.Repo, []),
-      # Start the endpoint when the application starts
-      supervisor(Slax.Endpoint, []),
-      # Start your own worker by calling: Slax.Worker.start_link(arg1, arg2, arg3)
-      # worker(Slax.Worker, [arg1, arg2, arg3]),
+      supervisor(SlaxWeb.Endpoint, [])
     ]
 
-    # See http://elixir-lang.org/docs/stable/elixir/Supervisor.html
-    # for other strategies and supported options
     opts = [strategy: :one_for_one, name: Slax.Supervisor]
     Supervisor.start_link(children, opts)
   end
 
-  # Tell Phoenix to update the endpoint configuration
-  # whenever the application is updated.
   def config_change(changed, _new, removed) do
-    Slax.Endpoint.config_change(changed, removed)
+    SlaxWeb.Endpoint.config_change(changed, removed)
     :ok
   end
 end
