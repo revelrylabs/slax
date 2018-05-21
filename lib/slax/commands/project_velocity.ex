@@ -6,6 +6,9 @@ defmodule Slax.Commands.ProjectVelocity do
   Finds the Velocity for sprints
   """
 
+  # **TODO** Update to use data captured in Database instead of
+  # Using Github API directory
+
   @doc """
   Gets the velocity for the given sprint.
   The issues in the originally set in the
