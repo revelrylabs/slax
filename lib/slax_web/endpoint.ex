@@ -44,5 +44,6 @@ defmodule SlaxWeb.Endpoint do
     signing_salt: "mSCzFYPz"
   )
 
+  plug(SlaxWeb.Plugs.SlackSSLCheck)
   plug(SlaxWeb.Router)
 end
