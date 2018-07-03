@@ -49,6 +49,7 @@ defmodule Slax.Mixfile do
       {:cowboy, "~> 1.0"},
       {:httpotion, "~> 3.0"},
       {:yaml_front_matter, "~> 0.3.0"},
+      {:sage, "~> 0.4.0"},
       {:ex_doc, "~> 0.18", only: :dev, runtime: false},
       {:excoveralls, "~> 0.7", only: :test},
       {:bypass, "~> 0.8.1", only: :test},

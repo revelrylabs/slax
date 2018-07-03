@@ -6,6 +6,8 @@ defmodule SlaxWeb.Router do
     get("/auth/github_redirect", AuthController, :github_redirect)
     get("/auth/github_callback", AuthController, :github_callback)
 
+    post("/slack_callbacks", SlackCallbackController, :start)
+
     post("/issue", IssueController, :start)
     post("/comment", CommentController, :start)
     post("/tarpon", TarponController, :start)

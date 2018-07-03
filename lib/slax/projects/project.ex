@@ -7,6 +7,7 @@ defmodule Slax.Project do
   schema "projects" do
     field(:name, :string)
     has_many(:repos, Slax.ProjectRepo)
+    has_many(:channels, Slax.ProjectChannel)
 
     timestamps()
   end

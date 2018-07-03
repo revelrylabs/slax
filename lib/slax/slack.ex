@@ -35,6 +35,25 @@ defmodule Slax.Slack do
   end
 
   @doc """
+  Update a chat message (useful for interactive messages)
+  """
+  def update_message(%{channel_id: channel_id, timestamp: timestamp, message: message}) do
+    request =
+      URI.encode_query(
+        token: api_token(),
+        channel: channel_id,
+        ts: timestamp,
+        text: message
+      )
+
+    HTTPotion.post(
+      "#{api_url()}/chat.update",
+      headers: ["Content-Type": "application/x-www-form-urlencoded"],
+      body: request
+    )
+  end
+
+  @doc """
   Add a channel
   """
   def create_channel(name) do
