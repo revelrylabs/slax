@@ -6,7 +6,7 @@ defmodule Slax.Sprints.ConfirmCommitmentSaga do
   confirm_sprint_commitment/1 is the main entry point
 
   It uses Sage for the saga pattern but keeps all CRUD functions in their
-  respective contexts
+  respective contexts. All functions are public for easier testing
   """
 
   import Sage
@@ -15,7 +15,7 @@ defmodule Slax.Sprints.ConfirmCommitmentSaga do
 
   def confirm_sprint_commitment(attrs) do
     new()
-    |> run(:attach_issues, &add_issues_to_milestone/2, &add_issues_to_milestone_error_handler/4)
+    |> run(:attach_issues, &add_issues_to_milestone/2)
     |> run(:confirm_commitment, &confirm_commitment/2)
     |> finally(&respond_to_creator/2)
     |> transaction(Slax.Repo, attrs)
@@ -38,21 +38,11 @@ defmodule Slax.Sprints.ConfirmCommitmentSaga do
     end
   end
 
-  def add_issues_to_milestone_error_handler(a, b, c, d) do
-    IO.inspect a
-    IO.inspect b
-    IO.inspect c
-    IO.inspect d
-
-    :abort
-  end
-
   def confirm_commitment(_, %{sprint: sprint}) do
     {:ok, Sprints.update_sprint(sprint, %{committed: true})}
   end
 
   def respond_to_creator(params, %{sprint: sprint, response_url: response_url}) do
-    IO.inspect params
     Slack.send_message(response_url, %{
       text: """
       Commitment for Week #{sprint.week} confirmed!

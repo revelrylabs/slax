@@ -6,7 +6,7 @@ defmodule Slax.Sprints.CreateCommitmentSaga do
   find_or_create_current_sprint/1 is the main entry point
 
   It uses Sage for the saga pattern but keeps all CRUD functions in their
-  respective contexts
+  respective contexts. All functions are public for easier testing
   """
 
   import Sage
@@ -16,7 +16,7 @@ defmodule Slax.Sprints.CreateCommitmentSaga do
   def find_or_create_current_commitment(attrs) do
     new()
     |> run(:issue_numbers, &validate_issue_numbers/2)
-    |> run(:repo, &get_repo/2, &get_repo_error_handler/4)
+    |> run(:repo, &get_repo/2)
     |> run(:milestone, &find_or_create_milestone/2)
     |> run(:current_sprint, &find_or_create_current_sprint/2)
     |> run(:issues, &fetch_issues/2)
@@ -35,11 +35,6 @@ defmodule Slax.Sprints.CreateCommitmentSaga do
 
   def get_repo(_effects_so_far, %{channel_name: channel_name}) do
     {:ok, Projects.get_repo_for_channel(channel_name)}
-  end
-
-  def get_repo_error_handler(effect_to_compensate, _, _, _) do
-    IO.inspect(effect_to_compensate)
-    :abort
   end
 
   def find_or_create_milestone(%{repo: repo}, %{current_user: user}) do
