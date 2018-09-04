@@ -12,6 +12,6 @@ defmodule Slax.User do
 
   def changeset(user, params \\ %{}) do
     user
-    |> cast(params, @required_fields, @optional_fields)
+    |> cast(params, @required_fields ++ @optional_fields)
   end
 end
