@@ -9,7 +9,7 @@ cache:
     - _build
     - deps
 addons:
-  postgresql: "9.5"
+  postgresql: '9.5'
 services:
   - postgresql
 install:
@@ -17,4 +17,4 @@ install:
   - mix local.rebar --force
   - mix deps.get
 script:
-  - mix test
+  - MIX_ENV=test mix coveralls.travis --pro
