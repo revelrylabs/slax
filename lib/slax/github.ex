@@ -52,7 +52,8 @@ defmodule Slax.Github do
       Poison.encode(%{
         title: params[:title],
         body: params[:body],
-        labels: Map.get(params, :labels, [])
+        labels: Map.get(params, :labels, []),
+        assignees: Map.get(params, :assignees, [])
       })
 
     response =
