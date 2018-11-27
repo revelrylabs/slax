@@ -1,4 +1,5 @@
 Master status: ![TravisCI Build Status](https://travis-ci.org/revelrylabs/slax.svg)
+[![Coverage Status](https://coveralls.io/repos/github/revelrylabs/slax/badge.svg?branch=master)](https://coveralls.io/github/revelrylabs/slax?branch=master)
 
 # Slax
 
@@ -39,7 +40,7 @@ All commands provide usage details when executing them without any parameters.
 
 This command will authenticate the Slack user with different services so that actions performed will be attributed to that user. This currently supports the following services:
 
-* Github
+- Github
 
 Example: `/auth github`
 
