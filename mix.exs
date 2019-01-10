@@ -42,7 +42,7 @@ defmodule Slax.Mixfile do
   defp deps do
     [
       {:phoenix, "~> 1.3.0-rc"},
-      {:phoenix_pubsub, "~> 1.0.0"},
+      {:phoenix_pubsub, "~> 1.1.1"},
       {:phoenix_ecto, "~> 3.3"},
       {:postgrex, ">= 0.0.0"},
       {:gettext, "~> 0.15"},
