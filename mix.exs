@@ -51,7 +51,7 @@ defmodule Slax.Mixfile do
       {:yaml_front_matter, "~> 0.3.0"},
       {:ex_doc, "~> 0.18", only: :dev, runtime: false},
       {:excoveralls, "~> 0.8", only: :test},
-      {:bypass, "~> 0.8.1", only: :test},
+      {:bypass, "~> 1.0.0", only: :test},
       {:mox, "~> 0.3", only: :test}
     ]
   end
