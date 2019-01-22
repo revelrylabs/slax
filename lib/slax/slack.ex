@@ -51,7 +51,7 @@ defmodule Slax.Slack do
         body: request
       )
 
-    body = Poison.decode!(response.body)
+    body = Jason.decode!(response.body)
 
     case body["ok"] do
       true -> {:ok, body["channel"]}
@@ -63,7 +63,7 @@ defmodule Slax.Slack do
   Sends a message to slack with the given url
   """
   def send_message(url, message) do
-    request = Poison.encode!(message)
+    request = Jason.encode!(message)
 
     HTTPotion.post(
       url,

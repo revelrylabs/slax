@@ -1,9 +1,9 @@
 language: elixir
 dist: trusty
 elixir:
-  - 1.6.5
+  - 1.8.0
 otp_release:
-  - 20.3
+  - 21.0
 cache:
   directories:
     - _build

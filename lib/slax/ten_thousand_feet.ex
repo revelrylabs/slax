@@ -20,7 +20,7 @@ defmodule Slax.TenThousandFeet do
   end
 
   defp handle_request(name) do
-    {:ok, request} = Poison.encode(%{name: name})
+    {:ok, request} = Jason.encode(%{name: name})
 
     response =
       HTTPotion.post(
@@ -31,7 +31,7 @@ defmodule Slax.TenThousandFeet do
 
     case response.status_code do
       status when status in 200..299 -> :ok
-      _ -> {:error, Poison.decode!(response.body) |> Map.get("message")}
+      _ -> {:error, Jason.decode!(response.body) |> Map.get("message")}
     end
   end
 
