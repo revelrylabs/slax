@@ -43,7 +43,7 @@ defmodule Slax.Mixfile do
     [
       {:phoenix, "~> 1.3.0-rc"},
       {:phoenix_pubsub, "~> 1.0.0"},
-      {:phoenix_ecto, "~> 3.3"},
+      {:phoenix_ecto, "~> 4.0"},
       {:postgrex, ">= 0.0.0"},
       {:gettext, "~> 0.15"},
       {:cowboy, "~> 1.0"},
