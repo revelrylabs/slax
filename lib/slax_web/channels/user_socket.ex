@@ -5,7 +5,6 @@ defmodule SlaxWeb.UserSocket do
   # channel "room:*", Slax.RoomChannel
 
   ## Transports
-  transport(:websocket, Phoenix.Transports.WebSocket)
   # transport :longpoll, Phoenix.Transports.LongPoll
 
   # Socket params are passed from the client and can
