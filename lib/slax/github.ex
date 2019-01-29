@@ -41,7 +41,7 @@ defmodule Slax.Github do
         headers: [Accept: "application/json"]
       )
 
-    Poison.decode!(response.body) |> Map.get("access_token")
+    Jason.decode!(response.body) |> Map.get("access_token")
   end
 
   @doc """
@@ -49,7 +49,7 @@ defmodule Slax.Github do
   """
   def create_issue(params) do
     {:ok, request} =
-      Poison.encode(%{
+      Jason.encode(%{
         title: params[:title],
         body: params[:body],
         labels: Map.get(params, :labels, []),
@@ -64,8 +64,8 @@ defmodule Slax.Github do
       )
 
     case response.status_code do
-      201 -> {:ok, Poison.decode!(response.body) |> Map.get("html_url")}
-      _ -> {:error, Poison.decode!(response.body) |> Map.get("message")}
+      201 -> {:ok, Jason.decode!(response.body) |> Map.get("html_url")}
+      _ -> {:error, Jason.decode!(response.body) |> Map.get("message")}
     end
   end
 
@@ -74,7 +74,7 @@ defmodule Slax.Github do
   """
   def create_comment(params) do
     {:ok, request} =
-      Poison.encode(%{
+      Jason.encode(%{
         body: params[:body]
       })
 
@@ -86,8 +86,8 @@ defmodule Slax.Github do
       )
 
     case response.status_code do
-      201 -> {:ok, Poison.decode!(response.body) |> Map.get("html_url")}
-      _ -> {:error, Poison.decode!(response.body) |> Map.get("message")}
+      201 -> {:ok, Jason.decode!(response.body) |> Map.get("html_url")}
+      _ -> {:error, Jason.decode!(response.body) |> Map.get("message")}
     end
   end
 
@@ -97,7 +97,7 @@ defmodule Slax.Github do
   def current_user_info(params) do
     response = HTTPotion.get("#{api_url()}/user", headers: request_headers(params[:access_token]))
 
-    Poison.decode!(response.body)
+    Jason.decode!(response.body)
   end
 
   @doc """
@@ -116,7 +116,7 @@ defmodule Slax.Github do
       )
 
     response.body
-    |> Poison.decode!()
+    |> Jason.decode!()
   end
 
   @doc """
@@ -129,7 +129,7 @@ defmodule Slax.Github do
         headers: request_headers(params[:access_token])
       )
 
-    Poison.decode!(response.body)
+    Jason.decode!(response.body)
   end
 
   @doc """
@@ -149,7 +149,7 @@ defmodule Slax.Github do
     )
     |> case do
       %{status_code: 404} -> {:error, :not_found}
-      %{body: body} -> {:ok, Poison.decode!(body)}
+      %{body: body} -> {:ok, Jason.decode!(body)}
     end
   end
 
@@ -158,7 +158,7 @@ defmodule Slax.Github do
   """
   def create_milestone(params) do
     {:ok, request} =
-      Poison.encode(%{
+      Jason.encode(%{
         title: params[:title],
         description: params[:description]
       })
@@ -171,8 +171,8 @@ defmodule Slax.Github do
       )
 
     case response.status_code do
-      201 -> {:ok, Poison.decode!(response.body)}
-      _ -> {:error, Poison.decode!(response.body) |> Map.get("message")}
+      201 -> {:ok, Jason.decode!(response.body)}
+      _ -> {:error, Jason.decode!(response.body) |> Map.get("message")}
     end
   end
 
@@ -181,7 +181,7 @@ defmodule Slax.Github do
   """
   def add_issue_to_milestone(params) do
     {:ok, request} =
-      Poison.encode(%{
+      Jason.encode(%{
         milestone: params[:milestone_number]
       })
 
@@ -193,8 +193,8 @@ defmodule Slax.Github do
       )
 
     case response.status_code do
-      200 -> {:ok, Poison.decode!(response.body)}
-      _ -> {:error, Poison.decode!(response.body) |> Map.get("message")}
+      200 -> {:ok, Jason.decode!(response.body)}
+      _ -> {:error, Jason.decode!(response.body) |> Map.get("message")}
     end
   end
 
@@ -222,7 +222,7 @@ defmodule Slax.Github do
     org_name = params[:org_name]
 
     {:ok, request} =
-      Poison.encode(%{
+      Jason.encode(%{
         name: params[:name],
         private: true
       })
@@ -237,11 +237,11 @@ defmodule Slax.Github do
 
     case response.status_code do
       201 ->
-        body = Poison.decode!(response.body)
+        body = Jason.decode!(response.body)
         {:ok, body |> Map.get("html_url")}
 
       _ ->
-        body = Poison.decode!(response.body)
+        body = Jason.decode!(response.body)
         {:error, body |> Map.get("message")}
     end
   end
@@ -262,14 +262,14 @@ defmodule Slax.Github do
 
     case response.status_code do
       201 ->
-        body = Poison.decode!(response.body)
+        body = Jason.decode!(response.body)
         {:ok, body |> Map.get("html_url")}
 
       404 ->
         :not_found
 
       _ ->
-        body = Poison.decode!(response.body)
+        body = Jason.decode!(response.body)
         {:error, body |> Map.get("message")}
     end
   end
@@ -281,7 +281,7 @@ defmodule Slax.Github do
     repo = params[:repo]
 
     {:ok, request} =
-      Poison.encode(%{
+      Jason.encode(%{
         name: params[:name],
         active: true,
         events: params[:events],
@@ -302,11 +302,11 @@ defmodule Slax.Github do
 
     case response.status_code do
       201 ->
-        body = Poison.decode!(response.body)
+        body = Jason.decode!(response.body)
         {:ok, body |> Map.get("id")}
 
       _ ->
-        body = Poison.decode!(response.body)
+        body = Jason.decode!(response.body)
         {:error, body |> Map.get("message")}
     end
   end
@@ -380,7 +380,7 @@ defmodule Slax.Github do
     team = params[:team]
 
     {:ok, request} =
-      Poison.encode(%{
+      Jason.encode(%{
         permission: "push"
       })
 
@@ -397,13 +397,13 @@ defmodule Slax.Github do
         {:ok, "Created"}
 
       _ ->
-        body = Poison.decode!(response.body)
+        body = Jason.decode!(response.body)
         {:error, body["message"]}
     end
   end
 
   defp handle_response(response) do
-    body = Poison.decode!(response.body)
+    body = Jason.decode!(response.body)
 
     case response.status_code do
       ok when ok in 200..299 ->

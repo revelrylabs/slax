@@ -1,7 +1,7 @@
 defmodule SlaxWeb.Endpoint do
   use Phoenix.Endpoint, otp_app: :slax
 
-  socket("/socket", SlaxWeb.UserSocket)
+  socket("/socket", SlaxWeb.UserSocket, websocket: true)
 
   # Serve at "/" the static files from "priv/static" directory.
   #
@@ -28,7 +28,7 @@ defmodule SlaxWeb.Endpoint do
     Plug.Parsers,
     parsers: [:urlencoded, :multipart, :json],
     pass: ["*/*"],
-    json_decoder: Poison
+    json_decoder: Jason
   )
 
   plug(Plug.MethodOverride)
