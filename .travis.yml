@@ -1,20 +1,39 @@
-language: elixir
-dist: trusty
-elixir:
-  - 1.8.0
-otp_release:
-  - 21.1
-cache:
-  directories:
-    - _build
-    - deps
-addons:
-  postgresql: '9.5'
-services:
-  - postgresql
-install:
-  - mix local.hex --force
-  - mix local.rebar --force
-  - mix deps.get
-script:
-  - MIX_ENV=test mix coveralls.travis --pro
+sudo: false
+git:
+  depth: false
+jobs:
+  include:
+    - stage: Tests
+      name: Unit Tests
+      language: elixir
+      elixir:
+        - '1.8'
+      otp_release:
+        - '21.1'
+      cache:
+        directories:
+          - _build
+          - deps
+      addons:
+        postgresql: '9.6'
+      services:
+        - postgresql
+      install:
+        - mix local.hex --force
+        - mix local.rebar --force
+        - mix deps.get
+      script:
+        - MIX_ENV=test mix coveralls.travis --pro
+    - stage: deploy-production
+      name: Deploy to Production
+      if: branch = master
+      script: skip
+      deploy:
+        - provider: deis
+          controller: https://deis.prod.revelry.net
+          app: slax
+          cli_version: v2.19.4
+          username: '$DEIS_USERNAME'
+          password: '$DEIS_PASSWORD'
+          on:
+            branch: master
