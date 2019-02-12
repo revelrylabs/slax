@@ -1,0 +1,9 @@
+# Git data
+.git
+
+# Elixir build artifacts
+_build
+deps
+
+# Tests
+test
