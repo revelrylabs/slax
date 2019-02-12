@@ -11,7 +11,6 @@ config :logger, level: :warn
 
 # Configure your database
 config :slax, Slax.Repo,
-  adapter: Ecto.Adapters.Postgres,
   database: "slax_test",
   hostname: "localhost",
   port: 5432,

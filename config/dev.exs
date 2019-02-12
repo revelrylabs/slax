@@ -22,7 +22,6 @@ config :phoenix, :stacktrace_depth, 20
 
 # Configure your database
 config :slax, Slax.Repo,
-  adapter: Ecto.Adapters.Postgres,
   database: "slax_dev",
   hostname: "localhost",
   port: 5432,

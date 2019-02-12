@@ -22,9 +22,6 @@ config :logger, :console,
   format: "$time $metadata[$level] $message\n",
   metadata: [:request_id]
 
-# Configure your database
-config :slax, Slax.Repo, adapter: Ecto.Adapters.Postgres
-
 config :slax, :integrations,
   github: Slax.Github,
   slack: Slax.Slack
