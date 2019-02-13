@@ -1,5 +1,6 @@
-Master status: ![TravisCI Build Status](https://travis-ci.org/revelrylabs/slax.svg)
+![TravisCI Build Status](https://travis-ci.org/revelrylabs/slax.svg)
 [![Coverage Status](https://coveralls.io/repos/github/revelrylabs/slax/badge.svg?branch=master)](https://coveralls.io/github/revelrylabs/slax?branch=master)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
 # Slax
 
