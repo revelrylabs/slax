@@ -2,7 +2,7 @@ defmodule SlaxWeb.ProjectController do
   use SlaxWeb, :controller
   alias Slax.Integrations
 
-  plug(Slax.Plugs.VerifySlackToken, :project)
+  plug(Slax.Plugs.VerifySlackToken, app_var: :project)
   plug(Slax.Plugs.VerifyUser)
 
   alias Slax.Commands.{NewProject, ReuseableStories, GithubCommands}

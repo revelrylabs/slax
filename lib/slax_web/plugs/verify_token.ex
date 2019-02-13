@@ -5,9 +5,22 @@ defmodule Slax.Plugs.VerifySlackToken do
 
   def init(app_var) do
     tokens = Application.get_env(:slax, Slax.Slack)[:tokens]
-    Logger.info("init: token: #{inspect(Keyword.get(tokens, app_var))}")
-
     Keyword.get(tokens, app_var)
+  end
+
+  def call(%Plug.Conn{params: %{"token" => token}} = conn, app_var: app_var) do
+    tokens = Application.get_env(:slax, Slax.Slack)[:tokens]
+    local_token = Keyword.get(tokens, app_var)
+
+    Logger.info("call: token: #{inspect(token)}, local_token: #{inspect(local_token)}")
+
+    case token == local_token do
+      true ->
+        conn
+
+      false ->
+        text(conn, "Invalid slack token.") |> halt
+    end
   end
 
   def call(%Plug.Conn{params: %{"token" => token}} = conn, local_token) do
