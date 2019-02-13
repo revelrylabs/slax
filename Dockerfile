@@ -23,7 +23,7 @@ COPY . .
 ENV PORT 5000
 
 # Compile app
-RUN mix do compile, phx.digest
+RUN mix do compile, release
 
 # Exposes this port from the docker container to the host machine
 EXPOSE 5000
