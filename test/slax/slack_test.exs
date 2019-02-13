@@ -10,7 +10,15 @@ defmodule Slax.Slack.Test do
       :slax,
       Slax.Slack,
       api_url: url,
-      api_token: "token"
+      api_token: "token",
+      tokens: [
+        comment: "token",
+        issue: "token",
+        auth: "token",
+        tarpon: "token",
+        project: "token",
+        sprint: "token"
+      ]
     )
 
     {:ok, bypass: bypass, url: url}
