@@ -1,30 +1,17 @@
-# This file is responsible for configuring your application
-# and its dependencies with the aid of the Mix.Config module.
-#
-# This configuration file is loaded before any dependency and
-# is restricted to this project.
 use Mix.Config
 
-config :phoenix, :json_library, Jason
+config :slax, Slax.Repo,
+  url: System.get_env("DATABASE_URL"),
+  pool_size: String.to_integer(System.get_env("POOL_SIZE") || "10")
 
-# General application configuration
-config :slax, ecto_repos: [Slax.Repo]
+port = String.to_integer(System.get_env("PORT"))
 
-# Configures the endpoint
 config :slax, SlaxWeb.Endpoint,
-  url: [host: "localhost"],
-  secret_key_base: "N4gXL4rdXzHD9kNbCBAaEKShN+mxlgX0biU+eMpc766DF1TYFf2o9kkDLvHNfv1Y",
-  render_errors: [view: SlaxWeb.ErrorView, accepts: ~w(json)],
-  pubsub: [name: Slax.PubSub, adapter: Phoenix.PubSub.PG2]
-
-# Configures Elixir's Logger
-config :logger, :console,
-  format: "$time $metadata[$level] $message\n",
-  metadata: [:request_id]
-
-config :slax, :integrations,
-  github: Slax.Github,
-  slack: Slax.Slack
+  http: [port: port, compress: true],
+  url: [scheme: "https", host: System.get_env("SITE_URL"), port: 443, compress: true],
+  force_ssl: [rewrite_on: [:x_forwarded_proto]],
+  root: ".",
+  secret_key_base: System.get_env("SECRET_KEY_BASE")
 
 config :slax, :lintron,
   secret: System.get_env("LINTRON_SECRET"),
@@ -61,12 +48,3 @@ config :slax, Slax.Slack,
     project: System.get_env("PROJECT_SLACK_TOKEN"),
     sprint: System.get_env("SPRINT_SLACK_TOKEN")
   ]
-
-# Import environment specific config. This must remain at the bottom
-# of this file so it overrides the configuration defined above.
-import_config "#{Mix.env()}.exs"
-
-# Import environment specific secrets if they exist
-if File.exists?(Path.join([__DIR__, "#{Mix.env()}.secret.exs"])) do
-  import_config "#{Mix.env()}.secret.exs"
-end

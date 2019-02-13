@@ -23,10 +23,10 @@ COPY . .
 ENV PORT 5000
 
 # Compile app
-RUN mix do compile
+RUN mix do compile, phx.digest
 
 # Exposes this port from the docker container to the host machine
 EXPOSE 5000
 
 # The command to run when this image starts up
-CMD ["mix", "phx.server", "--no-compile", "--no-deps-check"]
+CMD ["_build/prod/rel/slax/bin/slax", "foreground"]
