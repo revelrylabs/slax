@@ -7,12 +7,12 @@ config :slax, Slax.Repo,
 port = String.to_integer(System.get_env("PORT"))
 
 config :slax, SlaxWeb.Endpoint,
-  http: [port: port, compress: true],
+  http: [port: port, compress: true, host: System.get_env("APP_DOMAIN")],
   root: ".",
   secret_key_base: System.get_env("SECRET_KEY_BASE")
 
 config :slax, :lintron,
-  secret: System.get_env("L INTRON_SECRET"),
+  secret: System.get_env("LINTRON_SECRET"),
   url: System.get_env("LINTRON_URL")
 
 config :slax, :board_checker,
