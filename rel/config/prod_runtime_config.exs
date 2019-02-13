@@ -7,7 +7,9 @@ config :slax, Slax.Repo,
 port = String.to_integer(System.get_env("PORT"))
 
 config :slax, SlaxWeb.Endpoint,
-  http: [port: port, compress: true, host: System.get_env("APP_DOMAIN")],
+  http: [port: port, compress: true],
+  url: [scheme: "https", host: System.get_env("APP_DOMAIN"), port: 443, compress: true],
+  force_ssl: [rewrite_on: [:x_forwarded_proto]],
   root: ".",
   secret_key_base: System.get_env("SECRET_KEY_BASE")
 

@@ -2,7 +2,9 @@ use Mix.Config
 
 config :slax, SlaxWeb.Endpoint,
   http: [port: {:system, "PORT"}],
-  url: [host: "localhost", port: {:system, "PORT"}],
+  url: [scheme: "https", host: System.get_env("APP_DOMAIN"), port: 443],
+  cache_static_manifest: "priv/static/cache_manifest.json",
+  secret_key_base: System.get_env("SECRET_KEY_BASE"),
   server: true,
   root: ".",
   version: Application.spec(:slax, :vsn)
