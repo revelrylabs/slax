@@ -3,7 +3,7 @@ defmodule SlaxWeb.AuthController do
 
   alias Slax.{Users, Integrations}
 
-  plug(Slax.Plugs.VerifySlackToken, app_var: :auth)
+  plug(Slax.Plugs.VerifySlackToken, token: :auth)
 
   def start(conn, %{"user_id" => user_id, "text" => text}) do
     case text do

@@ -1,7 +1,7 @@
 defmodule SlaxWeb.SprintController do
   use SlaxWeb, :controller
 
-  plug(Slax.Plugs.VerifySlackToken, app_var: :sprint)
+  plug(Slax.Plugs.VerifySlackToken, token: :sprint)
   plug(Slax.Plugs.VerifyUser)
 
   alias Slax.{Projects, Sprints}
