@@ -6,7 +6,7 @@ defmodule SlaxWeb.CommentController do
 
   use SlaxWeb, :controller
 
-  plug(Slax.Plugs.VerifySlackToken, :comment)
+  plug(Slax.Plugs.VerifySlackToken, app_var: :comment)
   plug(Slax.Plugs.VerifyUser)
 
   def start(conn, %{"text" => ""}) do

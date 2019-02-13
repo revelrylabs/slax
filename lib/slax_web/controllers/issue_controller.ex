@@ -2,7 +2,7 @@ defmodule SlaxWeb.IssueController do
   use SlaxWeb, :controller
   alias Slax.Integrations
 
-  plug(Slax.Plugs.VerifySlackToken, :issue)
+  plug(Slax.Plugs.VerifySlackToken, app_var: :issue)
   plug(Slax.Plugs.VerifyUser)
 
   def start(conn, %{"text" => ""}) do
