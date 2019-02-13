@@ -8,12 +8,11 @@ port = String.to_integer(System.get_env("PORT"))
 
 config :slax, SlaxWeb.Endpoint,
   http: [port: port, compress: true],
-  force_ssl: [rewrite_on: [:x_forwarded_proto]],
   root: ".",
   secret_key_base: System.get_env("SECRET_KEY_BASE")
 
 config :slax, :lintron,
-  secret: System.get_env("LINTRON_SECRET"),
+  secret: System.get_env("L INTRON_SECRET"),
   url: System.get_env("LINTRON_URL")
 
 config :slax, :board_checker,
