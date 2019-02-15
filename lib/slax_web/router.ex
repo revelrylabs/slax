@@ -11,5 +11,6 @@ defmodule SlaxWeb.Router do
     post("/tarpon", TarponController, :start)
     post("/project", ProjectController, :start)
     post("/sprint", SprintController, :start)
+    post("/slax", SlaxController, :start)
   end
 end
