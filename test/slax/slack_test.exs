@@ -17,7 +17,8 @@ defmodule Slax.Slack.Test do
         auth: "token",
         tarpon: "token",
         project: "token",
-        sprint: "token"
+        sprint: "token",
+        slax: "token"
       ]
     )
 

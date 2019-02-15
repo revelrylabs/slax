@@ -3,7 +3,7 @@ defmodule SlaxWeb.SlaxController do
   alias Slax.{Commander, Integrations}
 
   plug(Slax.Plugs.VerifySlackToken, token: :slax)
-  # plug(Slax.Plugs.VerifyUser)
+  plug(Slax.Plugs.VerifyUser)
 
   def start(conn, %{"response_url" => response_url, "text" => command}) do
     do_start(
