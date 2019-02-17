@@ -3,14 +3,14 @@ defmodule Slax.Commander do
   Handles the execution of commands
   """
 
-  @spec run(Slax.User.t(), binary()) :: binary()
-  def run(user, command)
+  @spec run(Slax.Commands.Context.t(), [String.t()]) :: binary()
+  def run(context, command)
 
-  def run(_user, "ping") do
+  def run(_context, ["ping"]) do
     "pong"
   end
 
-  def run(user, command) do
+  def run(_context, _command) do
     """
     *Slax commands:*
     """
