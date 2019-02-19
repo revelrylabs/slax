@@ -26,6 +26,7 @@ defmodule SlaxWeb.ConnCase do
       import Ecto.Query
 
       import SlaxWeb.Router.Helpers
+      import Slax.Factory
 
       # The default endpoint for testing
       @endpoint SlaxWeb.Endpoint

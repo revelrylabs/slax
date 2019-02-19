@@ -24,5 +24,6 @@ config :slax, Slax.Slack,
     auth: "token",
     tarpon: "token",
     project: "token",
-    sprint: "token"
+    sprint: "token",
+    slax: "token"
   ]

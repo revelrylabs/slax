@@ -54,6 +54,7 @@ config :slax, Slax.Slack,
   api_url: "https://slack.com/api",
   api_token: System.get_env("SLACK_TOKEN"),
   tokens: [
+    slax: System.get_env("SLAX_SLACK_TOKEN"),
     comment: System.get_env("COMMENT_SLACK_TOKEN"),
     issue: System.get_env("ISSUE_SLACK_TOKEN"),
     auth: System.get_env("AUTH_SLACK_TOKEN"),
