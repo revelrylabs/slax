@@ -18,3 +18,5 @@ erl_crash.dump
 /doc/*
 /cover/*
 /.elixir_ls
+
+/config/*.secret.exs

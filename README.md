@@ -10,28 +10,14 @@ A Phoenix app that supports the following slash commands from Slack:
 
 ```
 git clone https://github.com/revelrylabs/slax
-mix deps.get
-mix ecto.create && mix ecto.migrate
+./bin/setup
 mix phx.server
 ```
 
 ## Configuration
 
-`.env.sample` is a template for the required environment variables. Copy it to .env:
-
-```
-cp .env.sample .env
-```
-
-and fill in with your actual credentials and configuration.
-
-Before running the app, you can do:
-
-```
-source .env
-```
-
-to ensure the variables are set properly.
+The `./bin/setup` script should add a `config/dev.secret.exs` file. Use this to put secrets into.
+`./priv/prod_runtime_config.exs` is a good example of what secrets are needed as that file is used to setup secrets in produciton.
 
 ## Usage / Commands
 
