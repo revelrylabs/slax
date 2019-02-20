@@ -41,6 +41,28 @@ Example: `/issue revelrylabs/slax New Issue!`
 
 <img src="http://dropit.atda.club/Screen-Shot-2016-07-05-13-44-34.png" width="350">
 
+### /project
+
+#### new
+
+Creates a new repo in github, runs reusable stories, sets up webhooks, and creates slack channel if it doesn't exist.
+
+Usage: `/project new <project_name>`
+
+Example: `/project new taco`
+
+Creates repo in the default organization
+
+#### add-reusable-stories
+
+runs reusable stories in the given repo
+
+Usage: `/project add-reusable-stories <repo>`
+
+Example: `/project add-reusable-stories taco`
+
+Looks for repo in the default organization
+
 ## Contributing
 
 Bug reports and pull requests are welcome on GitHub at https://github.com/revelrylabs/slax. Check out [CONTRIBUTING.md](https://github.com/revelrylabs/slax/blob/master/CONTRIBUTING.md) for more info.
