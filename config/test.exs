@@ -27,3 +27,7 @@ config :slax, Slax.Slack,
     sprint: "token",
     slax: "token"
   ]
+
+if File.exists?(Path.join([__DIR__, "dev.secret.exs"])) do
+  import_config "dev.secret.exs"
+end
