@@ -10,28 +10,14 @@ A Phoenix app that supports the following slash commands from Slack:
 
 ```
 git clone https://github.com/revelrylabs/slax
-mix deps.get
-mix ecto.create && mix ecto.migrate
-mix phx.server
+./bin/setup
+./bin/server
 ```
 
 ## Configuration
 
-`.env.sample` is a template for the required environment variables. Copy it to .env:
-
-```
-cp .env.sample .env
-```
-
-and fill in with your actual credentials and configuration.
-
-Before running the app, you can do:
-
-```
-source .env
-```
-
-to ensure the variables are set properly.
+The `./bin/setup` script should add a `config/dev.secret.exs` file. Use this to put secrets into.
+`./priv/prod_runtime_config.exs` is a good example of what secrets are needed as that file is used to setup secrets in produciton.
 
 ## Usage / Commands
 
@@ -54,6 +40,28 @@ Usage: `/issue <org/repo> <title> [\nbody]`
 Example: `/issue revelrylabs/slax New Issue!`
 
 <img src="http://dropit.atda.club/Screen-Shot-2016-07-05-13-44-34.png" width="350">
+
+### /project
+
+#### new
+
+Creates a new repo in github, runs reusable stories, sets up webhooks, and creates slack channel if it doesn't exist.
+
+Usage: `/project new <project_name>`
+
+Example: `/project new taco`
+
+Creates repo in the default organization
+
+#### add-reusable-stories
+
+runs reusable stories in the given repo
+
+Usage: `/project add-reusable-stories <repo>`
+
+Example: `/project add-reusable-stories taco`
+
+Looks for repo in the default organization
 
 ## Contributing
 

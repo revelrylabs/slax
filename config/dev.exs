@@ -26,3 +26,7 @@ config :slax, Slax.Repo,
   hostname: "localhost",
   port: 5432,
   pool: Ecto.Adapters.SQL.Sandbox
+
+if File.exists?(Path.join([__DIR__, "dev.secret.exs"])) do
+  import_config "dev.secret.exs"
+end
