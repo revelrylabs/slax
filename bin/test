@@ -1,3 +1,3 @@
 #!/bin/bash
 
-mix test "$@"
+mix coveralls.html

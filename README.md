@@ -11,7 +11,7 @@ A Phoenix app that supports the following slash commands from Slack:
 ```
 git clone https://github.com/revelrylabs/slax
 ./bin/setup
-mix phx.server
+./bin/server
 ```
 
 ## Configuration

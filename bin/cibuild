@@ -1,3 +1,3 @@
 #!/bin/bash
 
-sh ./bin/test
+MIX_ENV=test mix coveralls.travis --pro
