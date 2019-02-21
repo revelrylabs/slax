@@ -1,8 +1,19 @@
 defmodule SlaxWeb.AuthController.Test do
   use SlaxWeb.ConnCase, async: true
-  import Mox
 
-  setup :verify_on_exit!
+  setup %{conn: conn} do
+    bypass = Bypass.open()
+    url = "http://localhost:#{bypass.port}"
+
+    Application.put_env(
+      :slax,
+      Slax.Github,
+      api_url: url,
+      oauth_url: url
+    )
+
+    {:ok, conn: conn, bypass: bypass, url: url}
+  end
 
   test "sends usage message when there is no text", %{conn: conn} do
     params = %{
@@ -43,20 +54,19 @@ defmodule SlaxWeb.AuthController.Test do
     assert response(conn, 200) =~ "http"
   end
 
-  test "github_redirect", %{conn: conn} do
-    Slax.GithubMock
-    |> expect(:authorize_url, fn _ -> "https://github.com" end)
-
+  test "github_redirect", %{conn: conn, url: url} do
     conn = get(conn, auth_path(conn, :github_redirect), state: "state")
-    assert redirected_to(conn) =~ "https://github.com"
+    assert redirected_to(conn) =~ url
   end
 
-  @tag :skip
-  # Re-enable once we figure out db
-  test "github_callback", %{conn: conn} do
-    Slax.GithubMock
-    |> expect(:fetch_access_token, fn _ -> "12345" end)
-    |> expect(:current_user_info, fn _ -> %{"login" => "test"} end)
+  test "github_callback", %{conn: conn, bypass: bypass} do
+    Bypass.expect_once(bypass, "POST", "/access_token", fn conn ->
+      Plug.Conn.resp(conn, 200, ~s<{"access_token": "12345"}>)
+    end)
+
+    Bypass.expect_once(bypass, "GET", "/user", fn conn ->
+      Plug.Conn.resp(conn, 200, ~s<{"login": "test"}>)
+    end)
 
     conn = get(conn, auth_path(conn, :github_callback), state: "state", code: "code")
     assert response(conn, 200) =~ "Authentication successful!"

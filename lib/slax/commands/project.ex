@@ -2,7 +2,7 @@ defmodule Slax.Commands.NewProject do
   @moduledoc """
   Automates creation of a new project
   """
-  alias Slax.Integrations
+  alias Slax.{Github, Slack}
   alias Slax.Commands.GithubCommands
 
   @doc """
@@ -58,7 +58,7 @@ defmodule Slax.Commands.NewProject do
   end
 
   defp create_github_repo(%{project_name: project_name} = results, github_access_token, org_name) do
-    case Integrations.github().find_or_create_repo(%{
+    case Github.find_or_create_repo(%{
            name: project_name,
            access_token: github_access_token,
            org_name: org_name
@@ -79,7 +79,7 @@ defmodule Slax.Commands.NewProject do
   end
 
   defp create_slack_channel(%{project_name: project_name} = results) do
-    case Integrations.slack().create_channel(String.downcase(project_name)) do
+    case Slack.create_channel(String.downcase(project_name)) do
       {:ok, channel} ->
         channel_name = channel["name"]
         channel_id = channel["id"]
@@ -139,7 +139,7 @@ defmodule Slax.Commands.NewProject do
     |> Enum.map(fn team ->
       params = %{access_token: github_access_token, repo: repo, team: team}
 
-      case Integrations.github().add_team_to_repo(params) do
+      case Github.add_team_to_repo(params) do
         {:ok, _} ->
           {:ok, team, "team added"}
 
@@ -159,7 +159,7 @@ defmodule Slax.Commands.NewProject do
          webhook_key,
          success_message
        ) do
-    case Integrations.github().create_webhook(params) do
+    case Github.create_webhook(params) do
       {:ok, _} ->
         Map.put(results, webhook_key, true)
         |> Map.update(:success, %{}, fn x -> Map.put(x, webhook_key, success_message) end)

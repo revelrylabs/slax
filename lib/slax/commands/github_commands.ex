@@ -12,7 +12,7 @@ defmodule Slax.Commands.GithubCommands do
     :resuseable_stories
   ]
 
-  alias Slax.Integrations
+  alias Slax.{Github}
 
   def parse_project_name(results, text) do
     case Regex.run(~r/^[a-zA-Z0-9\-_]{3,21}$/, text) do
@@ -36,7 +36,7 @@ defmodule Slax.Commands.GithubCommands do
       ) do
     repo = "#{org_name}/#{project_name}"
 
-    case Integrations.github().fetch_tree(%{access_token: github_access_token, repo: story_repo}) do
+    case Github.fetch_tree(%{access_token: github_access_token, repo: story_repo}) do
       {:ok, data} ->
         {blobs, tree_errors} = process_tree(data, story_repo, story_paths, github_access_token)
         {parsed_issues, parse_errors} = decode_blobs(blobs)
@@ -79,7 +79,7 @@ defmodule Slax.Commands.GithubCommands do
     |> Enum.filter(fn x -> x["type"] == "blob" && String.ends_with?(x["path"], ".md") end)
     |> Enum.filter(fn x -> String.starts_with?(x["path"], Keyword.values(story_paths)) end)
     |> Enum.map(fn x ->
-      case Integrations.github().fetch_blob(%{
+      case Github.fetch_blob(%{
              access_token: github_access_token,
              repo: story_repo,
              sha: x["sha"]
@@ -128,7 +128,7 @@ defmodule Slax.Commands.GithubCommands do
         body: body
       }
 
-      case Integrations.github().create_issue(params) do
+      case Github.create_issue(params) do
         {:ok, data} ->
           {:ok, path, data}
 
