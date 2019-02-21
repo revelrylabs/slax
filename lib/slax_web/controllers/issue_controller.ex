@@ -1,6 +1,6 @@
 defmodule SlaxWeb.IssueController do
   use SlaxWeb, :controller
-  alias Slax.Integrations
+  alias Slax.Github
 
   plug(Slax.Plugs.VerifySlackToken, token: :issue)
   plug(Slax.Plugs.VerifyUser)
@@ -16,7 +16,7 @@ defmodule SlaxWeb.IssueController do
     case Regex.run(~r/(.+?\/[^ ]+) (.*)\n?([\s\S]*)?/, text) do
       [_, repo, title, body] ->
         github_response =
-          Integrations.github().create_issue(%{
+          Github.create_issue(%{
             title: title,
             body: body,
             repo: repo,

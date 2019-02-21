@@ -1,6 +1,6 @@
 defmodule SlaxWeb.SlaxController do
   use SlaxWeb, :controller
-  alias Slax.{Commander, Integrations}
+  alias Slax.{Commander, Slack}
 
   plug(Slax.Plugs.VerifySlackToken, token: :slax)
   plug(Slax.Plugs.VerifyUser)
@@ -15,7 +15,7 @@ defmodule SlaxWeb.SlaxController do
     Task.start_link(fn ->
       response = Commander.run(context, command_args)
 
-      Integrations.slack().send_message(response_url, %{
+      Slack.send_message(response_url, %{
         response_type: "in_channel",
         text: response
       })

@@ -7,8 +7,8 @@ defmodule Slax.User do
     field(:github_access_token, :string)
   end
 
-  @required_fields ~w(slack_id)
-  @optional_fields ~w(github_username github_access_token)
+  @required_fields [:slack_id]
+  @optional_fields [:github_username, :github_access_token]
 
   def changeset(user, params \\ %{}) do
     user

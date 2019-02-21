@@ -1,8 +1,5 @@
 defmodule SlaxWeb.SlaxController.Test do
   use SlaxWeb.ConnCase, async: true
-  import Mox
-
-  setup :verify_on_exit!
 
   setup %{conn: conn} do
     user = insert(:user)

@@ -1,6 +1,6 @@
 defmodule SlaxWeb.ProjectController do
   use SlaxWeb, :controller
-  alias Slax.Integrations
+  alias Slax.Slack
 
   plug(Slax.Plugs.VerifySlackToken, token: :project)
   plug(Slax.Plugs.VerifyUser)
@@ -49,7 +49,7 @@ defmodule SlaxWeb.ProjectController do
       NewProject.new_project(String.trim(repo), github_access_token)
       |> GithubCommands.format_results()
 
-    Integrations.slack().send_message(response_url, %{
+    Slack.send_message(response_url, %{
       response_type: "in_channel",
       text: formatted_response
     })
@@ -60,7 +60,7 @@ defmodule SlaxWeb.ProjectController do
       ReuseableStories.reuseable_stories(String.trim(repo), github_access_token)
       |> GithubCommands.format_results()
 
-    Integrations.slack().send_message(response_url, %{
+    Slack.send_message(response_url, %{
       response_type: "in_channel",
       text: formatted_response
     })

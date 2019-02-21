@@ -22,10 +22,6 @@ config :logger, :console,
   format: "$time $metadata[$level] $message\n",
   metadata: [:request_id]
 
-config :slax, :integrations,
-  github: Slax.Github,
-  slack: Slax.Slack
-
 config :slax, :lintron,
   secret: System.get_env("LINTRON_SECRET"),
   url: System.get_env("LINTRON_URL")
