@@ -19,6 +19,27 @@ git clone https://github.com/revelrylabs/slax
 The [/bin/setup](https://github.com/revelrylabs/slax/blob/master/bin/setup) script should add a `config/dev.secret.exs` file. Use this to put secrets into.
 [/rel/config/prod_runtime_config.exs](https://github.com/revelrylabs/slax/blob/master/rel/config/prod_runtime_config.exs) is a good example of what secrets are needed as that file is used to setup secrets in produciton.
 
+You will need to create a GitHub OAuth app in order to use the GitHub functionality, including authentication.
+
+### Create Github OAuth App
+- Go to https://github.com/settings/developers
+- Click "New Oauth App"
+- Fill in the following values:
+  - Application Name: <your_app_name>
+  - Homepage URL: Your app's URL (For development: http://localhost:4000 works)
+  - Authorization callback URL: (For development: http://localhost:4000/auth/github_callback works)
+- Click "Register Application"
+- Take the `Client ID` and `Client Secret` values and add them and put them in the configuration block for `Slax.Github` in your `dev.secret.exs` file
+
+```elixir
+config :slax, Slax.Github,
+  api_url: "https://api.github.com",
+  oauth_url: "https://github.com/login/oauth",
+  client_id: "<my_client_id>",
+  client_secret: "<my_client_secret>",
+  org_name: "<my_org_name>",
+  org_teams: ["<my_org_team>"]
+```
 ## Usage / Commands
 
 All commands provide usage details when executing them without any parameters.
