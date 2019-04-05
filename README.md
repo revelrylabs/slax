@@ -17,7 +17,7 @@ git clone https://github.com/revelrylabs/slax
 ## Configuration
 
 The `./bin/setup` script should add a `config/dev.secret.exs` file. Use this to put secrets into.
-`./priv/prod_runtime_config.exs` is a good example of what secrets are needed as that file is used to setup secrets in produciton.
+[/rel/config/prod_runtime_config.exs](https://github.com/revelrylabs/slax/blob/master/rel/config/prod_runtime_config.exs) is a good example of what secrets are needed as that file is used to setup secrets in produciton.
 
 ## Usage / Commands
 
