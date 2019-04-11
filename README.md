@@ -1,5 +1,5 @@
 ![TravisCI Build Status](https://travis-ci.org/revelrylabs/slax.svg)
-![Coverage Status](https://opencov.prod.revelry.net/projects/4/badge.svg)
+[![Coverage Status](https://opencov.prod.revelry.net/projects/4/badge.svg)](https://opencov.prod.revelry.net/projects/4)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
 # Slax
