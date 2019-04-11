@@ -19,11 +19,13 @@ jobs:
     services:
     - postgresql
     install:
+    - gem install coveralls-multi --no-document
     - mix local.hex --force
     - mix local.rebar --force
     - mix deps.get
     script:
-    - MIX_ENV=test mix coveralls.travis --pro
+    - MIX_ENV=test mix coveralls.json
+    - coveralls-multi
   - stage: deploy-production
     name: Deploy to Production
     if: branch = master

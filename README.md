@@ -1,5 +1,5 @@
 ![TravisCI Build Status](https://travis-ci.org/revelrylabs/slax.svg)
-[![Coverage Status](https://coveralls.io/repos/github/revelrylabs/slax/badge.svg?branch=master)](https://coveralls.io/github/revelrylabs/slax?branch=master)
+![Coverage Status](https://opencov.prod.revelry.net/projects/4/badge.svg)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
 # Slax
@@ -22,6 +22,7 @@ The [/bin/setup](https://github.com/revelrylabs/slax/blob/master/bin/setup) scri
 You will need to create a GitHub OAuth app in order to use the GitHub functionality, including authentication.
 
 ### Create Github OAuth App
+
 - Go to https://github.com/settings/developers
 - Click "New Oauth App"
 - Fill in the following values:
@@ -40,6 +41,7 @@ config :slax, Slax.Github,
   org_name: "<my_org_name>",
   org_teams: ["<my_org_team>"]
 ```
+
 ## Usage / Commands
 
 All commands provide usage details when executing them without any parameters.
