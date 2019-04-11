@@ -10,6 +10,8 @@ config :phoenix, :json_library, Jason
 # General application configuration
 config :slax, ecto_repos: [Slax.Repo]
 
+config :excoveralls, endpoint: System.get_env("COVERALLS_ENDPOINT")
+
 # Configures the endpoint
 config :slax, SlaxWeb.Endpoint,
   url: [host: "localhost"],
