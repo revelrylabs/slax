@@ -111,10 +111,10 @@ defmodule Slax.Github do
 
     response =
       HTTPotion.get(
-        "#{api_url()}/repos/#{params[:repo]}/issues?#{query_string}",
+        "#{api_url()}/repos/#{params[:project]}/#{params[:repo]}/issues?#{query_string}",
         headers: request_headers(params[:access_token])
       )
-
+      
     response.body
     |> Jason.decode!()
   end
