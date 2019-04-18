@@ -9,7 +9,8 @@ defmodule Slax do
     # Define workers and child supervisors to be supervised
     children = [
       supervisor(Slax.Repo, []),
-      supervisor(SlaxWeb.Endpoint, [])
+      supervisor(SlaxWeb.Endpoint, []),
+      worker(Slax.Scheduler, [])
     ]
 
     opts = [strategy: :one_for_one, name: Slax.Supervisor]

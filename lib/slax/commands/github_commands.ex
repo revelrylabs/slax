@@ -141,6 +141,14 @@ defmodule Slax.Commands.GithubCommands do
       {:error, _} -> false
     end)
   end
+  
+  @doc """
+  Formats list of issues to be displayed nicely within Slack
+  """
+  def format_issues(results) do
+    results
+    |> Jason.encode!() #TODO: actually format the issues nicely
+  end
 
   @doc """
   Formats results map to be displayed nicely within Slack

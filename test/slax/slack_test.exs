@@ -24,7 +24,6 @@ defmodule Slax.Slack.Test do
 
     {:ok, bypass: bypass, url: url}
   end
-
   test "send_message/1", %{bypass: bypass, url: url} do
     Bypass.expect_once(bypass, "POST", "/", fn conn ->
       Plug.Conn.resp(conn, 200, ~s<{"ok": true}>)
