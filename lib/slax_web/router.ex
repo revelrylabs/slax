@@ -14,5 +14,7 @@ defmodule SlaxWeb.Router do
     post("/slax", SlaxController, :start)
     post("/blocker", BlockerController, :start)
 
+
+    get("/blockerbot", BlockerbotController, :start)
   end
 end
