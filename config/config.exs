@@ -63,8 +63,8 @@ config :slax, Slax.Scheduler,
   jobs: [
     # schedule for 9:30 monday thru friday
     blockerbot: [
-      schedule: "30 9 * * 1,2,3,4,5",
-      task: fn -> "hello" end
+      schedule: "* * * * *",
+      task: {Slax.Scheduler, :start, []}
     ]
   ]
 
