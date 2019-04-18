@@ -11,10 +11,11 @@ defmodule SlaxWeb.BlockerController do
   # TODO: may want to think about repurposing this slash command to handle configuration of the  daily blocker bot messages
   # e.g. /blocker org/repo 9:00AM
   # /blocker in-progress-min=24
+  # /blocker turn-on/off
   # etc.
-  # would want to store configurations in db
+  # would want to store configurations in db somewhere
 
-  def start(conn, %{"response_url" => response_url, "text" => "get-all-issues", "channel_name" => channel_name}) do
+  def start(conn, %{"response_url" => response_url, "text" => "get-in-progress-issues", "channel_name" => channel_name}) do
     do_start(
       conn,
       :handle_get_blockers_request,
@@ -26,7 +27,7 @@ defmodule SlaxWeb.BlockerController do
     )
   end
 
-  def start(conn, %{ "text" => "init" <> scheduled_time, "channel_name" => channel_name}) do
+  def start(conn, %{"text" => "init" <> scheduled_time, "channel_name" => channel_name}) do
     do_start(
       conn,
       :handle_get_blockers_init_request,
@@ -41,7 +42,7 @@ defmodule SlaxWeb.BlockerController do
   def start(conn, _) do
     text(conn, """
     *Blocker commands:*
-    /blocker get-all-issues  -- _Gets all potential blockers for whatever project channel (=repo) you are calling from_
+    /blocker get-in-progress-issues  -- _Gets all potential blockers for whatever project channel (=repo) you are calling from_
     """)
   end
 
@@ -75,7 +76,7 @@ defmodule SlaxWeb.BlockerController do
  
     Slack.post_message_to_channel(%{
       text: formatted_response,
-      channel_name: "#"<>channel_name
+      channel_name: "#"<>"random"
     })
   end
 
