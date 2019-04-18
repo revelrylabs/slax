@@ -58,6 +58,15 @@ config :slax, Slax.Slack,
     project: System.get_env("PROJECT_SLACK_TOKEN"),
     sprint: System.get_env("SPRINT_SLACK_TOKEN")
   ]
+config :slax, Slax.Scheduler,
+  jobs: [
+    # Every 15 minutes
+    blockerbot: [
+      schedule: "30 9 * * *"
+      task: fn
+    ]
+  ]
+
 
 # Import environment specific config. This must remain at the bottom
 # of this file so it overrides the configuration defined above.
