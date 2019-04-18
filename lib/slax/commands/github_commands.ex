@@ -146,6 +146,7 @@ defmodule Slax.Commands.GithubCommands do
   Formats list of issues to be displayed nicely within Slack
   """
   def format_issues(results) do
+    IO.inspect(results, label: "results: ")
     formatted_list = results
     |> Enum.map(&format_issue(&1))
     |> Enum.join("\n")
@@ -160,7 +161,7 @@ defmodule Slax.Commands.GithubCommands do
     |> Enum.join(",")
 
     cond do
-      String.contains?(labels, "In Progress") -> 
+      String.contains?(labels, "in progress") -> 
         "_#{issue["title"]}_ - Last Updated at #{issue["updated_at"]} \n" <>
         " _     -- assigned to: #{issue["assignee"]["login"]}_ \n" <>
         " _     -- labels:_ #{labels}"

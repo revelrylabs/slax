@@ -44,7 +44,8 @@ config :slax, Slax.Github,
   client_id: System.get_env("GITHUB_CLIENT_ID"),
   client_secret: System.get_env("GITHUB_CLIENT_SECRET"),
   org_name: System.get_env("GITHUB_ORG_NAME"),
-  org_teams: System.get_env("GITHUB_ORG_TEAMS")
+  org_teams: System.get_env("GITHUB_ORG_TEAMS"),
+  api_token: System.get_env("GITHUB_API_TOKEN")
 
 config :slax, Slax.Slack,
   api_url: "https://slack.com/api",
