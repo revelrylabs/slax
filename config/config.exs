@@ -63,8 +63,8 @@ config :slax, Slax.Scheduler,
   jobs: [
     # Every 15 minutes
     blockerbot: [
-      schedule: "30 9 * * *"
-      task: fn
+      schedule: "30 9 * * 1,2,3,4,5",
+      task: fn -> "hello" end
     ]
   ]
 

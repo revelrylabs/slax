@@ -10,7 +10,6 @@ defmodule Slax.ProjectRepos do
     |> select([pr, pc], %{
       repo_name: pr.repo_name,
       org_name: pr.org_name,
-      webhook_token: pc.webhook_token,
       channel_name: pc.channel_name
     })
     |> Repo.all()
