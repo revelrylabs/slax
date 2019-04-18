@@ -71,4 +71,24 @@ defmodule Slax.Slack do
       body: request
     )
   end
+
+
+  @doc """
+    posts text to a given channel
+  """
+  def post_message_to_channel(%{text: text, channel_name: channel_name}) do
+    request =
+      URI.encode_query(
+        token: api_token(),
+        text: text,
+        channel: channel_name
+      )
+    IO.inspect(request, label: " request")
+    HTTPotion.post(
+      "#{api_url()}/chat.postMessage",
+      headers: ["Content-Type": "application/x-www-form-urlencoded"],
+      body: request
+    )
+  end
+
 end
