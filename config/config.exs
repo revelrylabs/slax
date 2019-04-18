@@ -61,7 +61,7 @@ config :slax, Slax.Slack,
   ]
 config :slax, Slax.Scheduler,
   jobs: [
-    # Every 15 minutes
+    # schedule for 9:30 monday thru friday
     blockerbot: [
       schedule: "30 9 * * 1,2,3,4,5",
       task: fn -> "hello" end
