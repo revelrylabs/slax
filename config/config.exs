@@ -62,9 +62,9 @@ config :slax, Slax.Slack,
   ]
 config :slax, Slax.Scheduler,
   jobs: [
-    # schedule for 9:30 monday thru friday
+    # schedule for 9:30 monday thru friday (14:30 UTC)
     blockerbot: [
-      schedule: "* * * * *",
+      schedule: "30 14 * * 1,2,3,4,5",
       task: {Slax.Scheduler, :start, []}
     ]
   ]
