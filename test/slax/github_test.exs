@@ -110,7 +110,7 @@ defmodule Slax.Github.Test do
     }
     
 
-    url = "/repos/#{params[:repo]}/#{params[:repo]}/issues"
+    url = "/repos/#{params[:org]}/#{params[:repo]}/issues"
 
     {:ok, context |> Map.put(:params, params) |> Map.put(:url, url)}
   end
