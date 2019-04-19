@@ -83,8 +83,8 @@ defmodule Slax.Slack do
         text: text,
         channel: channel_name
       )
-    IO.inspect(request, label: " request")
-    HTTPotion.post(
+
+      HTTPotion.post(
       "#{api_url()}/chat.postMessage",
       headers: ["Content-Type": "application/x-www-form-urlencoded"],
       body: request
