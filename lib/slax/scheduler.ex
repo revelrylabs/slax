@@ -6,7 +6,6 @@ defmodule Slax.Scheduler do
 
   def start() do
     repos = ProjectRepos.get_repos()
-    IO.inspect("RUNNING!!!!!!!!!!!!!!!!")
     repos
       |> Enum.map(fn repo ->
       params = %{

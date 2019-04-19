@@ -90,4 +90,30 @@ defmodule Slax.Slack.Test do
                })
     end
   end
+
+
+  def post_message_to_channel_setup(context) do
+    url = "/chat.postMessage"
+
+    {:ok, context |> Map.put(:url, url)}
+  end
+
+  describe "post_message_to_channel/1" do
+    setup [:post_message_to_channel_setup]
+
+    test "success", %{bypass: bypass, url: url} do
+      Bypass.expect_once(bypass, "POST", url, fn conn ->
+        Plug.Conn.resp(conn, 200, ~s<{"ok": true}>)
+      end)
+
+      assert %HTTPotion.Response{
+               status_code: 200,
+               body: "{\"ok\": true}"
+             } =
+               Slack.post_message_to_channel(%{
+                 text: "test message",
+                 channel_name: "#channel"
+               })
+    end
+  end
 end
