@@ -2,39 +2,21 @@ defmodule Slax.Slack.Test do
   use Slax.ModelCase, async: true
   alias Slax.Slack
 
-  setup do
-    bypass = Bypass.open()
-    url = "http://localhost:#{bypass.port}"
+  import Mox
 
-    Application.put_env(
-      :slax,
-      Slax.Slack,
-      api_url: url,
-      api_token: "token",
-      tokens: [
-        comment: "token",
-        issue: "token",
-        auth: "token",
-        tarpon: "token",
-        project: "token",
-        sprint: "token",
-        slax: "token"
-      ]
-    )
+  setup :verify_on_exit!
 
-    {:ok, bypass: bypass, url: url}
-  end
-
-  test "send_message/1", %{bypass: bypass, url: url} do
-    Bypass.expect_once(bypass, "POST", "/", fn conn ->
-      Plug.Conn.resp(conn, 200, ~s<{"ok": true}>)
+  test "send_message/1" do
+    expect(Slax.HttpMock, :post, fn _, _, _, _ ->
+      {:ok, %HTTPoison.Response{status_code: 200, body: ~s<{"ok": true}>}}
     end)
 
-    assert %HTTPotion.Response{
-             status_code: 200,
-             body: "{\"ok\": true}"
-           } =
-             Slack.send_message(url, %{
+    assert {:ok,
+            %{
+              status_code: 200,
+              body: %{"ok" => true}
+            }} =
+             Slack.send_message("", %{
                response_type: "in_channel",
                text: "Hello"
              })
@@ -49,17 +31,21 @@ defmodule Slax.Slack.Test do
   describe "create_channel/1" do
     setup [:create_channel_setup]
 
-    test "success", %{bypass: bypass, url: url} do
-      Bypass.expect_once(bypass, "POST", url, fn conn ->
-        Plug.Conn.resp(conn, 201, ~s<{"ok": true, "channel": "test"}>)
+    test "success" do
+      expect(Slax.HttpMock, :post, fn _, _, _, _ ->
+        {:ok, %HTTPoison.Response{status_code: 201, body: ~s<{"ok": true, "channel": "test"}>}}
       end)
 
       assert Slack.create_channel("test") == {:ok, "test"}
     end
 
-    test "failure", %{bypass: bypass, url: url} do
-      Bypass.expect_once(bypass, "POST", url, fn conn ->
-        Plug.Conn.resp(conn, 400, ~s<{"ok": false, "error": "Something happened"}>)
+    test "failure" do
+      expect(Slax.HttpMock, :post, fn _, _, _, _ ->
+        {:ok,
+         %HTTPoison.Response{
+           status_code: 400,
+           body: ~s<{"ok": false, "error": "Something happened"}>
+         }}
       end)
 
       assert Slack.create_channel("test") == {:error, "Something happened"}
@@ -75,15 +61,16 @@ defmodule Slax.Slack.Test do
   describe "add_reaction/1" do
     setup [:add_reaction_setup]
 
-    test "success", %{bypass: bypass, url: url} do
-      Bypass.expect_once(bypass, "POST", url, fn conn ->
-        Plug.Conn.resp(conn, 200, ~s<{"ok": true}>)
+    test "success" do
+      expect(Slax.HttpMock, :post, fn _, _, _, _ ->
+        {:ok, %HTTPoison.Response{status_code: 200, body: ~s<{"ok": true}>}}
       end)
 
-      assert %HTTPotion.Response{
-               status_code: 200,
-               body: "{\"ok\": true}"
-             } =
+      assert {:ok,
+              %{
+                status_code: 200,
+                body: %{"ok" => true}
+              }} =
                Slack.add_reaction(%{
                  name: "smile",
                  channel_id: "12345",

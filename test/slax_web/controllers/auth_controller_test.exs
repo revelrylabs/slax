@@ -1,19 +1,8 @@
 defmodule SlaxWeb.AuthController.Test do
   use SlaxWeb.ConnCase, async: true
+  import Mox
 
-  setup %{conn: conn} do
-    bypass = Bypass.open()
-    url = "http://localhost:#{bypass.port}"
-
-    Application.put_env(
-      :slax,
-      Slax.Github,
-      api_url: url,
-      oauth_url: url
-    )
-
-    {:ok, conn: conn, bypass: bypass, url: url}
-  end
+  setup :verify_on_exit!
 
   test "sends usage message when there is no text", %{conn: conn} do
     params = %{
@@ -54,18 +43,13 @@ defmodule SlaxWeb.AuthController.Test do
     assert response(conn, 200) =~ "http"
   end
 
-  test "github_redirect", %{conn: conn, url: url} do
-    conn = get(conn, auth_path(conn, :github_redirect), state: "state")
-    assert redirected_to(conn) =~ url
-  end
-
-  test "github_callback", %{conn: conn, bypass: bypass} do
-    Bypass.expect_once(bypass, "POST", "/access_token", fn conn ->
-      Plug.Conn.resp(conn, 200, ~s<{"access_token": "12345"}>)
+  test "github_callback", %{conn: conn} do
+    Slax.HttpMock
+    |> expect(:post, fn _, _, _, _ ->
+      {:ok, %HTTPoison.Response{status_code: 200, body: ~s<{"access_token": "12345"}>}}
     end)
-
-    Bypass.expect_once(bypass, "GET", "/user", fn conn ->
-      Plug.Conn.resp(conn, 200, ~s<{"login": "test"}>)
+    |> expect(:get, fn _, _, _ ->
+      {:ok, %HTTPoison.Response{status_code: 200, body: ~s<{"login": "test"}>}}
     end)
 
     conn = get(conn, auth_path(conn, :github_callback), state: "state", code: "code")

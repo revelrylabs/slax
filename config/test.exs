@@ -9,6 +9,8 @@ config :slax, SlaxWeb.Endpoint,
 # Print only warnings and errors during test
 config :logger, level: :warn
 
+config :slax, http_adapter: Slax.HttpMock
+
 # Configure your database
 config :slax, Slax.Repo,
   database: "slax_test",
