@@ -28,7 +28,7 @@ defmodule Slax.Mixfile do
   def application do
     [
       mod: {Slax, []},
-      extra_applications: [:logger, :quantum]
+      extra_applications: [:logger]
     ]
   end
 
@@ -57,6 +57,7 @@ defmodule Slax.Mixfile do
       {:jason, "~> 1.1"},
       {:distillery, "~> 2.0"},
       {:ex_machina, "~> 2.2", only: :test},
+      {:quantum, "~> 2.3"},
       {:timex, "~> 3.0"}
     ]
   end
