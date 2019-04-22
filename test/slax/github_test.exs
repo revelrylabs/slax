@@ -95,10 +95,12 @@ defmodule Slax.Github.Test do
     params = %{
       username: "test",
       repo: "test",
+      org: "test",
       access_token: "token"
     }
+    
 
-    url = "/repos/#{params[:repo]}/issues"
+    url = "/repos/#{params[:org]}/#{params[:repo]}/issues"
 
     {:ok, context |> Map.put(:params, params) |> Map.put(:url, url)}
   end

@@ -21,6 +21,7 @@ defmodule Slax.ModelCase do
       import Ecto
       import Ecto.Changeset
       import Ecto.Query
+      import Slax.Factory
       import Slax.ModelCase
     end
   end

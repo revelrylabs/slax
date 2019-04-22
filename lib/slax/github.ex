@@ -126,14 +126,18 @@ defmodule Slax.Github do
   Fetch issues from a repo created by a specific user
   """
   def fetch_issues(params) do
-    query_string =
-      URI.encode_query(%{
-        creator: params[:username]
-      })
+    params_map = %{}
+
+    case params[:username] do
+      _ ->
+        Map.put_new(params_map, :creator, params[:username])
+    end
+
+    query_string = URI.encode_query(params_map)
 
     response =
       Http.get(
-        "#{api_url()}/repos/#{params[:repo]}/issues?#{query_string}",
+        "#{api_url()}/repos/#{params[:org]}/#{params[:repo]}/issues?#{query_string}",
         request_headers(params[:access_token])
       )
 

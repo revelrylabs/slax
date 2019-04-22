@@ -1,5 +1,5 @@
 defmodule Slax.Factory do
-  alias Slax.{User, Repo}
+  alias Slax.{User, ProjectRepo, Project, ProjectChannel, Repo}
   use ExMachina.Ecto, repo: Repo
 
   def user_factory do
@@ -7,6 +7,28 @@ defmodule Slax.Factory do
       slack_id: "slack",
       github_username: "testuser",
       github_access_token: "token"
+    }
+  end
+
+  def project_factory do
+    %Project{
+      name: "hit song"
+    }
+  end
+
+  def project_repo_factory do
+    %ProjectRepo{
+      project: build(:project),
+      repo_name: "girl u know its true",
+      org_name: "milivanili"
+    }
+  end
+
+  def project_channel_factory do
+    %ProjectChannel{
+      project: build(:project),
+      channel_name: "testchannel",
+      webhook_token: "token"
     }
   end
 end

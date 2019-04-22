@@ -46,7 +46,8 @@ config :slax, Slax.Github,
   client_id: System.get_env("GITHUB_CLIENT_ID"),
   client_secret: System.get_env("GITHUB_CLIENT_SECRET"),
   org_name: System.get_env("GITHUB_ORG_NAME"),
-  org_teams: System.get_env("GITHUB_ORG_TEAMS")
+  org_teams: System.get_env("GITHUB_ORG_TEAMS"),
+  api_token: System.get_env("GITHUB_API_TOKEN")
 
 config :slax, Slax.Slack,
   api_url: "https://slack.com/api",
@@ -58,8 +59,18 @@ config :slax, Slax.Slack,
     auth: System.get_env("AUTH_SLACK_TOKEN"),
     tarpon: System.get_env("TARPON_SLACK_TOKEN"),
     project: System.get_env("PROJECT_SLACK_TOKEN"),
-    sprint: System.get_env("SPRINT_SLACK_TOKEN")
+    sprint: System.get_env("SPRINT_SLACK_TOKEN"),
+    blocker: System.get_env("BLOCKER_SLACK_TOKEN")
   ]
+config :slax, Slax.Scheduler,
+  jobs: [
+    # schedule for 9:25 monday thru friday (14:30 UTC)
+    blockerbot: [
+      schedule: "25 14 * * 1,2,3,4,5",
+      task: {Slax.Scheduler, :start, []}
+    ]
+  ]
+
 
 # Import environment specific config. This must remain at the bottom
 # of this file so it overrides the configuration defined above.

@@ -78,4 +78,30 @@ defmodule Slax.Slack.Test do
                })
     end
   end
+
+  def post_message_to_channel_setup(context) do
+    url = "/chat.postMessage"
+
+    {:ok, context |> Map.put(:url, url)}
+  end
+
+  describe "post_message_to_channel/1" do
+    setup [:post_message_to_channel_setup]
+
+    test "success" do
+      expect(Slax.HttpMock, :post, fn _, _, _, _ ->
+        {:ok, %HTTPoison.Response{status_code: 200, body: ~s<{"ok": true}>}}
+      end)
+
+      assert {:ok,
+              %{
+                status_code: 200,
+                body: %{"ok" => true}
+              }} =
+               Slack.post_message_to_channel(%{
+                 text: "test message",
+                 channel_name: "#channel"
+               })
+    end
+  end
 end

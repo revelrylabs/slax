@@ -27,5 +27,8 @@ config :slax, Slax.Slack,
     tarpon: "token",
     project: "token",
     sprint: "token",
-    slax: "token"
+    slax: "token",
+    blocker: "token"
   ]
+
+config :slax, Slax.Github, org_name: "organization"

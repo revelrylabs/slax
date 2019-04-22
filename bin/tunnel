@@ -1,0 +1,3 @@
+#!/bin/bash
+
+ssh -R "slax-$(hostname -s)-$(whoami):80:localhost:4000" serveo.net
