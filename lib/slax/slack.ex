@@ -2,6 +2,7 @@ defmodule Slax.Slack do
   @moduledoc """
   Functions for workig with the Slack API
   """
+  alias Slax.Http
 
   defp config() do
     Application.get_env(:slax, __MODULE__)
@@ -27,10 +28,10 @@ defmodule Slax.Slack do
         timestamp: timestamp
       )
 
-    HTTPotion.post(
+    Http.post(
       "#{api_url()}/reactions.add",
-      headers: ["Content-Type": "application/x-www-form-urlencoded"],
-      body: request
+      request,
+      "Content-Type": "application/x-www-form-urlencoded"
     )
   end
 
@@ -45,17 +46,18 @@ defmodule Slax.Slack do
       )
 
     response =
-      HTTPotion.post(
+      Http.post(
         "#{api_url()}/channels.create",
-        headers: ["Content-Type": "application/x-www-form-urlencoded"],
-        body: request
+        request,
+        "Content-Type": "application/x-www-form-urlencoded"
       )
 
-    body = Jason.decode!(response.body)
+    case response do
+      {_, %{body: %{"ok" => true} = body}} ->
+        {:ok, body["channel"]}
 
-    case body["ok"] do
-      true -> {:ok, body["channel"]}
-      false -> {:error, body["error"]}
+      {_, %{body: body}} ->
+        {:error, body["error"]}
     end
   end
 
@@ -65,13 +67,12 @@ defmodule Slax.Slack do
   def send_message(url, message) do
     request = Jason.encode!(message)
 
-    HTTPotion.post(
+    Http.post(
       url,
-      headers: ["Content-Type": "application/json"],
-      body: request
+      request,
+      "Content-Type": "application/json"
     )
   end
-
 
   @doc """
     posts text to a given channel
@@ -84,11 +85,10 @@ defmodule Slax.Slack do
         channel: channel_name
       )
 
-      HTTPotion.post(
+    Http.post(
       "#{api_url()}/chat.postMessage",
-      headers: ["Content-Type": "application/x-www-form-urlencoded"],
-      body: request
+      request,
+      "Content-Type": "application/x-www-form-urlencoded"
     )
   end
-
 end

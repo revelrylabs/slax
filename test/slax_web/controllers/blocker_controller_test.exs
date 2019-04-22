@@ -1,43 +1,10 @@
 defmodule SlaxWeb.BlockerController.Test do
   use SlaxWeb.ConnCase, async: true
+  import Mox
 
-  setup %{conn: conn} do    
-    bypass = Bypass.open()
-    url = "http://localhost:#{bypass.port}"
+  setup :verify_on_exit!
 
-    Application.put_env(
-      :slax,
-      Slax.Slack,
-      api_url: url,
-      api_token: "token",
-      tokens: [
-        comment: "token",
-        issue: "token",
-        auth: "token",
-        tarpon: "token",
-        project: "token",
-        sprint: "token",
-        slax: "token",
-        blocker: "token"
-      ]
-    )
-
-    Application.put_env(
-      :slax,
-      Slax.Github,
-      api_url: url,
-      oauth_url: url,
-      org_name: "organization"
-    )
-
-    {:ok, conn: conn, bypass: bypass, url: url}
-  end
-
-  test "halts on invalid token", %{conn: conn, bypass: bypass} do
-    Bypass.stub(bypass, "POST", "/chat.postMessage", fn conn ->
-      Plug.Conn.resp(conn, 200, ~s<{"ok": true}>)
-    end)
-
+  test "halts on invalid token", %{conn: conn} do
     params = %{
       token: "invalid token",
       text: "get-in-progress-issues",
@@ -53,12 +20,10 @@ defmodule SlaxWeb.BlockerController.Test do
   end
 
   describe "use authenticated user" do
-    test "returns a response when requesting all in progress issues", %{conn: conn, bypass: bypass} do
+    test "returns a response when requesting all in progress issues", %{
+      conn: conn
+    } do
       insert(:user)
-
-      Bypass.stub(bypass, "POST", "/chat.postMessage", fn conn ->
-        Plug.Conn.resp(conn, 200, ~s<{"ok": true}>)
-      end)
 
       params = %{
         user_id: "slack",

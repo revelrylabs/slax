@@ -22,6 +22,8 @@ config :logger, :console,
   format: "$time $metadata[$level] $message\n",
   metadata: [:request_id]
 
+config :slax, http_adapter: HTTPoison
+
 config :slax, :lintron,
   secret: System.get_env("LINTRON_SECRET"),
   url: System.get_env("LINTRON_URL")

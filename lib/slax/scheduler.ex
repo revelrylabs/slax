@@ -6,8 +6,9 @@ defmodule Slax.Scheduler do
 
   def start() do
     repos = ProjectRepos.get_repos()
+
     repos
-      |> Enum.map(fn repo ->
+    |> Enum.each(fn repo ->
       params = %{
         repo: repo.repo_name,
         access_token: Application.get_env(:slax, Slax.Github)[:api_token],
@@ -20,7 +21,7 @@ defmodule Slax.Scheduler do
 
       Slack.post_message_to_channel(%{
         text: formatted_response,
-        channel_name: "#"<>repo.channel_name
+        channel_name: "#" <> repo.channel_name
       })
     end)
   end
