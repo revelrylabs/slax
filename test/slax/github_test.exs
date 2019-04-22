@@ -1,36 +1,26 @@
 defmodule Slax.Github.Test do
   use Slax.ModelCase, async: true
   alias Slax.Github
+  import Mox
 
-  setup do
-    bypass = Bypass.open()
-    url = "http://localhost:#{bypass.port}"
-
-    Application.put_env(
-      :slax,
-      Slax.Github,
-      api_url: url,
-      oauth_url: url
-    )
-
-    {:ok, bypass: bypass}
-  end
+  # Make sure mocks are verified when the test exits
+  setup :verify_on_exit!
 
   test "authorize_url/1" do
     assert Github.authorize_url(%{token: "token"}) =~ "token=token"
   end
 
-  test "fetch_access_token/1", %{bypass: bypass} do
-    Bypass.expect_once(bypass, "POST", "/access_token", fn conn ->
-      Plug.Conn.resp(conn, 200, ~s<{"access_token": "token"}>)
+  test "fetch_access_token/1" do
+    expect(Slax.HttpMock, :post, fn _, _, _, _ ->
+      {:ok, %HTTPoison.Response{status_code: 200, body: ~s<{"access_token": "token"}>}}
     end)
 
     assert Github.fetch_access_token(%{}) == "token"
   end
 
-  test "current_user_info/1", %{bypass: bypass} do
-    Bypass.expect_once(bypass, "GET", "/user", fn conn ->
-      Plug.Conn.resp(conn, 200, ~s<{"username": "test"}>)
+  test "current_user_info/1" do
+    expect(Slax.HttpMock, :get, fn _, _, _ ->
+      {:ok, %HTTPoison.Response{status_code: 200, body: ~s<{"username": "test"}>}}
     end)
 
     assert Github.current_user_info(%{}) == %{"username" => "test"}
@@ -50,17 +40,17 @@ defmodule Slax.Github.Test do
   describe "create_issue/1" do
     setup [:create_issue_setup]
 
-    test "success", %{bypass: bypass, params: params, url: url} do
-      Bypass.expect_once(bypass, "POST", url, fn conn ->
-        Plug.Conn.resp(conn, 201, ~s<{"html_url": "http://github.com"}>)
+    test "success", %{params: params} do
+      expect(Slax.HttpMock, :post, fn _, _, _, _ ->
+        {:ok, %HTTPoison.Response{status_code: 201, body: ~s<{"html_url": "http://github.com"}>}}
       end)
 
       assert Github.create_issue(params) == {:ok, "http://github.com"}
     end
 
-    test "failure", %{bypass: bypass, params: params, url: url} do
-      Bypass.expect_once(bypass, "POST", url, fn conn ->
-        Plug.Conn.resp(conn, 400, ~s<{"message": "Something happened"}>)
+    test "failure", %{params: params} do
+      expect(Slax.HttpMock, :post, fn _, _, _, _ ->
+        {:ok, %HTTPoison.Response{status_code: 400, body: ~s<{"message": "Something happened"}>}}
       end)
 
       assert Github.create_issue(params) == {:error, "Something happened"}
@@ -84,17 +74,17 @@ defmodule Slax.Github.Test do
   describe "create_comment/1" do
     setup [:create_comment_setup]
 
-    test "success", %{bypass: bypass, params: params, url: url} do
-      Bypass.expect_once(bypass, "POST", url, fn conn ->
-        Plug.Conn.resp(conn, 201, ~s<{"html_url": "http://github.com"}>)
+    test "success", %{params: params} do
+      expect(Slax.HttpMock, :post, fn _, _, _, _ ->
+        {:ok, %HTTPoison.Response{status_code: 201, body: ~s<{"html_url": "http://github.com"}>}}
       end)
 
       assert Github.create_comment(params) == {:ok, "http://github.com"}
     end
 
-    test "failure", %{bypass: bypass, params: params, url: url} do
-      Bypass.expect_once(bypass, "POST", url, fn conn ->
-        Plug.Conn.resp(conn, 400, ~s<{"message": "Something happened"}>)
+    test "failure", %{params: params} do
+      expect(Slax.HttpMock, :post, fn _, _, _, _ ->
+        {:ok, %HTTPoison.Response{status_code: 400, body: ~s<{"message": "Something happened"}>}}
       end)
 
       assert Github.create_comment(params) == {:error, "Something happened"}
@@ -116,17 +106,17 @@ defmodule Slax.Github.Test do
   describe "fetch_issues/1" do
     setup [:fetch_issues_setup]
 
-    test "success", %{bypass: bypass, params: params, url: url} do
-      Bypass.expect_once(bypass, "GET", url, fn conn ->
-        Plug.Conn.resp(conn, 201, ~s<[{"id": 1}]>)
+    test "success", %{params: params} do
+      expect(Slax.HttpMock, :get, fn _, _, _ ->
+        {:ok, %HTTPoison.Response{status_code: 201, body: ~s<[{"id": 1}]>}}
       end)
 
       assert Github.fetch_issues(params) == [%{"id" => 1}]
     end
 
-    test "failure", %{bypass: bypass, params: params, url: url} do
-      Bypass.expect_once(bypass, "GET", url, fn conn ->
-        Plug.Conn.resp(conn, 400, ~s<{"message": "Something happened"}>)
+    test "failure", %{params: params} do
+      expect(Slax.HttpMock, :get, fn _, _, _ ->
+        {:ok, %HTTPoison.Response{status_code: 400, body: ~s<{"message": "Something happened"}>}}
       end)
 
       assert Github.fetch_issues(params) == %{"message" => "Something happened"}
@@ -149,17 +139,17 @@ defmodule Slax.Github.Test do
   describe "fetch_issue/1" do
     setup [:fetch_issue_setup]
 
-    test "success", %{bypass: bypass, params: params, url: url} do
-      Bypass.expect_once(bypass, "GET", url, fn conn ->
-        Plug.Conn.resp(conn, 201, ~s<{"id": 1}>)
+    test "success", %{params: params} do
+      expect(Slax.HttpMock, :get, fn _, _, _ ->
+        {:ok, %HTTPoison.Response{status_code: 201, body: ~s<{"id": 1}>}}
       end)
 
       assert Github.fetch_issue(params) == %{"id" => 1}
     end
 
-    test "failure", %{bypass: bypass, params: params, url: url} do
-      Bypass.expect_once(bypass, "GET", url, fn conn ->
-        Plug.Conn.resp(conn, 400, ~s<{"message": "Something happened"}>)
+    test "failure", %{params: params} do
+      expect(Slax.HttpMock, :get, fn _, _, _ ->
+        {:ok, %HTTPoison.Response{status_code: 400, body: ~s<{"message": "Something happened"}>}}
       end)
 
       assert Github.fetch_issue(params) == %{"message" => "Something happened"}
@@ -180,17 +170,17 @@ defmodule Slax.Github.Test do
   describe "fetch_milestones/1" do
     setup [:fetch_milestones_setup]
 
-    test "success", %{bypass: bypass, params: params, url: url} do
-      Bypass.expect_once(bypass, "GET", url, fn conn ->
-        Plug.Conn.resp(conn, 201, ~s<[{"id": 1}]>)
+    test "success", %{params: params} do
+      expect(Slax.HttpMock, :get, fn _, _, _ ->
+        {:ok, %HTTPoison.Response{status_code: 201, body: ~s<[{"id": 1}]>}}
       end)
 
       assert Github.fetch_milestones(params) == {:ok, [%{"id" => 1}]}
     end
 
-    test "failure", %{bypass: bypass, params: params, url: url} do
-      Bypass.expect_once(bypass, "GET", url, fn conn ->
-        Plug.Conn.resp(conn, 404, ~s<{"message": "Not Found"}>)
+    test "failure", %{params: params} do
+      expect(Slax.HttpMock, :get, fn _, _, _ ->
+        {:ok, %HTTPoison.Response{status_code: 404, body: ~s<{"message": "Not Found"}>}}
       end)
 
       assert Github.fetch_milestones(params) == {:error, :not_found}
@@ -213,17 +203,17 @@ defmodule Slax.Github.Test do
   describe "create_milestone/1" do
     setup [:create_milestone_setup]
 
-    test "success", %{bypass: bypass, params: params, url: url} do
-      Bypass.expect_once(bypass, "POST", url, fn conn ->
-        Plug.Conn.resp(conn, 201, ~s<{"id": 1}>)
+    test "success", %{params: params} do
+      expect(Slax.HttpMock, :post, fn _, _, _, _ ->
+        {:ok, %HTTPoison.Response{status_code: 201, body: ~s<{"id": 1}>}}
       end)
 
       assert Github.create_milestone(params) == {:ok, %{"id" => 1}}
     end
 
-    test "failure", %{bypass: bypass, params: params, url: url} do
-      Bypass.expect_once(bypass, "POST", url, fn conn ->
-        Plug.Conn.resp(conn, 400, ~s<{"message": "Invalid"}>)
+    test "failure", %{params: params} do
+      expect(Slax.HttpMock, :post, fn _, _, _, _ ->
+        {:ok, %HTTPoison.Response{status_code: 400, body: ~s<{"message": "Invalid"}>}}
       end)
 
       assert Github.create_milestone(params) == {:error, "Invalid"}
@@ -246,17 +236,17 @@ defmodule Slax.Github.Test do
   describe "add_issue_to_milestone/1" do
     setup [:add_issue_to_milestone_setup]
 
-    test "success", %{bypass: bypass, params: params, url: url} do
-      Bypass.expect_once(bypass, "PATCH", url, fn conn ->
-        Plug.Conn.resp(conn, 200, ~s<{"id": 1}>)
+    test "success", %{params: params} do
+      expect(Slax.HttpMock, :patch, fn _, _, _, _ ->
+        {:ok, %HTTPoison.Response{status_code: 201, body: ~s<{"id": 1}>}}
       end)
 
       assert Github.add_issue_to_milestone(params) == {:ok, %{"id" => 1}}
     end
 
-    test "failure", %{bypass: bypass, params: params, url: url} do
-      Bypass.expect_once(bypass, "PATCH", url, fn conn ->
-        Plug.Conn.resp(conn, 400, ~s<{"message": "Invalid"}>)
+    test "failure", %{params: params} do
+      expect(Slax.HttpMock, :patch, fn _, _, _, _ ->
+        {:ok, %HTTPoison.Response{status_code: 400, body: ~s<{"message": "Invalid"}>}}
       end)
 
       assert Github.add_issue_to_milestone(params) == {:error, "Invalid"}
@@ -278,17 +268,25 @@ defmodule Slax.Github.Test do
   describe "create_repo/1" do
     setup [:create_repo_setup]
 
-    test "success", %{bypass: bypass, params: params, url: url} do
-      Bypass.expect_once(bypass, "POST", url, fn conn ->
-        Plug.Conn.resp(conn, 201, ~s<{"html_url": "https://github.com/test/test"}>)
+    test "success", %{params: params} do
+      expect(Slax.HttpMock, :post, fn _, _, _, _ ->
+        {:ok,
+         %HTTPoison.Response{
+           status_code: 201,
+           body: ~s<{"html_url": "https://github.com/test/test"}>
+         }}
       end)
 
       assert Github.create_repo(params) == {:ok, "https://github.com/test/test"}
     end
 
-    test "failure", %{bypass: bypass, params: params, url: url} do
-      Bypass.expect_once(bypass, "POST", url, fn conn ->
-        Plug.Conn.resp(conn, 400, ~s<{"message": "Invalid"}>)
+    test "failure", %{params: params} do
+      expect(Slax.HttpMock, :post, fn _, _, _, _ ->
+        {:ok,
+         %HTTPoison.Response{
+           status_code: 400,
+           body: ~s<{"message": "Invalid"}>
+         }}
       end)
 
       assert Github.create_repo(params) == {:error, "Invalid"}
@@ -310,25 +308,37 @@ defmodule Slax.Github.Test do
   describe "fetch_repo/1" do
     setup [:fetch_repo_setup]
 
-    test "success", %{bypass: bypass, params: params, url: url} do
-      Bypass.expect_once(bypass, "GET", url, fn conn ->
-        Plug.Conn.resp(conn, 201, ~s<{"html_url": "https://github.com/test/test"}>)
+    test "success", %{params: params} do
+      expect(Slax.HttpMock, :get, fn _, _, _ ->
+        {:ok,
+         %HTTPoison.Response{
+           status_code: 201,
+           body: ~s<{"html_url": "https://github.com/test/test"}>
+         }}
       end)
 
       assert Github.fetch_repo(params) == {:ok, "https://github.com/test/test"}
     end
 
-    test "failure", %{bypass: bypass, params: params, url: url} do
-      Bypass.expect_once(bypass, "GET", url, fn conn ->
-        Plug.Conn.resp(conn, 400, ~s<{"message": "Invalid"}>)
+    test "failure", %{params: params} do
+      expect(Slax.HttpMock, :get, fn _, _, _ ->
+        {:ok,
+         %HTTPoison.Response{
+           status_code: 400,
+           body: ~s<{"message": "Invalid"}>
+         }}
       end)
 
       assert Github.fetch_repo(params) == {:error, "Invalid"}
     end
 
-    test "not found", %{bypass: bypass, params: params, url: url} do
-      Bypass.expect_once(bypass, "GET", url, fn conn ->
-        Plug.Conn.resp(conn, 404, ~s<{}>)
+    test "not found", %{params: params} do
+      expect(Slax.HttpMock, :get, fn _, _, _ ->
+        {:ok,
+         %HTTPoison.Response{
+           status_code: 404,
+           body: ~s<{}>
+         }}
       end)
 
       assert Github.fetch_repo(params) == :not_found
@@ -349,17 +359,25 @@ defmodule Slax.Github.Test do
   describe "create_webhook/1" do
     setup [:create_webhook_setup]
 
-    test "success", %{bypass: bypass, params: params, url: url} do
-      Bypass.expect_once(bypass, "POST", url, fn conn ->
-        Plug.Conn.resp(conn, 201, ~s<{"id": 1}>)
+    test "success", %{params: params} do
+      expect(Slax.HttpMock, :post, fn _, _, _, _ ->
+        {:ok,
+         %HTTPoison.Response{
+           status_code: 201,
+           body: ~s<{"id": 1}>
+         }}
       end)
 
       assert Github.create_webhook(params) == {:ok, 1}
     end
 
-    test "failure", %{bypass: bypass, params: params, url: url} do
-      Bypass.expect_once(bypass, "POST", url, fn conn ->
-        Plug.Conn.resp(conn, 400, ~s<{"message": "Invalid"}>)
+    test "failure", %{params: params} do
+      expect(Slax.HttpMock, :post, fn _, _, _, _ ->
+        {:ok,
+         %HTTPoison.Response{
+           status_code: 400,
+           body: ~s<{"message": "Invalid"}>
+         }}
       end)
 
       assert Github.create_webhook(params) == {:error, "Invalid"}
@@ -380,17 +398,25 @@ defmodule Slax.Github.Test do
   describe "fetch_tree/1" do
     setup [:fetch_tree_setup]
 
-    test "success", %{bypass: bypass, params: params, url: url} do
-      Bypass.expect_once(bypass, "GET", url, fn conn ->
-        Plug.Conn.resp(conn, 201, ~s<{"html_url": "https://github.com/test/test"}>)
+    test "success", %{params: params} do
+      expect(Slax.HttpMock, :get, fn _, _, _ ->
+        {:ok,
+         %HTTPoison.Response{
+           status_code: 201,
+           body: ~s<{"html_url": "https://github.com/test/test"}>
+         }}
       end)
 
       assert Github.fetch_tree(params) == {:ok, %{"html_url" => "https://github.com/test/test"}}
     end
 
-    test "failure", %{bypass: bypass, params: params, url: url} do
-      Bypass.expect_once(bypass, "GET", url, fn conn ->
-        Plug.Conn.resp(conn, 400, ~s<{"message": "Invalid"}>)
+    test "failure", %{params: params} do
+      expect(Slax.HttpMock, :get, fn _, _, _ ->
+        {:ok,
+         %HTTPoison.Response{
+           status_code: 400,
+           body: ~s<{"message": "Invalid"}>
+         }}
       end)
 
       assert Github.fetch_tree(params) == {:error, "Invalid"}
@@ -412,17 +438,25 @@ defmodule Slax.Github.Test do
   describe "fetch_blob/1" do
     setup [:fetch_blob_setup]
 
-    test "success", %{bypass: bypass, params: params, url: url} do
-      Bypass.expect_once(bypass, "GET", url, fn conn ->
-        Plug.Conn.resp(conn, 201, ~s<{"html_url": "https://github.com/test/test"}>)
+    test "success", %{params: params} do
+      expect(Slax.HttpMock, :get, fn _, _, _ ->
+        {:ok,
+         %HTTPoison.Response{
+           status_code: 201,
+           body: ~s<{"html_url": "https://github.com/test/test"}>
+         }}
       end)
 
       assert Github.fetch_blob(params) == {:ok, %{"html_url" => "https://github.com/test/test"}}
     end
 
-    test "failure", %{bypass: bypass, params: params, url: url} do
-      Bypass.expect_once(bypass, "GET", url, fn conn ->
-        Plug.Conn.resp(conn, 400, ~s<{"message": "Invalid"}>)
+    test "failure", %{params: params} do
+      expect(Slax.HttpMock, :get, fn _, _, _ ->
+        {:ok,
+         %HTTPoison.Response{
+           status_code: 400,
+           body: ~s<{"message": "Invalid"}>
+         }}
       end)
 
       assert Github.fetch_blob(params) == {:error, "Invalid"}
@@ -443,17 +477,25 @@ defmodule Slax.Github.Test do
   describe "list_teams/1" do
     setup [:list_teams_setup]
 
-    test "success", %{bypass: bypass, params: params, url: url} do
-      Bypass.expect_once(bypass, "GET", url, fn conn ->
-        Plug.Conn.resp(conn, 201, ~s<[{"id": 1}]>)
+    test "success", %{params: params} do
+      expect(Slax.HttpMock, :get, fn _, _, _ ->
+        {:ok,
+         %HTTPoison.Response{
+           status_code: 201,
+           body: ~s<[{"id": 1}]>
+         }}
       end)
 
       assert Github.list_teams(params) == {:ok, [%{"id" => 1}]}
     end
 
-    test "failure", %{bypass: bypass, params: params, url: url} do
-      Bypass.expect_once(bypass, "GET", url, fn conn ->
-        Plug.Conn.resp(conn, 400, ~s<{"message": "Invalid"}>)
+    test "failure", %{params: params} do
+      expect(Slax.HttpMock, :get, fn _, _, _ ->
+        {:ok,
+         %HTTPoison.Response{
+           status_code: 400,
+           body: ~s<{"message": "Invalid"}>
+         }}
       end)
 
       assert Github.list_teams(params) == {:error, "Invalid"}
@@ -475,17 +517,25 @@ defmodule Slax.Github.Test do
   describe "add_team_to_repo/1" do
     setup [:add_team_to_repo_setup]
 
-    test "success", %{bypass: bypass, params: params, url: url} do
-      Bypass.expect_once(bypass, "PUT", url, fn conn ->
-        Plug.Conn.resp(conn, 201, ~s<{"id": 1}>)
+    test "success", %{params: params} do
+      expect(Slax.HttpMock, :put, fn _, _, _, _ ->
+        {:ok,
+         %HTTPoison.Response{
+           status_code: 201,
+           body: ~s<{"id": 1}>
+         }}
       end)
 
       assert Github.add_team_to_repo(params) == {:ok, "Created"}
     end
 
-    test "failure", %{bypass: bypass, params: params, url: url} do
-      Bypass.expect_once(bypass, "PUT", url, fn conn ->
-        Plug.Conn.resp(conn, 400, ~s<{"message": "Invalid"}>)
+    test "failure", %{params: params} do
+      expect(Slax.HttpMock, :put, fn _, _, _, _ ->
+        {:ok,
+         %HTTPoison.Response{
+           status_code: 400,
+           body: ~s<{"message": "Invalid"}>
+         }}
       end)
 
       assert Github.add_team_to_repo(params) == {:error, "Invalid"}

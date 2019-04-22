@@ -2,6 +2,8 @@ defmodule Slax.Github do
   @moduledoc """
   Functions for working with the Github API
   """
+  alias Slax.Http
+  alias Slax.Http.Error
 
   defp config() do
     Application.get_env(:slax, __MODULE__)
@@ -35,13 +37,20 @@ defmodule Slax.Github do
     request_body = URI.encode_query(params)
 
     response =
-      HTTPotion.post(
+      Http.post(
         "#{oauth_url()}/access_token",
-        body: request_body,
-        headers: [Accept: "application/json"]
+        request_body,
+        Accept: "application/json"
       )
 
-    Jason.decode!(response.body) |> Map.get("access_token")
+    case response do
+      {:ok, %{body: body}} ->
+        Map.get(body, "access_token")
+
+      {:error, error} ->
+        raise Error,
+          message: "error response, got: #{inspect(error)}"
+    end
   end
 
   @doc """
@@ -57,15 +66,18 @@ defmodule Slax.Github do
       })
 
     response =
-      HTTPotion.post(
+      Http.post(
         "#{api_url()}/repos/#{params[:repo]}/issues",
-        headers: request_headers(params[:access_token]),
-        body: request
+        request,
+        request_headers(params[:access_token])
       )
 
-    case response.status_code do
-      201 -> {:ok, Jason.decode!(response.body) |> Map.get("html_url")}
-      _ -> {:error, Jason.decode!(response.body) |> Map.get("message")}
+    case response do
+      {:ok, %{body: body}} ->
+        {:ok, Map.get(body, "html_url")}
+
+      {:error, %{body: body}} ->
+        {:error, Map.get(body, "message")}
     end
   end
 
@@ -79,15 +91,18 @@ defmodule Slax.Github do
       })
 
     response =
-      HTTPotion.post(
+      Http.post(
         "#{api_url()}/repos/#{params[:org]}/#{params[:repo]}/issues/#{params[:issue_number]}/comments",
-        headers: request_headers(params[:access_token]),
-        body: request
+        request,
+        request_headers(params[:access_token])
       )
 
-    case response.status_code do
-      201 -> {:ok, Jason.decode!(response.body) |> Map.get("html_url")}
-      _ -> {:error, Jason.decode!(response.body) |> Map.get("message")}
+    case response do
+      {:ok, %{body: body}} ->
+        {:ok, Map.get(body, "html_url")}
+
+      {:error, %{body: body}} ->
+        {:error, Map.get(body, "message")}
     end
   end
 
@@ -95,9 +110,16 @@ defmodule Slax.Github do
   Fetch information about the currently authenticated user
   """
   def current_user_info(params) do
-    response = HTTPotion.get("#{api_url()}/user", headers: request_headers(params[:access_token]))
+    response = Http.get("#{api_url()}/user", request_headers(params[:access_token]))
 
-    Jason.decode!(response.body)
+    case response do
+      {:ok, %{body: body}} ->
+        body
+
+      {:error, error} ->
+        raise Error,
+          message: "error response, got: #{inspect(error)}"
+    end
   end
 
   @doc """
@@ -110,13 +132,18 @@ defmodule Slax.Github do
       })
 
     response =
-      HTTPotion.get(
+      Http.get(
         "#{api_url()}/repos/#{params[:repo]}/issues?#{query_string}",
-        headers: request_headers(params[:access_token])
+        request_headers(params[:access_token])
       )
 
-    response.body
-    |> Jason.decode!()
+    case response do
+      {:ok, %{body: body}} ->
+        body
+
+      {:error, %{body: body}} ->
+        body
+    end
   end
 
   @doc """
@@ -124,12 +151,18 @@ defmodule Slax.Github do
   """
   def fetch_issue(params) do
     response =
-      HTTPotion.get(
+      Http.get(
         "#{api_url()}/repos/#{params[:repo]}/issues/#{params[:number]}",
-        headers: request_headers(params[:access_token])
+        request_headers(params[:access_token])
       )
 
-    Jason.decode!(response.body)
+    case response do
+      {:ok, %{body: body}} ->
+        body
+
+      {:error, %{body: body}} ->
+        body
+    end
   end
 
   @doc """
@@ -143,13 +176,15 @@ defmodule Slax.Github do
         direction: Map.get(params, :direction, "asc")
       })
 
-    HTTPotion.get(
-      "#{api_url()}/repos/#{params[:repo]}/milestones?#{query_string}",
-      headers: request_headers(params[:access_token])
-    )
-    |> case do
-      %{status_code: 404} -> {:error, :not_found}
-      %{body: body} -> {:ok, Jason.decode!(body)}
+    response =
+      Http.get(
+        "#{api_url()}/repos/#{params[:repo]}/milestones?#{query_string}",
+        request_headers(params[:access_token])
+      )
+
+    case response do
+      {_, %{status_code: 404}} -> {:error, :not_found}
+      {:ok, %{body: body}} -> {:ok, body}
     end
   end
 
@@ -164,15 +199,15 @@ defmodule Slax.Github do
       })
 
     response =
-      HTTPotion.post(
+      Http.post(
         "#{api_url()}/repos/#{params[:repo]}/milestones",
-        headers: request_headers(params[:access_token]),
-        body: request
+        request,
+        request_headers(params[:access_token])
       )
 
-    case response.status_code do
-      201 -> {:ok, Jason.decode!(response.body)}
-      _ -> {:error, Jason.decode!(response.body) |> Map.get("message")}
+    case response do
+      {:ok, %{body: body}} -> {:ok, body}
+      {:error, %{body: body}} -> {:error, Map.get(body, "message")}
     end
   end
 
@@ -186,15 +221,15 @@ defmodule Slax.Github do
       })
 
     response =
-      HTTPotion.patch(
+      Http.patch(
         "#{api_url()}/repos/#{params[:repo]}/issues/#{params[:issue_number]}",
-        headers: request_headers(params[:access_token]),
-        body: request
+        request,
+        request_headers(params[:access_token])
       )
 
-    case response.status_code do
-      200 -> {:ok, Jason.decode!(response.body)}
-      _ -> {:error, Jason.decode!(response.body) |> Map.get("message")}
+    case response do
+      {:ok, %{body: body}} -> {:ok, body}
+      {:error, %{body: body}} -> {:error, Map.get(body, "message")}
     end
   end
 
@@ -228,21 +263,19 @@ defmodule Slax.Github do
       })
 
     response =
-      HTTPotion.post(
+      Http.post(
         "#{api_url()}/orgs/#{org_name}/repos",
-        headers: request_headers(params[:access_token]),
-        body: request,
+        request,
+        request_headers(params[:access_token]),
         timeout: @timeout_length
       )
 
-    case response.status_code do
-      201 ->
-        body = Jason.decode!(response.body)
-        {:ok, body |> Map.get("html_url")}
+    case response do
+      {:ok, %{body: body}} ->
+        {:ok, Map.get(body, "html_url")}
 
-      _ ->
-        body = Jason.decode!(response.body)
-        {:error, body |> Map.get("message")}
+      {:error, %{body: body}} ->
+        {:error, Map.get(body, "message")}
     end
   end
 
@@ -254,23 +287,21 @@ defmodule Slax.Github do
     name = params[:name]
 
     response =
-      HTTPotion.get(
+      Http.get(
         "#{api_url()}/repos/#{org_name}/#{name}",
-        headers: request_headers(params[:access_token]),
+        request_headers(params[:access_token]),
         timeout: @timeout_length
       )
 
-    case response.status_code do
-      201 ->
-        body = Jason.decode!(response.body)
-        {:ok, body |> Map.get("html_url")}
-
-      404 ->
+    case response do
+      {_, %{status_code: 404}} ->
         :not_found
 
-      _ ->
-        body = Jason.decode!(response.body)
-        {:error, body |> Map.get("message")}
+      {:ok, %{body: body}} ->
+        {:ok, Map.get(body, "html_url")}
+
+      {:error, %{body: body}} ->
+        {:error, Map.get(body, "message")}
     end
   end
 
@@ -293,21 +324,19 @@ defmodule Slax.Github do
       })
 
     response =
-      HTTPotion.post(
+      Http.post(
         "#{api_url()}/repos/#{repo}/hooks",
-        headers: request_headers(params[:access_token]),
-        body: request,
+        request,
+        request_headers(params[:access_token]),
         timeout: @timeout_length
       )
 
-    case response.status_code do
-      201 ->
-        body = Jason.decode!(response.body)
-        {:ok, body |> Map.get("id")}
+    case response do
+      {:ok, %{body: body}} ->
+        {:ok, Map.get(body, "id")}
 
-      _ ->
-        body = Jason.decode!(response.body)
-        {:error, body |> Map.get("message")}
+      {:error, %{body: body}} ->
+        {:error, Map.get(body, "message")}
     end
   end
 
@@ -318,18 +347,18 @@ defmodule Slax.Github do
     repo = params[:repo]
 
     response =
-      HTTPotion.get(
+      Http.get(
         "#{api_url()}/repos/#{repo}/git/trees/master?recursive=1",
-        headers: request_headers(params[:access_token]),
+        request_headers(params[:access_token]),
         timeout: @timeout_length
       )
 
-    case handle_response(response) do
-      {:ok, _} = ok ->
-        ok
+    case response do
+      {:ok, %{body: body}} ->
+        {:ok, body}
 
-      {:error, data} ->
-        {:error, data["message"]}
+      {:error, %{body: body}} ->
+        {:error, Map.get(body, "message")}
     end
   end
 
@@ -341,18 +370,18 @@ defmodule Slax.Github do
     sha = params[:sha]
 
     response =
-      HTTPotion.get(
+      Http.get(
         "#{api_url()}/repos/#{repo}/git/blobs/#{sha}",
-        headers: request_headers(params[:access_token]),
+        request_headers(params[:access_token]),
         timeout: @timeout_length
       )
 
-    case handle_response(response) do
-      {:ok, _} = ok ->
-        ok
+    case response do
+      {:ok, %{body: body}} ->
+        {:ok, body}
 
-      {:error, data} ->
-        {:error, data["message"]}
+      {:error, %{body: body}} ->
+        {:error, Map.get(body, "message")}
     end
   end
 
@@ -360,18 +389,18 @@ defmodule Slax.Github do
     org = params[:org]
 
     response =
-      HTTPotion.get(
+      Http.get(
         "#{api_url()}/orgs/#{org}/teams",
-        headers: request_headers(params[:access_token]),
+        request_headers(params[:access_token]),
         timeout: @timeout_length
       )
 
-    case handle_response(response) do
-      {:ok, _} = ok ->
-        ok
+    case response do
+      {:ok, %{body: body}} ->
+        {:ok, body}
 
-      {:error, data} ->
-        {:error, data["message"]}
+      {:error, %{body: body}} ->
+        {:error, Map.get(body, "message")}
     end
   end
 
@@ -385,32 +414,19 @@ defmodule Slax.Github do
       })
 
     response =
-      HTTPotion.put(
+      Http.put(
         "#{api_url()}/teams/#{team}/repos/#{repo}",
-        headers: request_headers(params[:access_token]),
-        body: request,
+        request,
+        request_headers(params[:access_token]),
         timeout: @timeout_length
       )
 
-    case response.status_code do
-      ok when ok in 200..299 ->
+    case response do
+      {:ok, _response} ->
         {:ok, "Created"}
 
-      _ ->
-        body = Jason.decode!(response.body)
-        {:error, body["message"]}
-    end
-  end
-
-  defp handle_response(response) do
-    body = Jason.decode!(response.body)
-
-    case response.status_code do
-      ok when ok in 200..299 ->
-        {:ok, body}
-
-      _ ->
-        {:error, body}
+      {:error, %{body: body}} ->
+        {:error, Map.get(body, "message")}
     end
   end
 
