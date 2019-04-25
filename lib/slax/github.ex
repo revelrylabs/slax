@@ -40,7 +40,8 @@ defmodule Slax.Github do
       Http.post(
         "#{oauth_url()}/access_token",
         request_body,
-        Accept: "application/json"
+        Accept: "application/json",
+        "Content-Type": "application/x-www-form-urlencoded"
       )
 
     case response do
