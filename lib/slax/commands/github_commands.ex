@@ -151,7 +151,14 @@ defmodule Slax.Commands.GithubCommands do
     |> Enum.join("")
 
     date = DateTime.utc_now
-    ":snail: *Issues In Progress for #{date.month}/#{date.day}* :snail: \n" <> formatted_list
+    #":snail: *Issues In Progress for * :snail: \n" <> formatted_list
+    ":snail:  *Latent Issues for Thursday, #{date.month}/#{date.day}* :slowpoke:
+    Ways to take ownership:
+    - Update ticket to correct column
+    - Pair 
+    - Comment blockers (even if you don't know)
+    - Escalate in channel (or another channel)\n
+    "<> formatted_list
   end
 
   defp format_issue(issue) do
@@ -160,11 +167,12 @@ defmodule Slax.Commands.GithubCommands do
     |> Enum.join(",")
 
     cond do
-      String.contains?(String.downcase(labels), "in progress") -> 
-        "_#{issue["title"]}_ - Last Updated at #{issue["updated_at"]} \n" <>
+      Enum.member?(["in progress", "in review", "qa", "uat"], String.downcase(labels)) ->
+        "_#{issue["title"]}_ - ##{issue["number"]}" <>
+        "#{issue["created_at"]} days\n" <>
+        " _     -- labels:_ #{labels}\n" <>
         " _     -- assigned to: #{issue["assignee"]["login"]}_ \n" <>
-        " _     -- labels:_ #{labels}" <>
-        "\n"
+        " _     -- last updated at: #{issue["updated_at"]}_ \n"
       true -> 
         ""
     end
