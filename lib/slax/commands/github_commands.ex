@@ -151,8 +151,10 @@ defmodule Slax.Commands.GithubCommands do
     |> Enum.join("")
 
     date = DateTime.utc_now
-    #":snail: *Issues In Progress for * :snail: \n" <> formatted_list
-    ":snail:  *Latent Issues for Thursday, #{date.month}/#{date.day}* :slowpoke:
+    today = date
+    |> Timex.weekday()
+    |> Timex.day_name()
+    ":snail:  *Latent Issues for #{today}, #{date.month}/#{date.day}* :slowpoke:
     Ways to take ownership:
     - Update ticket to correct column
     - Pair 
