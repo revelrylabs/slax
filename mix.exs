@@ -57,6 +57,7 @@ defmodule Slax.Mixfile do
       {:jason, "~> 1.1"},
       {:distillery, "~> 2.0"},
       {:ex_machina, "~> 2.2", only: :test},
+      {:stream_data, "~> 0.4.3", only: :test},
       {:quantum, "~> 2.3"},
       {:timex, "~> 3.0"}
     ]

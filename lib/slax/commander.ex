@@ -10,6 +10,21 @@ defmodule Slax.Commander do
     "pong"
   end
 
+  def run(context, ["roll", number]) do
+    case Integer.parse(number) do
+      :error ->
+        run(context, ["help"])
+
+      {num, _} when num <= 0 ->
+        run(context, ["help"])
+
+      {num, _} ->
+        num
+        |> :random.uniform()
+        |> to_string()
+    end
+  end
+
   def run(_context, _command) do
     """
     *Slax commands:*
@@ -19,6 +34,7 @@ defmodule Slax.Commander do
     Commands:
 
     ping    Checks to make sure the server is alive
+    roll [number-of-sides]  Rolls an n-sided die and returns the result
     """
   end
 end
