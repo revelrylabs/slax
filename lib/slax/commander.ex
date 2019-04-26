@@ -13,6 +13,12 @@ defmodule Slax.Commander do
   def run(_context, _command) do
     """
     *Slax commands:*
+
+    Usage: /slax [command] [options]
+
+    Commands:
+
+    ping    Checks to make sure the server is alive
     """
   end
 end
