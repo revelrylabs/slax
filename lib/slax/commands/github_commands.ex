@@ -147,7 +147,6 @@ defmodule Slax.Commands.GithubCommands do
   """
   def format_issues(results) do
     formatted_list = results
-    # add event label filter here
     |> Enum.map(&format_issue(&1))
     |> Enum.join("")
 
