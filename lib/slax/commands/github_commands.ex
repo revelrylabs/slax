@@ -147,6 +147,7 @@ defmodule Slax.Commands.GithubCommands do
   """
   def format_issues(results) do
     formatted_list = results
+    # add event label filter here
     |> Enum.map(&format_issue(&1))
     |> Enum.join("")
 
@@ -171,7 +172,8 @@ defmodule Slax.Commands.GithubCommands do
     cond do
       Enum.member?(["in progress", "in review", "qa", "uat"], String.downcase(labels)) ->
         "_#{issue["title"]}_ - ##{issue["number"]}" <>
-        "#{issue["created_at"]} days\n" <>
+          # since moved to in progress
+        "__ days\n" <>
         " _     -- labels:_ #{labels}\n" <>
         " _     -- assigned to: #{issue["assignee"]["login"]}_ \n" <>
         " _     -- last updated at: #{issue["updated_at"]}_ \n"
@@ -180,6 +182,14 @@ defmodule Slax.Commands.GithubCommands do
     end
   end
 
+  @doc """
+  Formats issue events for signal cue filtering
+  """
+  defp format_events(results) do
+  end
+
+  defp format_event(results) do
+  end
 
   @doc """
   Formats results map to be displayed nicely within Slack

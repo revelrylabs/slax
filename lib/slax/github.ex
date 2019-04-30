@@ -171,6 +171,25 @@ defmodule Slax.Github do
   end
 
   @doc """
+  Fetch issue events
+  """
+  def fetch_issue_events(params) do
+    response =
+      Http.get(
+        "#{api_url()}/repos/#{params[:org]}/#{params[:repo]}/issues/events",
+        request_headers(params[:access_token])
+      )
+
+    case response do
+      {:ok, %{body: body}} ->
+        body
+
+      {:error, %{body: body}} ->
+        body
+    end
+  end
+
+  @doc """
   Fetch all milestones for a repo
   """
   def fetch_milestones(params) do

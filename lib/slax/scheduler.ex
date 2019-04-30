@@ -19,6 +19,15 @@ defmodule Slax.Scheduler do
         Github.fetch_issues(params)
         |> GithubCommands.format_issues()
 
+      formatted_events =
+        Github.fetch_issue_events(params)
+        # given raw list of issues
+        # format for label event timeline
+        # |> Enum.map(&format_events(&1))
+        # constrain based upon set cues
+        # |> Enum.map(&constrain_events(&1))
+
+
       Slack.post_message_to_channel(%{
         text: formatted_response,
         channel_name: "#" <> repo.channel_name
