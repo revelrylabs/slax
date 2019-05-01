@@ -164,30 +164,52 @@ defmodule Slax.Commands.GithubCommands do
   end
 
   defp format_issue(issue) do
-    labels = issue["labels"]
-    |> Enum.map(& &1["name"])
-    |> Enum.join(",")
+    label = issue["label"]["name"]
+    issue = issue["issue"]
 
     cond do
-      Enum.member?(["in progress", "in review", "qa", "uat"], String.downcase(labels)) ->
+      Enum.member?(["in progress", "in review", "qa", "uat"], label) ->
+        # by hour
+        threshold = case label do
+          "in progress" ->
+            8
+          "in review" ->
+            4
+          "qa" ->
+            8
+          "uat" ->
+            8
+        end
+
+        IO.inspect("-")
+
+        Timex.today()
+          |> IO.inspect()
+        issue["created_at"]
+          |> IO.inspect()
+        label 
+          |> IO.inspect()
+        threshold
+          |> IO.inspect()
+        
+        IO.inspect("today\n created at\n hours\n threshold")
+        
+        #Timex.today() > issue["created_at"] + issue_threshold_hour(label)
+        #IO.inspect()
+      true ->
+        ""
+    end
+    cond do
+      Enum.member?(["in progress", "in review", "qa", "uat"], label) ->
         "_#{issue["title"]}_ - ##{issue["number"]}" <>
           # since moved to in progress
-        "__ days\n" <>
-        " _     -- labels:_ #{labels}\n" <>
+        "*__ days*\n" <>
+        " _     -- labels:_ #{label}\n" <>
         " _     -- assigned to: #{issue["assignee"]["login"]}_ \n" <>
         " _     -- last updated at: #{issue["updated_at"]}_ \n"
       true -> 
         ""
     end
-  end
-
-  @doc """
-  Formats issue events for signal cue filtering
-  """
-  defp format_events(results) do
-  end
-
-  defp format_event(results) do
   end
 
   @doc """
