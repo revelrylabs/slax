@@ -167,31 +167,26 @@ defmodule Slax.Commands.GithubCommands do
     label = issue["label"]["name"]
     issue = issue["issue"]
 
-    cond do
-      Enum.member?(["in progress", "in review", "qa", "uat"], label) ->
-        # by hour
-        threshold = case label do
-          "in progress" ->
-            8
-          "in review" ->
-            4
-          "qa" ->
-            8
-          "uat" ->
-            8
-        end
-
-        {_, created_at} = NaiveDateTime.from_iso8601(issue["created_at"])
-        # check for movement for >8 hours
-        Timex.today()
-          |> Timex.compare(Timex.shift(created_at, hours: threshold))
-          |> IO.inspect()
-
-      true ->
-        ""
+    # by hour
+    threshold = case label do
+      "in progress" ->
+        8
+      "in review" ->
+        4
+      "qa" ->
+        8
+      "uat" ->
+        8
     end
+
+    {_, created_at} = NaiveDateTime.from_iso8601(issue["created_at"])
+    # check for movement for >8 hours
+    
+    issue_movement = Timex.today()
+      |> Timex.compare(Timex.shift(created_at, hours: threshold))
+
     cond do
-      Enum.member?(["in progress", "in review", "qa", "uat"], label) ->
+      Enum.member?(["in progress", "in review", "qa", "uat"], label) && issue_movement == 1 ->
         "_#{issue["title"]}_ - ##{issue["number"]}" <>
           # since moved to in progress
         "*{Timex.format_duration(,:humanized)}__ days*\n" <>
