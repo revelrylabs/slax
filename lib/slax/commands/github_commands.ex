@@ -181,21 +181,12 @@ defmodule Slax.Commands.GithubCommands do
             8
         end
 
-        IO.inspect("-")
-
+        {_, created_at} = NaiveDateTime.from_iso8601(issue["created_at"])
+        # check for movement for >8 hours
         Timex.today()
+          |> Timex.compare(Timex.shift(created_at, hours: threshold))
           |> IO.inspect()
-        issue["created_at"]
-          |> IO.inspect()
-        label 
-          |> IO.inspect()
-        threshold
-          |> IO.inspect()
-        
-        IO.inspect("today\n created at\n hours\n threshold")
-        
-        #Timex.today() > issue["created_at"] + issue_threshold_hour(label)
-        #IO.inspect()
+
       true ->
         ""
     end
@@ -203,7 +194,7 @@ defmodule Slax.Commands.GithubCommands do
       Enum.member?(["in progress", "in review", "qa", "uat"], label) ->
         "_#{issue["title"]}_ - ##{issue["number"]}" <>
           # since moved to in progress
-        "*__ days*\n" <>
+        "*{Timex.format_duration(,:humanized)}__ days*\n" <>
         " _     -- labels:_ #{label}\n" <>
         " _     -- assigned to: #{issue["assignee"]["login"]}_ \n" <>
         " _     -- last updated at: #{issue["updated_at"]}_ \n"
