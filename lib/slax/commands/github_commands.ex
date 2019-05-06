@@ -148,6 +148,7 @@ defmodule Slax.Commands.GithubCommands do
   def format_issues(results) do
     formatted_list = results
     |> Enum.map(&format_issue(&1))
+    #|> Enum.uniq()
     |> Enum.join("")
 
     date = DateTime.utc_now
@@ -157,40 +158,61 @@ defmodule Slax.Commands.GithubCommands do
     ":snail:  *Latent Issues for #{today}, #{date.month}/#{date.day}* :slowpoke:
     Ways to take ownership:
     - Update ticket to correct column
-    - Pair 
+    - Pair
     - Comment blockers (even if you don't know)
     - Escalate in channel (or another channel)\n
     "<> formatted_list
   end
 
-  defp format_issue(issue) do
-    label = issue["label"]["name"]
-    issue = issue["issue"]
+  @doc """
+  Filters list of issues based from column threshold Slack
+  """
+  def filter_issues(results) do
+    Enum.filter(results, fn issue ->
+      label = issue["labels"]#["name"]
+      #issue = issue["issue"]
 
-    # by hour
-    threshold = case label do
-      "in progress" ->
-        8
-      "in review" ->
-        4
-      "qa" ->
-        8
-      "uat" ->
-        8
-    end
+      # by hour
+      threshold = case label do
+        "in progress" ->
+          8
+        "in review" ->
+          4
+        "qa" ->
+          8
+        "uat" ->
+          8
+        _ ->
+          0
+      end
 
-    {_, created_at} = NaiveDateTime.from_iso8601(issue["created_at"])
-    # check for movement for >8 hours
+      {_, created_at} = NaiveDateTime.from_iso8601(issue["created_at"])
+      {_, created_at} = DateTime.from_naive(created_at, "Etc/UTC")
+      threshold_at = Timex.shift(created_at, hours: threshold)
+      # today past set threshold
+      # should take business hours into account 
+      issue_movement = Timex.compare(Timex.now, threshold_at)
+      IO.inspect("-")
+      IO.inspect(label)
+      IO.inspect("movement - - --")
+      IO.inspect(issue_movement)
+      IO.inspect("- - -")
+      IO.inspect(issue)
+    end) 
     
-    issue_movement = Timex.today()
-      |> Timex.compare(Timex.shift(created_at, hours: threshold))
+  end
+
+  defp format_issue(issue) do
+    labels = issue["labels"]
+    |> Enum.map(& &1["name"])
+    |> Enum.join(",")
 
     cond do
-      Enum.member?(["in progress", "in review", "qa", "uat"], label) && issue_movement == 1 ->
+      Enum.member?(["in progress", "in review", "qa", "uat"], labels) ->
         "_#{issue["title"]}_ - ##{issue["number"]}" <>
           # since moved to in progress
         "*{Timex.format_duration(,:humanized)}__ days*\n" <>
-        " _     -- labels:_ #{label}\n" <>
+        " _     -- labels:_ #{labels}\n" <>
         " _     -- assigned to: #{issue["assignee"]["login"]}_ \n" <>
         " _     -- last updated at: #{issue["updated_at"]}_ \n"
       true -> 

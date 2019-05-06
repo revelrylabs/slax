@@ -134,11 +134,11 @@ defmodule Slax.Github do
         Map.put_new(params_map, :creator, params[:username])
     end
 
-    #query_string = URI.encode_query(params_map)
+    query_string = URI.encode_query(params_map)
 
     response =
       Http.get(
-        "#{api_url()}/repos/#{params[:org]}/#{params[:repo]}/issues/events",
+        "#{api_url()}/repos/#{params[:org]}/#{params[:repo]}/issues?#{query_string}",
         request_headers(params[:access_token])
       )
 
