@@ -173,10 +173,10 @@ defmodule Slax.Github do
   @doc """
   Fetch issue events
   """
-  def fetch_issue_events(params) do
+  def fetch_issue_event(params) do
     response =
       Http.get(
-        "#{api_url()}/repos/#{params[:org]}/#{params[:repo]}/issues/events",
+        "#{api_url()}/repos/#{params[:org]}/#{params[:repo]}/issues/#{params[:issue_number]}/events",
         request_headers(params[:access_token])
       )
 

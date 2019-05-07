@@ -164,62 +164,60 @@ defmodule Slax.Commands.GithubCommands do
     "<> formatted_list
   end
 
-  @doc """
-  Filters list of issues based from column threshold Slack
-  """
-  def filter_issues(results) do
-    Enum.filter(results, fn issue ->
-      label = issue["labels"]#["name"]
-      #issue = issue["issue"]
-
-      # by hour
-      threshold = case label do
-        "in progress" ->
-          8
-        "in review" ->
-          4
-        "qa" ->
-          8
-        "uat" ->
-          8
-        _ ->
-          0
-      end
-
-      {_, created_at} = NaiveDateTime.from_iso8601(issue["created_at"])
-      {_, created_at} = DateTime.from_naive(created_at, "Etc/UTC")
-      threshold_at = Timex.shift(created_at, hours: threshold)
-      # today past set threshold
-      # should take business hours into account 
-      issue_movement = Timex.compare(Timex.now, threshold_at)
-      IO.inspect("-")
-      IO.inspect(label)
-      IO.inspect("movement - - --")
-      IO.inspect(issue_movement)
-      IO.inspect("- - -")
-      IO.inspect(issue)
-    end) 
-    
-  end
-
   defp format_issue(issue) do
     labels = issue["labels"]
     |> Enum.map(& &1["name"])
     |> Enum.join(",")
 
-    cond do
-      Enum.member?(["in progress", "in review", "qa", "uat"], labels) ->
-        "_#{issue["title"]}_ - ##{issue["number"]}" <>
-          # since moved to in progress
-        "*{Timex.format_duration(,:humanized)}__ days*\n" <>
-        " _     -- labels:_ #{labels}\n" <>
-        " _     -- assigned to: #{issue["assignee"]["login"]}_ \n" <>
-        " _     -- last updated at: #{issue["updated_at"]}_ \n"
-      true -> 
-        ""
-    end
+    "_#{issue["title"]}_ - ##{issue["number"]}" <>
+      # since moved to in progress
+    "*{Timex.format_duration(,:humanized)}__ days*\n" <>
+    " _     -- labels:_ #{labels}\n" <>
+    " _     -- assigned to: #{issue["assignee"]["login"]}_ \n" <>
+    " _     -- last updated at: #{issue["updated_at"]}_ \n"
   end
 
+  @doc """
+  Filters list of issues based from column threshold Slack
+  """
+  def filter_issues(results, params) do
+    Enum.filter(results, fn issue ->
+      labels = issue["labels"]["name"]
+      #issue = issue["issue"]
+
+      cond do
+        String.contains?(String.downcase(labels), ["in progress", "in review", "qa", "uat"]) ->
+          threshold = cond do
+            String.match?(labels, ~r/in progress[\d]+/) -> 8
+            String.match?(labels, ~r/in review[\d]+/) -> 4
+            String.match?(labels, ~r/qa[\d]+/) -> 8
+            String.match?(labels, ~r/uat[\d]+/) -> 8
+            true -> 0
+          end
+
+          unless threshold == 0 do
+            issue =
+              params
+              |> Map.put(:issue_number, issue["number"])
+              |> Github.fetch_issue_event()
+
+            {_, created_at} = NaiveDateTime.from_iso8601(issue["created_at"])
+            {_, created_at} = DateTime.from_naive(created_at, "Etc/UTC")
+
+            # today past set threshold
+            # NEED_TO: should take business hours into account 
+            threshold_at = Timex.shift(created_at, hours: threshold)
+
+            IO.inspect("-")
+            IO.inspect("- - -")
+          end
+
+          Timex.compare(Timex.now, threshold_at) == 1
+        true ->
+          false
+      end
+    end)
+  end
   @doc """
   Formats results map to be displayed nicely within Slack
   """
