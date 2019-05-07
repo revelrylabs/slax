@@ -19,9 +19,9 @@ defmodule Slax.Commander do
         run(context, ["help"])
 
       {num, _} ->
-        num
-        |> :random.uniform()
-        |> to_string()
+        num = :random.uniform(num)
+
+        "#{number}-sided die rolled. You rolled: #{num}"
     end
   end
 
