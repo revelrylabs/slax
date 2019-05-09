@@ -178,48 +178,38 @@ defmodule Slax.Commands.GithubCommands do
   end
 
   @doc """
-  Filters list of issues based from column threshold Slack
+  Filters list of issues from issues events request
+  threshold for filtering is based from
+  set column threshold and labeled date
   """
-  def filter_issues(results, params) do
-    Enum.filter(results, fn issue ->
-      labels = issue["labels"]
-        |> Enum.map(& &1["name"])
-        |> Enum.join(",")
-
-      cond do
-        String.contains?(String.downcase(labels), ["in progress", "in review", "qa", "uat"]) ->
+  def filter_issues(params) do
+    params
+    |> Enum.filter(fn issue ->
+      threshold_at =
+        if issue["label"]["name"] != nil do
           threshold = cond do
-            String.match?(labels, ~r/in progress/) -> 8
-            String.match?(labels, ~r/in review/) -> 4
-            String.match?(labels, ~r/qa/) -> 8
-            String.match?(labels, ~r/uat/) -> 8
+            issue["label"]["name"] == "in progress" -> 8
+            issue["label"]["name"] == "in review" -> 4
+            issue["label"]["name"] == "qa" -> 8
+            issue["label"]["name"] == "uat" -> 8
             true -> 0
           end
+          # create_at should rep when label 
+          # was first moved to rel col 
+          {_, created_at} = NaiveDateTime.from_iso8601(issue["created_at"])
+          {_, created_at} = DateTime.from_naive(created_at, "Etc/UTC")
 
-          unless threshold == 0 do
-            issue =
-              params
-              |> Map.put(:issue_number, issue["number"])
-              |> Github.fetch_issue_event()
+          # today past set threshold
+          # NEED_TO: should take business hours into account 
+          Timex.shift(created_at, hours: threshold)
+        else
+          0
+        end
 
-            IO.inspect("-")
-            IO.inspect(issue)
-            IO.inspect("- - -")
-
-            # create_at should rep when label 
-            # was first moved to rel col 
-            {_, created_at} = NaiveDateTime.from_iso8601(issue["created_at"])
-            {_, created_at} = DateTime.from_naive(created_at, "Etc/UTC")
-
-            # today past set threshold
-            # NEED_TO: should take business hours into account 
-            threshold_at = Timex.shift(created_at, hours: threshold)
-          end
-
-          Timex.compare(Timex.now, threshold_at) == 1
-        true ->
-          false
-      end
+        issue["label"]["name"] != nil &&
+        (issue["event"] == "assigned" || issue["event"] == "labeled") &&
+        String.contains?(issue["label"]["name"], ["in progress", "in review", "qa", "uat"]) &&
+        Timex.compare(Timex.now, threshold_at) == 1
     end)
   end
   @doc """
