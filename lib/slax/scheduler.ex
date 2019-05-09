@@ -17,8 +17,7 @@ defmodule Slax.Scheduler do
 
       formatted_response =
         Github.fetch_issues(params)
-        #|> IO.inspect()
-        |> GithubCommands.filter_issues(params)
+        |> GithubCommands.filter_issues(Github.fetch_issues_events(params))
         |> GithubCommands.format_issues()
 
       Slack.post_message_to_channel(%{

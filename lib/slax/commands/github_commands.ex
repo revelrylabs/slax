@@ -148,7 +148,6 @@ defmodule Slax.Commands.GithubCommands do
   def format_issues(results) do
     formatted_list = results
     |> Enum.map(&format_issue(&1))
-    #|> Enum.uniq()
     |> Enum.join("")
 
     date = DateTime.utc_now
@@ -165,16 +164,25 @@ defmodule Slax.Commands.GithubCommands do
   end
 
   defp format_issue(issue) do
-    labels = issue["labels"]
-    |> Enum.map(& &1["name"])
-    |> Enum.join(",")
+    labels =
+      issue["labels"]
+        |> Enum.map(& &1["name"])
+        |> Enum.join(",")
+
+    events =
+      issue[:issue_events]
+      |> Enum.map(fn event -> 
+        event["label"]["name"]
+      end)
+      |> Enum.join(",")
 
     "_#{issue["title"]}_ - ##{issue["number"]}" <>
       # since moved to in progress
     "*{Timex.format_duration(,:humanized)}__ days*\n" <>
     " _     -- labels:_ #{labels}\n" <>
     " _     -- assigned to: #{issue["assignee"]["login"]}_ \n" <>
-    " _     -- last updated at: #{issue["updated_at"]}_ \n"
+    " _     -- last updated at: #{issue["updated_at"]}_ \n" <>
+    " _     -- events: #{events}_ \n"
   end
 
   @doc """
@@ -182,7 +190,18 @@ defmodule Slax.Commands.GithubCommands do
   threshold for filtering is based from
   set column threshold and labeled date
   """
-  def filter_issues(params) do
+  def filter_issues(issues, issues_events) do
+    issues_events = filter_issues_events(issues_events)
+
+    issues
+    |> Enum.map(fn issue -> 
+      Map.put(issue, :issue_events, Enum.filter(issues_events, fn issue_event ->
+        issue["number"] == issue_event["issue"]["number"]
+      end))
+    end)
+  end
+
+  def filter_issues_events(params) do
     params
     |> Enum.filter(fn issue ->
       threshold_at =
