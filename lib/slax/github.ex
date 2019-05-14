@@ -173,6 +173,25 @@ defmodule Slax.Github do
   @doc """
   Fetch issue events
   """
+  def fetch_issues_events(params) do
+    response =
+      Http.get(
+        "#{api_url()}/repos/#{params[:org]}/#{params[:repo]}/issues/events",
+        request_headers(params[:access_token])
+      )
+
+    case response do
+      {:ok, %{body: body}} ->
+        body
+
+      {:error, %{body: body}} ->
+        body
+    end
+  end
+
+  @doc """
+  Fetch issue event
+  """
   def fetch_issue_event(params) do
     response =
       Http.get(

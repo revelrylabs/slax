@@ -171,18 +171,26 @@ defmodule Slax.Commands.GithubCommands do
 
     events =
       issue[:issue_events]
-      |> Enum.map(fn event -> 
-        event["label"]["name"]
-      end)
-      |> Enum.join(",")
+      #|> Enum.map(fn event ->
+      #  event["label"]["name"]
+      #end)
+      #|> Enum.join(",")
+
+    IO.inspect("____")
+    IO.inspect(events)
+    IO.inspect("----")
+      #  |> Enum.max_by(fn event ->
+      #      {_, created_at} = NaiveDateTime.from_iso8601(event["created_at"])
+      #      {_, created_at} = DateTime.from_naive(created_at, "Etc/UTC")
+      #    IO.inspect(created_at)
+      #  end)
 
     "_#{issue["title"]}_ - ##{issue["number"]}" <>
       # since moved to in progress
     "*{Timex.format_duration(,:humanized)}__ days*\n" <>
     " _     -- labels:_ #{labels}\n" <>
     " _     -- assigned to: #{issue["assignee"]["login"]}_ \n" <>
-    " _     -- last updated at: #{issue["updated_at"]}_ \n" <>
-    " _     -- events: #{events}_ \n"
+    " _     -- last updated at: #{issue["updated_at"]}_ \n"
   end
 
   @doc """
