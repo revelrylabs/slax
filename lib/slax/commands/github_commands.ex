@@ -2,6 +2,9 @@ defmodule Slax.Commands.GithubCommands do
   @moduledoc """
   Common functions for github commands
   """
+
+  require IEx
+
   @steps [
     :project_name,
     :github_repo,
@@ -141,7 +144,7 @@ defmodule Slax.Commands.GithubCommands do
       {:error, _} -> false
     end)
   end
-  
+
   @doc """
   Formats list of issues to be displayed nicely within Slack
   """
@@ -159,38 +162,77 @@ defmodule Slax.Commands.GithubCommands do
     - Update ticket to correct column
     - Pair
     - Comment blockers (even if you don't know)
-    - Escalate in channel (or another channel)\n
-    "<> formatted_list
+    - Escalate in channel (or another channel)\n\n"<> formatted_list
   end
 
   defp format_issue(issue) do
     labels =
       issue["labels"]
         |> Enum.map(& &1["name"])
-        |> Enum.join(",")
+        |> Enum.map(&(String.downcase(&1)))
 
-    events =
-      issue[:issue_events]
-      #|> Enum.map(fn event ->
-      #  event["label"]["name"]
-      #end)
-      #|> Enum.join(",")
+    [status, status_as_of] = calculate_status_from_events(issue[:issue_events])
+    {:ok, status_timestamp, _} = DateTime.from_iso8601(status_as_of)
+    status_seconds = DateTime.diff(DateTime.utc_now(), status_timestamp)
+    status_duration = Timex.Duration.from_seconds(status_seconds)
 
-    IO.inspect("____")
-    IO.inspect(events)
-    IO.inspect("----")
-      #  |> Enum.max_by(fn event ->
-      #      {_, created_at} = NaiveDateTime.from_iso8601(event["created_at"])
-      #      {_, created_at} = DateTime.from_naive(created_at, "Etc/UTC")
-      #    IO.inspect(created_at)
-      #  end)
+    if Enum.member?(["in progress", "in review", "qa", "uat"], status) do
+      {:ok, timestamp, _} = DateTime.from_iso8601(issue["updated_at"])
+      seconds = DateTime.diff(DateTime.utc_now(), timestamp)
+      duration = Timex.Duration.from_seconds(seconds)
 
-    "_#{issue["title"]}_ - ##{issue["number"]}" <>
-      # since moved to in progress
-    "*{Timex.format_duration(,:humanized)}__ days*\n" <>
-    " _     -- labels:_ #{labels}\n" <>
-    " _     -- assigned to: #{issue["assignee"]["login"]}_ \n" <>
-    " _     -- last updated at: #{issue["updated_at"]}_ \n"
+      assignees =
+        case issue["assignees"] do
+          [] ->
+            "_No one._"
+          _ ->
+            issue["assignees"] |> Enum.map(&(&1["login"]))
+        end
+
+      events =
+        issue[:issue_events]
+        |> Enum.map(fn event ->
+          "#{event["action"]} #{event["label"]["name"]} (#{event["created_at"]})"
+        end)
+        |> Enum.join(", ")
+
+      {:ok, update_time_string} = Elixir.Timex.Format.DateTime.Formatters.Relative.format(timestamp, "{relative}")
+      {:ok, status_time_string} = Elixir.Timex.Format.DateTime.Formatters.Relative.format(status_timestamp, "{relative}")
+
+      "*#{issue["title"] |> String.strip()}* (#{issue[:org]}/#{issue[:repo]}##{issue["number"]})\n" <>
+      "Status: #{status} for #{status_time_string}\n" <>
+      "Last Updated: #{update_time_string}\n" <>
+      "Assigned to: #{assignees}\n\n"
+    else
+      ""
+    end
+  end
+
+  def calculate_status_from_events(events) do
+    first_timestamp =
+      case events do
+        [] ->
+          DateTime.utc_now() |> DateTime.to_iso8601()
+        _ ->
+          events
+          |> Enum.at(0)
+          |> Map.get("created_at")
+      end
+
+    events
+    |> Enum.reduce([nil, first_timestamp], fn event, status ->
+      case event["action"] do
+        "labeled" ->
+          [event["label"]["name"], event["created_at"]]
+        "unlabeled" ->
+          [old_status, _] = status
+          if old_status == event["label"]["name"] do
+            [nil, event["created_at"]]
+          else
+            status
+          end
+      end
+    end)
   end
 
   @doc """
@@ -202,43 +244,28 @@ defmodule Slax.Commands.GithubCommands do
     issues_events = filter_issues_events(issues_events)
 
     issues
-    |> Enum.map(fn issue -> 
+    |> Enum.map(fn issue ->
       Map.put(issue, :issue_events, Enum.filter(issues_events, fn issue_event ->
         issue["number"] == issue_event["issue"]["number"]
       end))
     end)
   end
 
-  def filter_issues_events(params) do
-    params
-    |> Enum.filter(fn issue ->
-      threshold_at =
-        if issue["label"]["name"] != nil do
-          threshold = cond do
-            issue["label"]["name"] == "in progress" -> 8
-            issue["label"]["name"] == "in review" -> 4
-            issue["label"]["name"] == "qa" -> 8
-            issue["label"]["name"] == "uat" -> 8
-            true -> 0
-          end
-          # create_at should rep when label 
-          # was first moved to rel col 
-          {_, created_at} = NaiveDateTime.from_iso8601(issue["created_at"])
-          {_, created_at} = DateTime.from_naive(created_at, "Etc/UTC")
+  def filter_issues_events(issue_events) do
+    status_labels = ["in progress", "in review", "qa", "uat", "up next"]
 
-          # today past set threshold
-          # NEED_TO: should take business hours into account 
-          Timex.shift(created_at, hours: threshold)
-        else
-          0
-        end
+    issue_events
+    |> Enum.filter(&(Enum.member?(["labeled", "unlabeled"], &1["action"])))
+    |> Enum.filter(fn event ->
+        label_name =
+          event["label"]["name"]
+          |> String.downcase()
+          |> String.strip()
 
-        issue["label"]["name"] != nil &&
-        (issue["event"] == "assigned" || issue["event"] == "labeled") &&
-        String.contains?(issue["label"]["name"], ["in progress", "in review", "qa", "uat"]) &&
-        Timex.compare(Timex.now, threshold_at) == 1
+        Enum.member?(status_labels, label_name)
     end)
   end
+
   @doc """
   Formats results map to be displayed nicely within Slack
   """

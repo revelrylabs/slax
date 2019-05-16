@@ -2,6 +2,8 @@ defmodule Slax.Github do
   @moduledoc """
   Functions for working with the Github API
   """
+  require IEx
+
   alias Slax.Http
   alias Slax.Http.Error
 
@@ -145,6 +147,9 @@ defmodule Slax.Github do
     case response do
       {:ok, %{body: body}} ->
         body
+        |> Enum.map(fn issue ->
+          Map.merge(issue, %{org: params[:org], repo: params[:repo]})
+        end)
 
       {:error, %{body: body}} ->
         body
@@ -173,17 +178,26 @@ defmodule Slax.Github do
   @doc """
   Fetch issue events
   """
-  def fetch_issues_events(params) do
-    response =
-      Http.get(
-        "#{api_url()}/repos/#{params[:org]}/#{params[:repo]}/issues/events",
-        request_headers(params[:access_token])
+  def fetch_issues_events(params, issues) do
+    {:ok, secret} =
+      Application.get_env(:slax, Slax.EventSink, :issue_events_secret)
+      |> Keyword.fetch(:issue_events_secret)
+    issue_ids = issues |> Enum.map(&(&1["number"])) |> Enum.join(",")
+
+    signature =
+      :crypto.hash(
+        :sha256,
+        "#{secret}:#{issue_ids}"
       )
+      |> Base.url_encode64()
+
+    url = "https://event-sink.prod.revelry.net/api/issue/events/#{params[:org]}/#{params[:repo]}?issue_ids=#{issue_ids}&signature=#{signature}"
+
+    response = Http.get(url)
 
     case response do
       {:ok, %{body: body}} ->
         body
-
       {:error, %{body: body}} ->
         body
     end
