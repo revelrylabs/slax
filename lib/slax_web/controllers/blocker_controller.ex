@@ -4,8 +4,8 @@ defmodule SlaxWeb.BlockerController do
   plug(Slax.Plugs.VerifySlackToken, token: :blocker)
   plug(Slax.Plugs.VerifyUser)
 
-  alias Slax.{EventSink, Github, Slack}
-  alias Slax.Commands.{GithubCommands, Latency}
+  alias Slax.{Github, Slack}
+  alias Slax.Commands.{Latency}
 
   @moduledoc """
   Entry point to interact with blockerbot functionality.
@@ -63,7 +63,7 @@ defmodule SlaxWeb.BlockerController do
   end
 
   defp respond_for_repo(repo_name, github_access_token, response_url) do
-    org_name =  Application.get_env(:slax, Slax.Github)[:org_name]
+    org_name =  Application.get_env(:slax, Github)[:org_name]
 
     formatted_response =
       Latency.text_for_org_and_repo(org_name, repo_name, github_access_token)

@@ -1,8 +1,12 @@
 defmodule Slax.Scheduler do
+  @moduledoc """
+  Run the unmoved issue report on a schedule.
+  """
   use Quantum.Scheduler,
     otp_app: :slax
 
-  alias Slax.{Commands.GithubCommands, Github, Latency, ProjectRepos, Slack}
+  alias Slax.{Github, ProjectRepos, Slack}
+  alias Slax.Commands.{Latency}
 
   def start() do
     project_repos = ProjectRepos.get_repos()
@@ -18,7 +22,7 @@ defmodule Slax.Scheduler do
       Latency.text_for_org_and_repo(
         org_name,
         repo_name,
-        Application.get_env(:slax, Slax.Github)[:api_token]
+        Application.get_env(:slax, Github)[:api_token]
       )
 
     Slack.post_message_to_channel(%{

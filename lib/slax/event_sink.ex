@@ -3,7 +3,6 @@ defmodule Slax.EventSink do
   Functions for working with the Github API
   """
   alias Slax.Http
-  alias Slax.Http.Error
 
   @doc """
   Fetch issue events

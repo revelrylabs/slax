@@ -64,7 +64,7 @@ defmodule Slax.Commands.Latency do
     today = date
     |> Timex.weekday()
     |> Timex.day_name()
-    ":snail:  *Latent Issues for #{today}, #{date.month}/#{date.day}* :slowpoke:
+    ":snail:  *Unmoved Issues for #{today}, #{date.month}/#{date.day}* :slowpoke:
     Ways to take ownership:
     - Update ticket to correct column
     - Pair
@@ -90,7 +90,7 @@ defmodule Slax.Commands.Latency do
 
     issue_link = "<https://github.com/#{issue[:org]}/#{issue[:repo]}/issues/#{issue["number"]}|#{issue[:org]}/#{issue[:repo]}##{issue["number"]}>"
 
-    "*#{issue["title"] |> String.strip()}* (#{issue_link})\n" <>
+    "*#{issue["title"] |> String.trim()}* (#{issue_link})\n" <>
     "Status: #{status} for #{status_time_string}\n" <>
     "Last Updated: #{update_time_string}\n" <>
     "Assigned to: #{assignees}\n\n"
