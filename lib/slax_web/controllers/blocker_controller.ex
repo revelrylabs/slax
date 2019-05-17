@@ -63,22 +63,10 @@ defmodule SlaxWeb.BlockerController do
   end
 
   defp respond_for_repo(repo_name, github_access_token, response_url) do
-    params = %{
-      repo: repo_name,
-      access_token: github_access_token,
-      org: Application.get_env(:slax, Slax.Github)[:org_name]
-    }
-
-    issues = Github.fetch_issues(params)
-    events =
-      params
-      |> EventSink.fetch_issues_events(issues)
-      |> Latency.filter_issues_events()
+    org_name =  Application.get_env(:slax, Slax.Github)[:org_name]
 
     formatted_response =
-      issues
-      |> Latency.add_events_to_issues(events)
-      |> Latency.format_response()
+      Latency.text_for_org_and_repo(org_name, repo_name, github_access_token)
 
     Slack.send_message(response_url, %{
       response_type: "in_channel",

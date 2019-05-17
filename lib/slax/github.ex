@@ -2,7 +2,6 @@ defmodule Slax.Github do
   @moduledoc """
   Functions for working with the Github API
   """
-  require IEx
 
   alias Slax.Http
   alias Slax.Http.Error
