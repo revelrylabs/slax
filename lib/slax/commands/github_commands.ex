@@ -71,7 +71,7 @@ defmodule Slax.Commands.GithubCommands do
         results
 
       {:error, message} ->
-        Map.update(results, :errors, %{}, fn x -> Map.put(x, :resuseable_stories, message) end)
+        Map.update(results, :errors, %{}, fn x -> Map.put(x, :reusable_stories, message) end)
     end
   end
 
@@ -102,7 +102,7 @@ defmodule Slax.Commands.GithubCommands do
     blobs
     |> Enum.map(fn {:ok, path, content} ->
       with {:ok, issue} <- Base.decode64(content |> String.replace("\n", "")),
-           {:ok, front_matter, body} <- YamlFrontMatter.parse(issue) do
+           {:ok, {:ok, front_matter}, body} <- YamlFrontMatter.parse(issue) do
         {:ok, path, front_matter, body}
       else
         :error ->
@@ -139,7 +139,7 @@ defmodule Slax.Commands.GithubCommands do
     end)
     |> Enum.split_with(fn
       {:ok, _, _} -> true
-      {:error, _} -> false
+      {:error, _,_} -> false
     end)
   end
 
