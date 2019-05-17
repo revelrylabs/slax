@@ -10,7 +10,7 @@ defmodule Slax.Commands.GithubCommands do
     :slack_channel,
     :lintron,
     :board_checker,
-    :resuseable_stories
+    :reusable_stories
   ]
 
   alias Slax.{Github}
@@ -53,7 +53,7 @@ defmodule Slax.Commands.GithubCommands do
               Enum.map(errors, fn {:error, path, message} -> "#{path}: #{message}" end)
               |> Enum.join("\n")
 
-            Map.update(results, :errors, %{}, fn x -> Map.put(x, :resuseable_stories, errors) end)
+            Map.update(results, :errors, %{}, fn x -> Map.put(x, :reusable_stories, errors) end)
           else
             results
           end
@@ -62,7 +62,7 @@ defmodule Slax.Commands.GithubCommands do
           if length(issue_ids) > 0 do
             Map.put(results, :reusable_stories, true)
             |> Map.update(:success, %{}, fn x ->
-              Map.put(x, :resuseable_stories, "Reuseable Stories Created")
+              Map.put(x, :reusable_stories, "Reuseable Stories Created")
             end)
           else
             results
@@ -186,8 +186,8 @@ defmodule Slax.Commands.GithubCommands do
       :board_checker ->
         "Board Checker"
 
-      :resuseable_stories ->
-        "Reuseable Stories"
+      :reusable_stories ->
+        "Reusable Stories"
 
       _ ->
         ""
