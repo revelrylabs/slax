@@ -148,7 +148,7 @@ defmodule Slax.Github do
       {:ok, %{body: body}} ->
         body
         |> Enum.map(fn issue ->
-          Map.merge(issue, %{org: params[:org], repo: params[:repo]})
+          Map.merge(issue, %{"org" => params[:org], "repo" => params[:repo]})
         end)
 
       {:error, %{body: body}} ->

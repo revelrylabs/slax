@@ -29,7 +29,7 @@ defmodule SlaxWeb.BlockerController do
   def start(conn, _) do
     text(conn, """
     *Blocker commands:*
-    /blocker get-in-progress-issues  -- _Gets all issues that are in progress for whatever project channel (ie. repo) you are calling it from_
+    /blocker latency  -- _Get issues for this channel which have not updated lately_
     """)
   end
 
@@ -41,8 +41,8 @@ defmodule SlaxWeb.BlockerController do
   def handle_get_blockers_request(github_access_token, response_url, channel_name) do
     repo_names =
       Slax.ProjectChannel
-      |> from(Slax.ProjectChannel)
-      |> where(pc.channel_name == ^channel_name)
+      |> from()
+      |> where([pc], pc.channel_name == ^channel_name)
       |> join(:inner, [pc], p in assoc(pc, :project))
       |> select([_, pc], pc.name)
       |> Repo.all()

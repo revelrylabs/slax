@@ -98,7 +98,7 @@ defmodule Slax.Github.Test do
       org: "test",
       access_token: "token"
     }
-    
+
 
     url = "/repos/#{params[:org]}/#{params[:repo]}/issues"
 
@@ -113,7 +113,7 @@ defmodule Slax.Github.Test do
         {:ok, %HTTPoison.Response{status_code: 201, body: ~s<[{"id": 1}]>}}
       end)
 
-      assert Github.fetch_issues(params) == [%{"id" => 1}]
+      assert Github.fetch_issues(params) == [%{"id" => 1, "org" => "test", "repo" => "test"}]
     end
 
     test "failure", %{params: params} do

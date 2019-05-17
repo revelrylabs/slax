@@ -28,7 +28,7 @@ defmodule Slax.Commands.Latency do
 
     issues
     |> Enum.map(fn issue ->
-      Map.put(issue, :issue_events, Enum.filter(issues_events, fn issue_event ->
+      Map.put(issue, "events", Enum.filter(issues_events, fn issue_event ->
         issue["number"] == issue_event["issue"]["number"]
       end))
     end)
@@ -60,7 +60,7 @@ defmodule Slax.Commands.Latency do
         |> Enum.map(& &1["name"])
         |> Enum.map(&(String.downcase(&1)))
 
-    [status, status_as_of] = calculate_status_from_events(issue[:issue_events])
+    [status, status_as_of] = calculate_status_from_events(issue["events"])
     {:ok, status_timestamp, _} = DateTime.from_iso8601(status_as_of)
     status_seconds = DateTime.diff(DateTime.utc_now(), status_timestamp)
     status_duration = Timex.Duration.from_seconds(status_seconds)
@@ -80,7 +80,7 @@ defmodule Slax.Commands.Latency do
         end
 
       events =
-        issue[:issue_events]
+        issue["events"]
         |> Enum.map(fn event ->
           "#{event["action"]} #{event["label"]["name"]} (#{event["created_at"]})"
         end)

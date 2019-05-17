@@ -37,7 +37,7 @@ defmodule SlaxWeb.BlockerController.Test do
         conn
         |> post(blocker_path(conn, :start), params)
 
-      assert response(conn, 201) == ""
+      assert response(conn, 200) =~ "Get issues"
     end
   end
 end
