@@ -1,12 +1,11 @@
 defmodule SlaxWeb.BlockerController do
   use SlaxWeb, :controller
-  alias Slax.Slack
-  alias Slax.Github
 
   plug(Slax.Plugs.VerifySlackToken, token: :blocker)
   plug(Slax.Plugs.VerifyUser)
 
-  alias Slax.Commands.{GithubCommands}
+  alias Slax.{EventSink, Github, Slack}
+  alias Slax.Commands.{GithubCommands, Latency}
 
   @moduledoc """
   Entry point to interact with blockerbot functionality.
@@ -15,7 +14,7 @@ defmodule SlaxWeb.BlockerController do
   > /blocker turn-on/off #Turn on/off the blockerbot for a particular channel and/or project
   """
 
-  def start(conn, %{"response_url" => response_url, "text" => "get-in-progress-issues", "channel_name" => channel_name}) do
+  def start(conn, %{"response_url" => response_url, "text" => "latency", "channel_name" => channel_name}) do
     do_start(
       conn,
       :handle_get_blockers_request,
@@ -41,41 +40,49 @@ defmodule SlaxWeb.BlockerController do
 
   def handle_get_blockers_request(github_access_token, response_url, channel_name) do
     repo_names =
-      from(
-        pc in Slax.ProjectChannel,
-        where: pc.channel_name == ^channel_name,
-      )
+      Slax.ProjectChannel
+      |> from(Slax.ProjectChannel)
+      |> where(pc.channel_name == ^channel_name)
       |> join(:inner, [pc], p in assoc(pc, :project))
       |> select([_, pc], pc.name)
       |> Repo.all()
 
-    case repo_names do
-      [] ->
-        Slack.send_message(response_url, %{
-          response_type: "in_channel",
-          text: "No repos for this channel."
-        })
-      _ ->
-        Enum.each(repo_names, fn repo_name ->
-          params = %{
-            repo: repo_name,
-            access_token: github_access_token,
-            org: Application.get_env(:slax, Slax.Github)[:org_name]
-          }
+    respond_for_repos(repo_names, github_access_token, response_url)
+  end
 
-          issues = Github.fetch_issues(params)
-          events = Github.fetch_issues_events(params, issues) |> GithubCommands.filter_issues_events()
+  defp respond_for_repos([], _, response_url) do
+    Slack.send_message(response_url, %{
+      response_type: "in_channel",
+      text: "No repos for this channel."
+    })
+  end
+  defp respond_for_repos(repo_names, github_access_token, response_url) do
+    Enum.each(repo_names, fn repo_name ->
+      respond_for_repo(repo_name, github_access_token, response_url)
+    end)
+  end
 
-          formatted_response =
-            issues
-            |> GithubCommands.filter_issues(events)
-            |> GithubCommands.format_issues()
+  defp respond_for_repo(repo_name, github_access_token, response_url) do
+    params = %{
+      repo: repo_name,
+      access_token: github_access_token,
+      org: Application.get_env(:slax, Slax.Github)[:org_name]
+    }
 
-          Slack.send_message(response_url, %{
-            response_type: "in_channel",
-            text: formatted_response
-          })
-        end)
-    end
+    issues = Github.fetch_issues(params)
+    events =
+      params
+      |> EventSink.fetch_issues_events(issues)
+      |> Latency.filter_issues_events()
+
+    formatted_response =
+      issues
+      |> Latency.add_events_to_issues(events)
+      |> Latency.format_response()
+
+    Slack.send_message(response_url, %{
+      response_type: "in_channel",
+      text: formatted_response
+    })
   end
 end

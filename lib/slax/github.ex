@@ -176,53 +176,6 @@ defmodule Slax.Github do
   end
 
   @doc """
-  Fetch issue events
-  """
-  def fetch_issues_events(params, issues) do
-    {:ok, secret} =
-      Application.get_env(:slax, Slax.EventSink, :issue_events_secret)
-      |> Keyword.fetch(:issue_events_secret)
-    issue_ids = issues |> Enum.map(&(&1["number"])) |> Enum.join(",")
-
-    signature =
-      :crypto.hash(
-        :sha256,
-        "#{secret}:#{issue_ids}"
-      )
-      |> Base.url_encode64()
-
-    url = "https://event-sink.prod.revelry.net/api/issue/events/#{params[:org]}/#{params[:repo]}?issue_ids=#{issue_ids}&signature=#{signature}"
-
-    response = Http.get(url)
-
-    case response do
-      {:ok, %{body: body}} ->
-        body
-      {:error, %{body: body}} ->
-        body
-    end
-  end
-
-  @doc """
-  Fetch issue event
-  """
-  def fetch_issue_event(params) do
-    response =
-      Http.get(
-        "#{api_url()}/repos/#{params[:org]}/#{params[:repo]}/issues/#{params[:issue_number]}/events",
-        request_headers(params[:access_token])
-      )
-
-    case response do
-      {:ok, %{body: body}} ->
-        body
-
-      {:error, %{body: body}} ->
-        body
-    end
-  end
-
-  @doc """
   Fetch all milestones for a repo
   """
   def fetch_milestones(params) do

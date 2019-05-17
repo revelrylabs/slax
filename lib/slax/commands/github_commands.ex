@@ -3,8 +3,6 @@ defmodule Slax.Commands.GithubCommands do
   Common functions for github commands
   """
 
-  require IEx
-
   @steps [
     :project_name,
     :github_repo,
@@ -142,127 +140,6 @@ defmodule Slax.Commands.GithubCommands do
     |> Enum.split_with(fn
       {:ok, _, _} -> true
       {:error, _} -> false
-    end)
-  end
-
-  @doc """
-  Formats list of issues to be displayed nicely within Slack
-  """
-  def format_issues(results) do
-    formatted_list = results
-    |> Enum.map(&format_issue(&1))
-    |> Enum.join("")
-
-    date = DateTime.utc_now
-    today = date
-    |> Timex.weekday()
-    |> Timex.day_name()
-    ":snail:  *Latent Issues for #{today}, #{date.month}/#{date.day}* :slowpoke:
-    Ways to take ownership:
-    - Update ticket to correct column
-    - Pair
-    - Comment blockers (even if you don't know)
-    - Escalate in channel (or another channel)\n\n"<> formatted_list
-  end
-
-  defp format_issue(issue) do
-    labels =
-      issue["labels"]
-        |> Enum.map(& &1["name"])
-        |> Enum.map(&(String.downcase(&1)))
-
-    [status, status_as_of] = calculate_status_from_events(issue[:issue_events])
-    {:ok, status_timestamp, _} = DateTime.from_iso8601(status_as_of)
-    status_seconds = DateTime.diff(DateTime.utc_now(), status_timestamp)
-    status_duration = Timex.Duration.from_seconds(status_seconds)
-
-    if Enum.member?(["in progress", "in review", "qa", "uat"], status) do
-      {:ok, timestamp, _} = DateTime.from_iso8601(issue["updated_at"])
-      seconds = DateTime.diff(DateTime.utc_now(), timestamp)
-      duration = Timex.Duration.from_seconds(seconds)
-
-      assignees =
-        case issue["assignees"] do
-          [] ->
-            "_No one._"
-          _ ->
-            issue["assignees"] |> Enum.map(&(&1["login"]))
-        end
-
-      events =
-        issue[:issue_events]
-        |> Enum.map(fn event ->
-          "#{event["action"]} #{event["label"]["name"]} (#{event["created_at"]})"
-        end)
-        |> Enum.join(", ")
-
-      {:ok, update_time_string} = Elixir.Timex.Format.DateTime.Formatters.Relative.format(timestamp, "{relative}")
-      {:ok, status_time_string} = Elixir.Timex.Format.DateTime.Formatters.Relative.format(status_timestamp, "{relative}")
-
-      "*#{issue["title"] |> String.strip()}* (#{issue[:org]}/#{issue[:repo]}##{issue["number"]})\n" <>
-      "Status: #{status} for #{status_time_string}\n" <>
-      "Last Updated: #{update_time_string}\n" <>
-      "Assigned to: #{assignees}\n\n"
-    else
-      ""
-    end
-  end
-
-  def calculate_status_from_events(events) do
-    first_timestamp =
-      case events do
-        [] ->
-          DateTime.utc_now() |> DateTime.to_iso8601()
-        _ ->
-          events
-          |> Enum.at(0)
-          |> Map.get("created_at")
-      end
-
-    events
-    |> Enum.reduce([nil, first_timestamp], fn event, status ->
-      case event["action"] do
-        "labeled" ->
-          [event["label"]["name"], event["created_at"]]
-        "unlabeled" ->
-          [old_status, _] = status
-          if old_status == event["label"]["name"] do
-            [nil, event["created_at"]]
-          else
-            status
-          end
-      end
-    end)
-  end
-
-  @doc """
-  Filters list of issues from issues events request
-  threshold for filtering is based from
-  set column threshold and labeled date
-  """
-  def filter_issues(issues, issues_events) do
-    issues_events = filter_issues_events(issues_events)
-
-    issues
-    |> Enum.map(fn issue ->
-      Map.put(issue, :issue_events, Enum.filter(issues_events, fn issue_event ->
-        issue["number"] == issue_event["issue"]["number"]
-      end))
-    end)
-  end
-
-  def filter_issues_events(issue_events) do
-    status_labels = ["in progress", "in review", "qa", "uat", "up next"]
-
-    issue_events
-    |> Enum.filter(&(Enum.member?(["labeled", "unlabeled"], &1["action"])))
-    |> Enum.filter(fn event ->
-        label_name =
-          event["label"]["name"]
-          |> String.downcase()
-          |> String.strip()
-
-        Enum.member?(status_labels, label_name)
     end)
   end
 
