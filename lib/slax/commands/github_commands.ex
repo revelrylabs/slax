@@ -15,6 +15,12 @@ defmodule Slax.Commands.GithubCommands do
 
   alias Slax.{Github}
 
+  @doc """
+  Accepts a results map and the potential name of a new github repo.
+  If the name is a valid github repo name, it will return a new result map
+  containing the `project_name` as well as a key indicating that the `project_name`
+  step is complete
+  """
   def parse_project_name(results, text) do
     case Regex.run(~r/^[a-zA-Z0-9\-_]{3,21}$/, text) do
       [project_name] ->
@@ -28,6 +34,10 @@ defmodule Slax.Commands.GithubCommands do
     end
   end
 
+  @doc """
+  Pulls all issue templates from a story repo that are included in `story_paths`.
+  It  then uses these templates to create issues in a newly created github repository,
+  """
   def create_reusable_stories(
         %{project_name: project_name} = results,
         github_access_token,
