@@ -1,11 +1,11 @@
 defmodule Slax.GithubCommands.Test do
   use Slax.ModelCase, async: true
-  alias Slax.Commands.GithubCommands
   import Mox
+  @subject Slax.Commands.GithubCommands
 
   describe "format_issues/1" do
     test "when there is an 'in progress' label" do
-      assert GithubCommands.format_issues([
+      assert @subject.format_issues([
                %{
                  "title" => "title",
                  "updated_at" => "2019-04-18T14:08:35Z",
@@ -15,7 +15,7 @@ defmodule Slax.GithubCommands.Test do
     end
 
     test "when there is not an 'in progress' label" do
-      assert GithubCommands.format_issues([
+      assert @subject.format_issues([
                %{
                  "title" => "title",
                  "updated_at" => "2019-04-18T14:08:35Z",
@@ -45,7 +45,7 @@ defmodule Slax.GithubCommands.Test do
     end
 
     test "when there are no errors for any steps", %{starting_result: starting_result} do
-      result = GithubCommands.format_results(starting_result)
+      result = @subject.format_results(starting_result)
 
       assert result ==
                "Project Name: project_name\nGithub: org_name/project_name\nGithub Teams: \nSlack: slack_channel\nLintron: \nBoard Checker: \nReusable Stories: "
@@ -64,7 +64,7 @@ defmodule Slax.GithubCommands.Test do
         }
       }
 
-      result = GithubCommands.format_results(starting_result)
+      result = @subject.format_results(starting_result)
 
       assert result ==
                "Project Name: project_name\nGithub: org_name/project_name\nGithub Teams: \nSlack: slack_channel error\nLintron: \nBoard Checker: \nReusable Stories: "
@@ -81,7 +81,7 @@ defmodule Slax.GithubCommands.Test do
     setup :setup_starting_result
 
     test "invalid characters", %{starting_result: starting_result} do
-      with result <- GithubCommands.parse_project_name(starting_result, "hi&") do
+      with result <- @subject.parse_project_name(starting_result, "hi&") do
         assert Map.get(result, :errors) == %{project_name: "Invalid Project Name"}
         assert Map.get(result, :project_name) == nil
       end
@@ -89,7 +89,7 @@ defmodule Slax.GithubCommands.Test do
 
     test "too many characters", %{starting_result: starting_result} do
       with result <-
-             GithubCommands.parse_project_name(
+             @subject.parse_project_name(
                starting_result,
                "thisshouldbemorethantwentytwocharacters"
              ) do
@@ -99,7 +99,7 @@ defmodule Slax.GithubCommands.Test do
     end
 
     test "valid_input", %{starting_result: starting_result} do
-      with result <- GithubCommands.parse_project_name(starting_result, "valid_repo_name") do
+      with result <- @subject.parse_project_name(starting_result, "valid_repo_name") do
         assert Map.get(result, :errors) == %{}
         assert Map.get(result, :success) == %{project_name: "Project Name Parsed"}
         assert Map.get(result, :project_name) == "valid_repo_name"
@@ -166,7 +166,7 @@ defmodule Slax.GithubCommands.Test do
       expect(Slax.HttpMock, :post, 3, &successful_issue_request/4)
 
       result =
-        GithubCommands.create_reusable_stories(
+        @subject.create_reusable_stories(
           starting_result,
           "access_token",
           "test_org",
@@ -197,7 +197,7 @@ defmodule Slax.GithubCommands.Test do
       expect(Slax.HttpMock, :get, 1, &failing_request/3)
 
       result =
-        GithubCommands.create_reusable_stories(
+        @subject.create_reusable_stories(
           starting_result,
           "access_token",
           "test_org",
@@ -217,7 +217,7 @@ defmodule Slax.GithubCommands.Test do
       expect(Slax.HttpMock, :get, 2, &failing_request/3)
 
       result =
-        GithubCommands.create_reusable_stories(
+        @subject.create_reusable_stories(
           starting_result,
           "access_token",
           "test_org",
@@ -243,7 +243,7 @@ defmodule Slax.GithubCommands.Test do
       expect(Slax.HttpMock, :post, 3, &failing_request/4)
 
       result =
-        GithubCommands.create_reusable_stories(
+        @subject.create_reusable_stories(
           starting_result,
           "access_token",
           "test_org",
@@ -279,7 +279,7 @@ defmodule Slax.GithubCommands.Test do
       expect(Slax.HttpMock, :post, 3, &successful_issue_request/4)
 
       result =
-        GithubCommands.create_reusable_stories(
+        @subject.create_reusable_stories(
           starting_result,
           "access_token",
           "test_org",
@@ -315,7 +315,7 @@ defmodule Slax.GithubCommands.Test do
       expect(Slax.HttpMock, :post, 3, &successful_issue_request/4)
 
       result =
-        GithubCommands.create_reusable_stories(
+        @subject.create_reusable_stories(
           starting_result,
           "access_token",
           "test_org",
