@@ -3,14 +3,72 @@ defmodule Slax.GithubCommands.Test do
   alias Slax.Commands.GithubCommands
   import Mox
 
-  test "format_issues/1" do
-    assert GithubCommands.format_issues([
-             %{
-               "title" => "title",
-               "updated_at" => "2019-04-18T14:08:35Z",
-               "labels" => [%{"name" => "in progress"}]
-             }
-           ]) =~ "Last Updated at"
+  describe "format_issues/1" do
+    test "when there is an 'in progress' label" do
+      assert GithubCommands.format_issues([
+               %{
+                 "title" => "title",
+                 "updated_at" => "2019-04-18T14:08:35Z",
+                 "labels" => [%{"name" => "in progress"}]
+               }
+             ]) =~ "Last Updated at"
+    end
+
+    test "when there is not an 'in progress' label" do
+      assert GithubCommands.format_issues([
+               %{
+                 "title" => "title",
+                 "updated_at" => "2019-04-18T14:08:35Z",
+                 "labels" => [%{"name" => "back log"}]
+               }
+             ]) =~ ":snail: *Issues In Progress for 5/18* :snail: \n"
+    end
+  end
+
+  describe "format_results/1" do
+    setup :setup_no_errors
+
+    def setup_no_errors(context) do
+      {:ok,
+       context
+       |> Map.put(:starting_result, %{
+         project_name: true,
+         github_repo: true,
+         slack_channel: true,
+         errors: %{},
+         success: %{
+           project_name: "project_name",
+           github_repo: "org_name/project_name",
+           slack_channel: "slack_channel"
+         }
+       })}
+    end
+
+    test "when there are no errors for any steps", %{starting_result: starting_result} do
+      result = GithubCommands.format_results(starting_result)
+
+      assert result ==
+               "Project Name: project_name\nGithub: org_name/project_name\nGithub Teams: \nSlack: slack_channel\nLintron: \nBoard Checker: \nReusable Stories: "
+    end
+
+    test "when there are errors for certain steps" do
+      starting_result = %{
+        project_name: true,
+        github_repo: true,
+        errors: %{
+          slack_channel: "slack_channel error"
+        },
+        success: %{
+          project_name: "project_name",
+          github_repo: "org_name/project_name"
+        }
+      }
+
+      result = GithubCommands.format_results(starting_result)
+
+      assert result ==
+               "Project Name: project_name\nGithub: org_name/project_name\nGithub Teams: \nSlack: slack_channel error\nLintron: \nBoard Checker: \nReusable Stories: "
+    end
   end
 
   describe "parse_project_name/2" do
@@ -57,14 +115,6 @@ defmodule Slax.GithubCommands.Test do
      |> put_in([:starting_result, :project_name], "valid_project_name")}
   end
 
-  def setup_successful_tree_requests(context) do
-    {:ok,
-     context
-     |> Map.put(:starting_result, %{errors: %{}, success: %{}})
-     |> put_in([:starting_result, :success, :project_name], "Project Name Parsed")
-     |> put_in([:starting_result, :project_name], "valid_project_name")}
-  end
-
   def successful_tree_request(_, _, _) do
     {:ok,
      %HTTPoison.Response{
@@ -97,7 +147,7 @@ defmodule Slax.GithubCommands.Test do
      }}
   end
 
-  def successful_issue_request(_,_,_,_) do
+  def successful_issue_request(_, _, _, _) do
     {:ok,
      %HTTPoison.Response{
        status_code: 200,
@@ -106,7 +156,6 @@ defmodule Slax.GithubCommands.Test do
        }>
      }}
   end
-
 
   describe "create_reusable_stories/5" do
     setup [:setup_starting_result_with_name]
@@ -132,7 +181,7 @@ defmodule Slax.GithubCommands.Test do
       assert result[:success][:reusable_stories] == "Reuseable Stories Created"
     end
 
-    def failing_request(_,_,_) do
+    def failing_request(_, _, _) do
       {:ok,
        %HTTPoison.Response{
          status_code: 400,
@@ -141,7 +190,8 @@ defmodule Slax.GithubCommands.Test do
          }>
        }}
     end
-    def failing_request(w,x,y,_), do: failing_request(w,x,y)
+
+    def failing_request(w, x, y, _), do: failing_request(w, x, y)
 
     test "when fetching the project tree fails", %{starting_result: starting_result} do
       expect(Slax.HttpMock, :get, 1, &failing_request/3)
@@ -205,15 +255,15 @@ defmodule Slax.GithubCommands.Test do
       assert result[:reusable_stories] == nil
 
       assert result[:errors] == %{
-        reusable_stories:
-        "story_path1.md: you done goofed\nstory_path3.md: you done goofed"
-      }
+               reusable_stories:
+                 "story_path1.md: you done goofed\nstory_path3.md: you done goofed"
+             }
 
       assert result[:project_name] == "valid_project_name"
       assert result[:success] == %{project_name: "Project Name Parsed"}
     end
 
-    def invalid_blob_request(_,_,_) do
+    def invalid_blob_request(_, _, _) do
       {:ok,
        %HTTPoison.Response{
          status_code: 200,
@@ -241,15 +291,15 @@ defmodule Slax.GithubCommands.Test do
       assert result[:reusable_stories] == nil
 
       assert result[:errors] == %{
-        reusable_stories:
-        "story_path1.md: Unable to parse content\nstory_path3.md: Unable to parse content"
-      }
+               reusable_stories:
+                 "story_path1.md: Unable to parse content\nstory_path3.md: Unable to parse content"
+             }
 
       assert result[:project_name] == "valid_project_name"
       assert result[:success] == %{project_name: "Project Name Parsed"}
     end
 
-    def invalid_frontmatter_request(_,_,_) do
+    def invalid_frontmatter_request(_, _, _) do
       {:ok,
        %HTTPoison.Response{
          status_code: 200,
@@ -277,9 +327,9 @@ defmodule Slax.GithubCommands.Test do
       assert result[:reusable_stories] == nil
 
       assert result[:errors] == %{
-        reusable_stories:
-        "story_path1.md: invalid_front_matter\nstory_path3.md: invalid_front_matter"
-      }
+               reusable_stories:
+                 "story_path1.md: invalid_front_matter\nstory_path3.md: invalid_front_matter"
+             }
 
       assert result[:project_name] == "valid_project_name"
       assert result[:success] == %{project_name: "Project Name Parsed"}
