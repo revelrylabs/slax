@@ -112,7 +112,10 @@ defmodule Slax.GithubCommands.Test do
      context
      |> Map.put(:starting_result, %{errors: %{}, success: %{}})
      |> put_in([:starting_result, :success, :project_name], "Project Name Parsed")
-     |> put_in([:starting_result, :project_name], "valid_project_name")}
+     |> put_in([:starting_result, :project_name], "valid_project_name")
+     |> put_in([:starting_result, :github_repo], "repo_url")
+     |> put_in([:starting_result, :success, :github_repo], "Github Repo Found or Created: <repo_url>")
+    }
   end
 
   def successful_tree_request(_, _, _) do
@@ -177,8 +180,13 @@ defmodule Slax.GithubCommands.Test do
 
       assert result[:errors] == %{}
       assert result[:project_name] == "valid_project_name"
+      assert result[:github_repo] == "repo_url"
       assert result[:reusable_stories] == true
-      assert result[:success][:reusable_stories] == "Reuseable Stories Created"
+      assert result[:success] == %{
+        project_name: "Project Name Parsed",
+        reusable_stories: "Reuseable Stories Created",
+        github_repo: "Github Repo Found or Created: <repo_url>"
+      }
     end
 
     def failing_request(_, _, _) do
@@ -189,6 +197,29 @@ defmodule Slax.GithubCommands.Test do
            "message": "you done goofed"
          }>
        }}
+    end
+
+    test "when the starting results dont have a github repo" do
+      starting_result =
+        %{
+          project_name: "valid_project_name",
+          errors: %{},
+          success: %{
+            project_name: "Project Name Parsed"
+          }
+        }
+
+      result =
+        @subject.create_reusable_stories(
+          starting_result,
+          "access_token",
+          "test_org",
+          "story_repo",
+          path1: "story_path1",
+          path3: "story_path3"
+        )
+
+      assert result == starting_result
     end
 
     def failing_request(w, x, y, _), do: failing_request(w, x, y)
@@ -206,10 +237,14 @@ defmodule Slax.GithubCommands.Test do
           path3: "story_path3"
         )
 
-      assert result[:reusable_stories] == nil
       assert result[:errors] == %{reusable_stories: "you done goofed"}
       assert result[:project_name] == "valid_project_name"
-      assert result[:success] == %{project_name: "Project Name Parsed"}
+      assert result[:github_repo] == "repo_url"
+      assert result[:reusable_stories] == nil
+      assert result[:success] == %{
+        project_name: "Project Name Parsed",
+        github_repo: "Github Repo Found or Created: <repo_url>"
+      }
     end
 
     test "when fetching a blob fails", %{starting_result: starting_result} do
@@ -226,15 +261,18 @@ defmodule Slax.GithubCommands.Test do
           path3: "story_path3"
         )
 
-      assert result[:reusable_stories] == nil
-
       assert result[:errors] == %{
-               reusable_stories:
-                 "story_path1.md: you done goofed\nstory_path3.md: you done goofed"
-             }
-
+        reusable_stories:
+        "story_path1.md: you done goofed\nstory_path3.md: you done goofed"
+      }
       assert result[:project_name] == "valid_project_name"
-      assert result[:success] == %{project_name: "Project Name Parsed"}
+      assert result[:github_repo] == "repo_url"
+      assert result[:reusable_stories] == nil
+      assert result[:success] == %{
+        project_name: "Project Name Parsed",
+        github_repo: "Github Repo Found or Created: <repo_url>"
+      }
+
     end
 
     test "when posting issues fails", %{starting_result: starting_result} do
@@ -252,15 +290,18 @@ defmodule Slax.GithubCommands.Test do
           path3: "story_path3"
         )
 
-      assert result[:reusable_stories] == nil
-
       assert result[:errors] == %{
-               reusable_stories:
-                 "story_path1.md: you done goofed\nstory_path3.md: you done goofed"
-             }
-
+        reusable_stories:
+        "story_path1.md: you done goofed\nstory_path3.md: you done goofed"
+      }
       assert result[:project_name] == "valid_project_name"
-      assert result[:success] == %{project_name: "Project Name Parsed"}
+      assert result[:github_repo] == "repo_url"
+      assert result[:reusable_stories] == nil
+      assert result[:success] == %{
+        project_name: "Project Name Parsed",
+        github_repo: "Github Repo Found or Created: <repo_url>"
+      }
+
     end
 
     def invalid_blob_request(_, _, _) do
@@ -288,15 +329,17 @@ defmodule Slax.GithubCommands.Test do
           path3: "story_path3"
         )
 
-      assert result[:reusable_stories] == nil
-
       assert result[:errors] == %{
-               reusable_stories:
-                 "story_path1.md: Unable to parse content\nstory_path3.md: Unable to parse content"
-             }
-
+        reusable_stories:
+        "story_path1.md: Unable to parse content\nstory_path3.md: Unable to parse content"
+      }
       assert result[:project_name] == "valid_project_name"
-      assert result[:success] == %{project_name: "Project Name Parsed"}
+      assert result[:github_repo] == "repo_url"
+      assert result[:reusable_stories] == nil
+      assert result[:success] == %{
+        project_name: "Project Name Parsed",
+        github_repo: "Github Repo Found or Created: <repo_url>"
+      }
     end
 
     def invalid_frontmatter_request(_, _, _) do
@@ -324,15 +367,17 @@ defmodule Slax.GithubCommands.Test do
           path3: "story_path3"
         )
 
-      assert result[:reusable_stories] == nil
-
       assert result[:errors] == %{
-               reusable_stories:
-                 "story_path1.md: invalid_front_matter\nstory_path3.md: invalid_front_matter"
-             }
-
+        reusable_stories:
+        "story_path1.md: invalid_front_matter\nstory_path3.md: invalid_front_matter"
+      }
       assert result[:project_name] == "valid_project_name"
-      assert result[:success] == %{project_name: "Project Name Parsed"}
+      assert result[:github_repo] == "repo_url"
+      assert result[:reusable_stories] == nil
+      assert result[:success] == %{
+        project_name: "Project Name Parsed",
+        github_repo: "Github Repo Found or Created: <repo_url>"
+      }
     end
   end
 end

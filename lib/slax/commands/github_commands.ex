@@ -37,9 +37,10 @@ defmodule Slax.Commands.GithubCommands do
   @doc """
   Pulls all issue templates from a story repo that are included in `story_paths`.
   It  then uses these templates to create issues in a newly created github repository,
+  If there is no github repository the function will exit early
   """
   def create_reusable_stories(
-        %{project_name: project_name} = results,
+        %{project_name: project_name, github_repo: _} = results,
         github_access_token,
         org_name,
         story_repo,
@@ -84,6 +85,8 @@ defmodule Slax.Commands.GithubCommands do
         Map.update(results, :errors, %{}, fn x -> Map.put(x, :reusable_stories, message) end)
     end
   end
+
+  def create_reusable_stories(results, _, _, _, _), do: results
 
   defp process_tree(data, story_repo, story_paths, github_access_token) do
     Map.get(data, "tree", [])
@@ -149,7 +152,7 @@ defmodule Slax.Commands.GithubCommands do
     end)
     |> Enum.split_with(fn
       {:ok, _, _} -> true
-      {:error, _,_} -> false
+      {:error, _, _} -> false
     end)
   end
 
