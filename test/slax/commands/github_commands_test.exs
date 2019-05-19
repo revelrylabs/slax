@@ -21,7 +21,7 @@ defmodule Slax.GithubCommands.Test do
                  "updated_at" => "2019-04-18T14:08:35Z",
                  "labels" => [%{"name" => "back log"}]
                }
-             ]) =~ ":snail: *Issues In Progress for 5/18* :snail: \n"
+             ]) =~ ":snail: *Issues In Progress for"
     end
   end
 
