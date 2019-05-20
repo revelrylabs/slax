@@ -3,7 +3,6 @@ defmodule Slax.Commands.NewProject do
   Automates creation of a new project
   """
   alias Slax.{Github, Slack}
-  alias Slax.Commands.GithubCommands
 
   @doc """
   Automates creating a new project.
@@ -35,10 +34,10 @@ defmodule Slax.Commands.NewProject do
   @spec new_project(binary, binary, binary, binary, keyword(binary), binary) :: map
   def new_project(org_name, name, github_access_token, story_repo, story_paths, org_teams) do
     %{errors: %{}, success: %{}}
-    |> GithubCommands.parse_project_name(name)
+    |> github_commands().parse_project_name(name)
     |> create_github_repo(github_access_token, org_name)
     |> create_slack_channel
-    |> GithubCommands.create_reusable_stories(
+    |> github_commands().create_reusable_stories(
       github_access_token,
       org_name,
       story_repo,
@@ -56,6 +55,8 @@ defmodule Slax.Commands.NewProject do
       "Board Checker Created"
     )
   end
+
+  defp github_commands(), do: Application.get_env(:slax, :github_commands)
 
   defp create_github_repo(%{project_name: project_name} = results, github_access_token, org_name) do
     case Github.find_or_create_repo(%{
@@ -133,6 +134,8 @@ defmodule Slax.Commands.NewProject do
     results
   end
 
+  defp add_org_teams(results, _, _, _), do: results
+
   defp send_org_teams_to_github(repo, teams, github_access_token) do
     teams
     |> String.split([",", " "], trim: true)
@@ -149,7 +152,7 @@ defmodule Slax.Commands.NewProject do
     end)
     |> Enum.split_with(fn
       {:ok, _, _} -> true
-      {:error, _} -> false
+      {:error, _,_} -> false
     end)
   end
 

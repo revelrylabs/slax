@@ -10,6 +10,7 @@ config :slax, SlaxWeb.Endpoint,
 config :logger, level: :warn
 
 config :slax, http_adapter: Slax.HttpMock
+config :slax, github_commands: Slax.Commands.GithubCommandsMock
 
 # Configure your database
 config :slax, Slax.Repo,
