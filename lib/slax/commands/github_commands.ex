@@ -2,6 +2,7 @@ defmodule Slax.Commands.GithubCommands do
   @moduledoc """
   Common functions for github commands
   """
+
   @steps [
     :project_name,
     :github_repo,
@@ -141,35 +142,6 @@ defmodule Slax.Commands.GithubCommands do
       {:error, _} -> false
     end)
   end
-  
-  @doc """
-  Formats list of issues to be displayed nicely within Slack
-  """
-  def format_issues(results) do
-    formatted_list = results
-    |> Enum.map(&format_issue(&1))
-    |> Enum.join("")
-
-    date = DateTime.utc_now
-    ":snail: *Issues In Progress for #{date.month}/#{date.day}* :snail: \n" <> formatted_list
-  end
-
-  defp format_issue(issue) do
-    labels = issue["labels"]
-    |> Enum.map(& &1["name"])
-    |> Enum.join(",")
-
-    cond do
-      String.contains?(String.downcase(labels), "in progress") -> 
-        "_#{issue["title"]}_ - Last Updated at #{issue["updated_at"]} \n" <>
-        " _     -- assigned to: #{issue["assignee"]["login"]}_ \n" <>
-        " _     -- labels:_ #{labels}" <>
-        "\n"
-      true -> 
-        ""
-    end
-  end
-
 
   @doc """
   Formats results map to be displayed nicely within Slack

@@ -2,6 +2,7 @@ defmodule Slax.Github do
   @moduledoc """
   Functions for working with the Github API
   """
+
   alias Slax.Http
   alias Slax.Http.Error
 
@@ -145,6 +146,9 @@ defmodule Slax.Github do
     case response do
       {:ok, %{body: body}} ->
         body
+        |> Enum.map(fn issue ->
+          Map.merge(issue, %{"org" => params[:org], "repo" => params[:repo]})
+        end)
 
       {:error, %{body: body}} ->
         body
