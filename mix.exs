@@ -58,7 +58,8 @@ defmodule Slax.Mixfile do
       {:distillery, "~> 2.0"},
       {:ex_machina, "~> 2.2", only: :test},
       {:quantum, "~> 2.3"},
-      {:timex, "~> 3.0"}
+      {:timex, "~> 3.0"},
+      {:credo, "~> 1.0.0", only: [:dev, :test], runtime: false}
     ]
   end
 
