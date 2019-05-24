@@ -2,7 +2,6 @@ defmodule Slax.ProjectRepos.Test do
   use Slax.ModelCase, async: true
   alias Slax.{ProjectRepos, Projects}
 
-
   setup do
     project = insert(:project)
     project_repo = insert(:project_repo, project: project)
@@ -29,6 +28,5 @@ defmodule Slax.ProjectRepos.Test do
 
       assert length(repos) == 2
     end
-
   end
 end
