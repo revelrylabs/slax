@@ -28,13 +28,13 @@ defmodule Slax.Commands.NewProjectTest do
     end
   end
 
-  def successful_create_reusable_stories(results, _,_,_,_) do
+  def successful_create_reusable_stories(results, _, _, _, _) do
     results
     |> put_in([:resuseable_stories], true)
     |> put_in([:success, :resuseable_stories], "Reuseable Stories Created")
   end
 
-  def failing_create_reusable_stories(results, _,_,_,_), do: results
+  def failing_create_reusable_stories(results, _, _, _, _), do: results
 
   describe "new_project/6" do
     test "when all args are valid and all requests work and the repo hasn't been created yet" do
@@ -60,7 +60,12 @@ defmodule Slax.Commands.NewProjectTest do
       )
 
       # add all reusable stories from the story_repo
-      expect(Slax.Commands.GithubCommandsMock, :create_reusable_stories, 1, &successful_create_reusable_stories/5)
+      expect(
+        Slax.Commands.GithubCommandsMock,
+        :create_reusable_stories,
+        1,
+        &successful_create_reusable_stories/5
+      )
 
       # create slack channel
       expect(
@@ -134,9 +139,13 @@ defmodule Slax.Commands.NewProjectTest do
         post_response("project_name", 500, ~S<{ "message": "no repo for you!" }>)
       )
 
-
       # we can't create any reusable stories
-      expect(Slax.Commands.GithubCommandsMock, :create_reusable_stories, 1, &failing_create_reusable_stories/5)
+      expect(
+        Slax.Commands.GithubCommandsMock,
+        :create_reusable_stories,
+        1,
+        &failing_create_reusable_stories/5
+      )
 
       # create slack channel
       expect(
@@ -160,7 +169,7 @@ defmodule Slax.Commands.NewProjectTest do
           "org_team1,org_team2"
         )
 
-      assert result[:errors] == %{ github_repo: "no repo for you!"}
+      assert result[:errors] == %{github_repo: "no repo for you!"}
 
       assert result[:project_name] == "project_name"
       assert result[:github_repo] == nil
@@ -172,7 +181,7 @@ defmodule Slax.Commands.NewProjectTest do
 
       assert result[:success] == %{
                project_name: "Project Name Parsed",
-               slack_channel: "Channel Created: <#1|project_name>",
+               slack_channel: "Channel Created: <#1|project_name>"
              }
     end
 
@@ -183,7 +192,12 @@ defmodule Slax.Commands.NewProjectTest do
       expect(GithubCommandsMock, :parse_project_name, 1, &GithubCommands.parse_project_name/2)
 
       # we can't create any reusable stories
-      expect(Slax.Commands.GithubCommandsMock, :create_reusable_stories, 1, &failing_create_reusable_stories/5)
+      expect(
+        Slax.Commands.GithubCommandsMock,
+        :create_reusable_stories,
+        1,
+        &failing_create_reusable_stories/5
+      )
 
       result =
         @subject.new_project(
@@ -195,7 +209,7 @@ defmodule Slax.Commands.NewProjectTest do
           "org_team1,org_team2"
         )
 
-      assert result[:errors] == %{ project_name: "Invalid Project Name"}
+      assert result[:errors] == %{project_name: "Invalid Project Name"}
       assert result[:project_name] == nil
       assert result[:github_repo] == nil
       assert result[:slack_channel] == nil
@@ -229,7 +243,12 @@ defmodule Slax.Commands.NewProjectTest do
       )
 
       # add all reusable stories from the story_repo
-      expect(Slax.Commands.GithubCommandsMock, :create_reusable_stories, 1, &successful_create_reusable_stories/5)
+      expect(
+        Slax.Commands.GithubCommandsMock,
+        :create_reusable_stories,
+        1,
+        &successful_create_reusable_stories/5
+      )
 
       # create slack channel
       expect(
@@ -261,7 +280,7 @@ defmodule Slax.Commands.NewProjectTest do
           "org_team1,org_team2"
         )
 
-      assert result[:errors] == %{ slack_channel: "no channel" }
+      assert result[:errors] == %{slack_channel: "no channel"}
       assert result[:project_name] == "project_name"
       assert result[:github_repo] == "project_url"
       assert result[:slack_channel] == nil
@@ -269,14 +288,15 @@ defmodule Slax.Commands.NewProjectTest do
       assert result[:board_checker] == true
       assert result[:github_org_teams] == true
       assert result[:resuseable_stories] == true
+
       assert result[:success] == %{
-        resuseable_stories: "Reuseable Stories Created",
-        board_checker: "Board Checker Created",
-        github_org_teams: "Github Teams Added",
-        github_repo: "Github Repo Found or Created: <project_url>",
-        lintron: "Lintron Created",
-        project_name: "Project Name Parsed"
-      }
+               resuseable_stories: "Reuseable Stories Created",
+               board_checker: "Board Checker Created",
+               github_org_teams: "Github Teams Added",
+               github_repo: "Github Repo Found or Created: <project_url>",
+               lintron: "Lintron Created",
+               project_name: "Project Name Parsed"
+             }
     end
 
     test "adding the org teams fails" do
@@ -302,7 +322,12 @@ defmodule Slax.Commands.NewProjectTest do
       )
 
       # add all reusable stories from the story_repo
-      expect(Slax.Commands.GithubCommandsMock, :create_reusable_stories, 1, &successful_create_reusable_stories/5)
+      expect(
+        Slax.Commands.GithubCommandsMock,
+        :create_reusable_stories,
+        1,
+        &successful_create_reusable_stories/5
+      )
 
       # create slack channel
       expect(
@@ -317,8 +342,19 @@ defmodule Slax.Commands.NewProjectTest do
       )
 
       # add the teams push permission to the github repo
-      expect(Slax.HttpMock, :put, 1, post_response("org_team1", 400, ~S<{ "message": "you done goofed" }>))
-      expect(Slax.HttpMock, :put, 1, post_response("org_team2", 400, ~S<{ "message": "you done goofed" }>))
+      expect(
+        Slax.HttpMock,
+        :put,
+        1,
+        post_response("org_team1", 400, ~S<{ "message": "you done goofed" }>)
+      )
+
+      expect(
+        Slax.HttpMock,
+        :put,
+        1,
+        post_response("org_team2", 400, ~S<{ "message": "you done goofed" }>)
+      )
 
       # webhooks
       expect(Slax.HttpMock, :post, 1, post_response("project_name", 200, ~S<{ "id": "1"}>))
@@ -334,7 +370,10 @@ defmodule Slax.Commands.NewProjectTest do
           "org_team1,org_team2"
         )
 
-      assert result[:errors] == %{ github_org_teams: "org_team1: you done goofed\norg_team2: you done goofed" }
+      assert result[:errors] == %{
+               github_org_teams: "org_team1: you done goofed\norg_team2: you done goofed"
+             }
+
       assert result[:project_name] == "project_name"
       assert result[:github_repo] == "project_url"
       assert result[:slack_channel] == "project_name"
@@ -342,14 +381,15 @@ defmodule Slax.Commands.NewProjectTest do
       assert result[:board_checker] == true
       assert result[:github_org_teams] == nil
       assert result[:resuseable_stories] == true
+
       assert result[:success] == %{
-        resuseable_stories: "Reuseable Stories Created",
-        slack_channel: "Channel Created: <#1|project_name>",
-        board_checker: "Board Checker Created",
-        github_repo: "Github Repo Found or Created: <project_url>",
-        lintron: "Lintron Created",
-        project_name: "Project Name Parsed"
-      }
+               resuseable_stories: "Reuseable Stories Created",
+               slack_channel: "Channel Created: <#1|project_name>",
+               board_checker: "Board Checker Created",
+               github_repo: "Github Repo Found or Created: <project_url>",
+               lintron: "Lintron Created",
+               project_name: "Project Name Parsed"
+             }
     end
   end
 end
