@@ -9,7 +9,7 @@ defmodule Slax.Scheduler do
   alias Slax.Commands.{Latency}
 
   def start() do
-    project_repos = ProjectRepos.get_repos()
+    project_repos = ProjectRepos.get_blockerbot_repos()
 
     project_repos
     |> Enum.each(fn repo ->
@@ -27,7 +27,7 @@ defmodule Slax.Scheduler do
 
     Slack.post_message_to_channel(%{
       text: formatted_response,
-      channel_name: "#" <> channel_name
+      channel_name: channel_name
     })
   end
 end
