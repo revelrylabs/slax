@@ -91,7 +91,6 @@ defmodule Slax.Slack do
       "Content-Type": "application/x-www-form-urlencoded"
     )
 
-    IO.inspect response
     case response do
       %{body: %{"ok" => false, "error" => error}} ->
         IO.puts "Error for #{channel_name}: #{error}"

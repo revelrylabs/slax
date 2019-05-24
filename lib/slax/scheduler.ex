@@ -13,7 +13,6 @@ defmodule Slax.Scheduler do
 
     project_repos
     |> Enum.each(fn repo ->
-      IO.inspect repo
       send_repo_to_channel(repo.org_name, repo.repo_name, repo.channel_name)
     end)
   end
