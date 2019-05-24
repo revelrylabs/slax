@@ -128,20 +128,15 @@ defmodule Slax.Github do
   Fetch issues from a repo created by a specific user
   """
   def fetch_issues(params) do
-    params_map = %{}
 
-    case params[:username] do
-      _ ->
-        Map.put_new(params_map, :creator, params[:username])
-    end
 
-    query_string = URI.encode_query(params_map)
+    "#{api_url()}/repos/#{params[:org]}/#{params[:repo]}/issues"
+    |> fetch_issues_from_url(params)
+  end
 
-    response =
-      Http.get(
-        "#{api_url()}/repos/#{params[:org]}/#{params[:repo]}/issues?#{query_string}",
-        request_headers(params[:access_token])
-      )
+  defp fetch_issues_from_url(url, params) do
+    access_token = request_headers(params[:access_token])
+    response = Http.get(url, access_token)
 
     case response do
       {:ok, %{body: body}} ->
@@ -149,6 +144,20 @@ defmodule Slax.Github do
         |> Enum.map(fn issue ->
           Map.merge(issue, %{"org" => params[:org], "repo" => params[:repo]})
         end)
+
+      {:error, %{status_code: 301, body: body, headers: headers}}->
+        location =
+          headers
+          |> Enum.find_value(fn({header, value}) ->
+            case header do
+              "Location" ->
+                value
+              _ ->
+                false
+            end
+          end)
+
+        fetch_issues_from_url(location, params)
 
       {:error, %{body: body}} ->
         body

@@ -8,6 +8,7 @@ defmodule Slax.ProjectChannel do
     belongs_to(:project, Slax.Project)
     field(:channel_name, :string)
     field(:webhook_token, :string)
+    field(:blockerbot_on, :boolean)
 
     timestamps()
   end

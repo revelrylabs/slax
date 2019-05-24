@@ -51,6 +51,7 @@ defmodule Slax.Repo.Migrations.Database do
       add(:created_at, :utc_datetime, null: false)
       add(:updated_at, :utc_datetime, null: false)
       add(:webhook_token, :string)
+      add(:blockerbot_on, :boolean)
     end
 
     create_if_not_exists(

@@ -85,10 +85,18 @@ defmodule Slax.Slack do
         channel: channel_name
       )
 
-    Http.post(
+    {:ok, response} = Http.post(
       "#{api_url()}/chat.postMessage",
       request,
       "Content-Type": "application/x-www-form-urlencoded"
     )
+
+    IO.inspect response
+    case response do
+      %{body: %{"ok" => false, "error" => error}} ->
+        IO.puts "Error for #{channel_name}: #{error}"
+      _ ->
+        :ok
+    end
   end
 end
