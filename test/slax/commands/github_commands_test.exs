@@ -3,28 +3,6 @@ defmodule Slax.GithubCommands.Test do
   import Mox
   @subject Slax.Commands.GithubCommands
 
-  describe "format_issues/1" do
-    test "when there is an 'in progress' label" do
-      assert @subject.format_issues([
-               %{
-                 "title" => "title",
-                 "updated_at" => "2019-04-18T14:08:35Z",
-                 "labels" => [%{"name" => "in progress"}]
-               }
-             ]) =~ "Last Updated at"
-    end
-
-    test "when there is not an 'in progress' label" do
-      assert @subject.format_issues([
-               %{
-                 "title" => "title",
-                 "updated_at" => "2019-04-18T14:08:35Z",
-                 "labels" => [%{"name" => "back log"}]
-               }
-             ]) =~ ":snail: *Issues In Progress for"
-    end
-  end
-
   describe "format_results/1" do
     setup :setup_no_errors
 
