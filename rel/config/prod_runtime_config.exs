@@ -51,3 +51,5 @@ config :slax, Slax.Slack,
     slax: System.get_env("SLAX_SLACK_TOKEN"),
     blocker: System.get_env("BLOCKER_SLACK_TOKEN")
   ]
+
+  config :slax, Slax.EventSink, issue_events_secret: System.get_env("ISSUE_EVENTS_SECRET")
