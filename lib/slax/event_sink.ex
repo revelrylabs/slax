@@ -4,14 +4,18 @@ defmodule Slax.EventSink do
   """
   alias Slax.Http
 
+  defp config() do
+    Application.get_env(:slax, __MODULE__)
+  end
+
+  defp secret() do
+    Keyword.get(config(), :issue_events_secret)
+  end
+
   @doc """
   Fetch issue events
   """
-  def fetch_issues_events(params, issues) do
-    {:ok, secret} =
-      Application.get_env(:slax, Slax.EventSink, :issue_events_secret)
-      |> Keyword.fetch(:issue_events_secret)
-
+  def fetch_issues_events(params, issues) when is_list(issues) do
     issue_ids =
       issues
       |> Enum.map(&(&1["number"]))
@@ -20,7 +24,7 @@ defmodule Slax.EventSink do
     signature =
       :crypto.hash(
         :sha256,
-        "#{secret}:#{issue_ids}"
+        "#{secret()}:#{issue_ids}"
       )
       |> Base.url_encode64()
 
