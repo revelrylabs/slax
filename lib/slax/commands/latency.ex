@@ -88,7 +88,7 @@ defmodule Slax.Commands.Latency do
     {:ok, update_time_string} = Relative.format(timestamp, "{relative}")
     {:ok, status_time_string} = Relative.format(status_timestamp, "{relative}")
 
-    issue_link = "<https://github.com/#{issue[:org]}/#{issue[:repo]}/issues/#{issue["number"]}|#{issue[:org]}/#{issue[:repo]}##{issue["number"]}>"
+    issue_link = "<https://github.com/#{issue["org"]}/#{issue["repo"]}/issues/#{issue["number"]}|#{issue["org"]}/#{issue["repo"]}##{issue["number"]}>"
 
     "*#{issue["title"] |> String.trim()}* (#{issue_link})\n" <>
     "Status: #{status} for #{status_time_string}\n" <>
