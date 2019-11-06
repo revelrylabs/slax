@@ -5,12 +5,12 @@ defmodule SlaxWeb.InspireController do
   plug(Slax.Plugs.VerifySlackToken, token: :inspire)
 
   def start(conn, %{"text" => text, "channel_name" => channel_name}) do
-    if Regex.match?(~r/tarpon/i, text) do
-      %HTTPoison.Response{body: body} = HTTPoison.get!("https://inspirobot.me/api?generate=true")
+    if Regex.match?(~r/inspire/i, text) do
+      %HTTPoison.Response{body: inspiration} = HTTPoison.get!("https://inspirobot.me/api?generate=true")
 
       Slack.post_message_to_channel(%{
         channel_name: channel_name,
-        text: body,
+        text: inspiration,
       })
     end
 

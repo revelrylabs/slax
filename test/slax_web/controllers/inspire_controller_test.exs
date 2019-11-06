@@ -42,7 +42,7 @@ defmodule SlaxWeb.InspireController.Test do
 
     params = %{
       token: "token",
-      text: "tarpon",
+      text: "inspire",
       channel_name: "blah",
       timestamp: "12345"
     }
