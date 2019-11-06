@@ -29,7 +29,8 @@ config :slax, Slax.Slack,
     project: "token",
     sprint: "token",
     slax: "token",
-    blocker: "token"
+    blocker: "token",
+    inspire: "token"
   ]
 
 config :slax, Slax.Github, org_name: "organization"
