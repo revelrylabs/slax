@@ -61,7 +61,8 @@ config :slax, Slax.Slack,
     tarpon: System.get_env("TARPON_SLACK_TOKEN"),
     project: System.get_env("PROJECT_SLACK_TOKEN"),
     sprint: System.get_env("SPRINT_SLACK_TOKEN"),
-    blocker: System.get_env("BLOCKER_SLACK_TOKEN")
+    blocker: System.get_env("BLOCKER_SLACK_TOKEN"),
+    inspire: System.get_env("INSPIRE_SLACK_TOKEN")
   ]
 config :slax, Slax.Scheduler,
   jobs: [
