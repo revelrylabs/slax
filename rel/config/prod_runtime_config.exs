@@ -40,7 +40,7 @@ config :slax, Slax.Github,
 
 config :slax, Slax.Slack,
   api_url: "https://slack.com/api",
-  api_token: System.get_env("SLACK_TOKEN"),
+  api_signing_secret: System.get_env("SLACK_SIGNING_SECRET"),
   tokens: [
     comment: System.get_env("COMMENT_SLACK_TOKEN"),
     issue: System.get_env("ISSUE_SLACK_TOKEN"),
@@ -52,4 +52,4 @@ config :slax, Slax.Slack,
     blocker: System.get_env("BLOCKER_SLACK_TOKEN")
   ]
 
-  config :slax, Slax.EventSink, issue_events_secret: System.get_env("ISSUE_EVENTS_SECRET")
+config :slax, Slax.EventSink, issue_events_secret: System.get_env("ISSUE_EVENTS_SECRET")

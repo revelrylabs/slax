@@ -52,7 +52,7 @@ config :slax, Slax.Github,
 
 config :slax, Slax.Slack,
   api_url: "https://slack.com/api",
-  api_token: System.get_env("SLACK_TOKEN"),
+  api_signing_secret: System.get_env("SLACK_SIGNING_SECRET"),
   tokens: [
     slax: System.get_env("SLAX_SLACK_TOKEN"),
     comment: System.get_env("COMMENT_SLACK_TOKEN"),
@@ -64,6 +64,7 @@ config :slax, Slax.Slack,
     blocker: System.get_env("BLOCKER_SLACK_TOKEN"),
     inspire: System.get_env("INSPIRE_SLACK_TOKEN")
   ]
+
 config :slax, Slax.Scheduler,
   jobs: [
     # schedule for 9:25 monday thru friday (14:30 UTC)
@@ -72,7 +73,6 @@ config :slax, Slax.Scheduler,
       task: {Slax.Scheduler, :start, []}
     ]
   ]
-
 
 # Import environment specific config. This must remain at the bottom
 # of this file so it overrides the configuration defined above.

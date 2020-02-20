@@ -6,17 +6,31 @@ defmodule Slax.Plugs.VerifySlackToken do
     options
   end
 
-  def call(%Plug.Conn{params: %{"token" => token}} = conn, token: app_var) do
-    slax_config = Application.get_env(:slax, Slax.Slack, [])
-    tokens = Keyword.get(slax_config, :tokens, [])
-    local_token = Keyword.get(tokens, app_var)
+  def call(%Plug.Conn{req_headers: req_headers} = conn, _params) do
+    header_map = Enum.into(req_headers, %{})
+    %{"x-slack-request-timestamp" => timestamp, "x-slack-signature" => slack_sig} = header_map
 
-    case token == local_token do
+    body = SlaxWeb.CacheBodyReader.read_cached_body(conn)
+
+    base_sig = ~s{v0:#{timestamp}:#{body}}
+
+    hashed_sig =
+      :crypto.hmac(
+        :sha256,
+        Application.get_env(:slax, Slax.Slack)[:api_signing_secret],
+        base_sig
+      )
+      |> Base.encode16()
+      |> String.downcase()
+
+    my_sig = ~s{v0=#{hashed_sig}}
+
+    case my_sig == slack_sig do
       true ->
         conn
 
       false ->
-        text(conn, "Invalid slack token.") |> halt
+        text(conn, "Invalid slack signing secret.") |> halt
     end
   end
 

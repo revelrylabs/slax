@@ -1,6 +1,5 @@
 defmodule Slax.Poker do
-
-  alias Slax.{Github, Poker.Round, Repo}
+  alias Slax.{Github, Round, Repo}
 
   import Ecto.Query
 

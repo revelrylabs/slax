@@ -65,7 +65,7 @@ defmodule Slax.Slack do
   Sends a message to slack with the given url
   """
   def send_message(url, message) do
-    request = Jason.encode!(message)
+    request = "{\"text\": \"#{message}\"}"
 
     Http.post(
       url,
@@ -85,15 +85,17 @@ defmodule Slax.Slack do
         channel: channel_name
       )
 
-    {:ok, response} = Http.post(
-      "#{api_url()}/chat.postMessage",
-      request,
-      "Content-Type": "application/x-www-form-urlencoded"
-    )
+    {:ok, response} =
+      Http.post(
+        "#{api_url()}/chat.postMessage",
+        request,
+        "Content-Type": "application/x-www-form-urlencoded"
+      )
 
     case response do
       %{body: %{"ok" => false, "error" => error}} ->
-        IO.puts "Error for #{channel_name}: #{error}"
+        IO.puts("Error for #{channel_name}: #{error}")
+
       _ ->
         :ok
     end
