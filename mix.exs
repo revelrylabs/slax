@@ -50,7 +50,7 @@ defmodule Slax.Mixfile do
       {:plug_cowboy, "~> 2.0"},
       {:plug, "~> 1.7"},
       {:httpoison, "~> 1.5"},
-      {:yaml_front_matter, "~> 0.3.0"},
+      {:yaml_front_matter, "~> 1.0.0"},
       {:ex_doc, "~> 0.19", only: :dev, runtime: false},
       {:excoveralls, "~> 0.8", only: :test},
       {:mox, "~> 0.3", only: :test},
