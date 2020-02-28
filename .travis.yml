@@ -18,6 +18,7 @@ jobs:
       postgresql: '9.6'
     services:
     - postgresql
+    - docker
     install:
     - gem install coveralls-multi --no-document
     - mix local.hex --force
