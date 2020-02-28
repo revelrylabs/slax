@@ -33,10 +33,18 @@ jobs:
     before_deploy:
       - echo $DOCKER_PASSWORD | docker login harbor.revelry-prod.revelry.net -u $DOCKER_USERNAME --password-stdin
     deploy:
-      provider: script
-      script: bin/docker_pub . library/slax harbor.revelry-prod.revelry.net
-      on:
-        branch: master
+      - provider: deis
+        controller: https://deis.prod.revelry.net
+        app: slax
+        cli_version: v2.19.4
+        username: "$DEIS_USERNAME"
+        password: "$DEIS_PASSWORD"
+        on:
+          branch: master
+      - provider: script
+        script: bin/docker_pub . library/slax harbor.revelry-prod.revelry.net
+        on:
+          branch: master
 notifications:
   slack:
     secure: QZv9dds8oxeSDj5s98ZiA5fB+cONN9JusQrUJelVpoR3vXbAu/9Is+cKMW77ZS8lq4tyo5xbLUaJuivsPFZEg4KLsXVIy8TETpNYMIpunYRaQQkJc7xl3L0t+fyRJML1bu0DRfFb8b/77RPuvmypfVYwn9B3OJH28a/9mqsPIdJUWPBwBBFPLhxoO5angWzuB2HNA9XEoztuFDl4IATzcsxL3HXjzwM1cNXCsb5bvR1cr5KLzsNI2LcRDKnHilIWI++V4XTYEvgPTregUXKGcDFDNMRaFXTtOi54SoPiZIbKSVws0oT3bxzNbQexgG1CLRHUp7OL/Ly8UbcF55EmhjNbV+TNOXaPiwv17+DyHIrMMCaKAT0lPwIS0FlfEGChXeiC9Lo/Hz3E4Zh0IBn5JHydV61PzwGgOFLjeGSz2ZLCrlANUJWGpvFqmtwl/hqNZ737UzrNk7SoIG5mDOeh1ZfDEKM5t0J/Xk1xc9JhYmCbCY5q3hljLucZoUtyMtryW+sDtM4ws8Teg6D98J9pfaVnFp2NmYcJE3HguBTl6UqFlC9wXP5sT6hgfWLV95gpzndpT1DdeY1o1lMqEUgjmSUqPrRp8bNX76C2tBijERKUwFxCdmQunRda8hnqoE3fvJzf1mXut6oAVLhhoeS4fix5X8ut7U0h2NJZrk6Fnjo=
