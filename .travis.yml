@@ -30,13 +30,11 @@ jobs:
     name: Deploy to Production
     if: branch = master
     script: skip
+    before_deploy:
+      - echo $DOCKER_PASSWORD | docker login harbor.revelry-prod.revelry.net -u $DOCKER_USERNAME --password-stdin
     deploy:
-    - provider: deis
-      controller: https://deis.prod.revelry.net
-      app: slax
-      cli_version: v2.19.4
-      username: "$DEIS_USERNAME"
-      password: "$DEIS_PASSWORD"
+      provider: script
+      script: bin/docker_pub . library/slax harbor.revelry-prod.revelry.net
       on:
         branch: master
 notifications:
