@@ -6,7 +6,7 @@ defmodule Slax.Plugs.VerifySlackToken do
     options
   end
 
-  def call(%Plug.Conn{req_headers: req_headers} = conn, _params) do
+  def call(%Plug.Conn{req_headers: req_headers} = conn, params) do
     header_map = Enum.into(req_headers, %{})
     %{"x-slack-request-timestamp" => timestamp, "x-slack-signature" => slack_sig} = header_map
 
