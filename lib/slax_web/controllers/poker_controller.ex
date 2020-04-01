@@ -34,18 +34,19 @@ defmodule SlaxWeb.PokerController do
     access_token = conn.assigns.current_user.github_access_token
 
     with {:ok, issue} <- load_issue(access_token, repo_and_issue),
-         {:ok , _} <- Poker.end_current_round_for_channel(channel_name),
+         {:ok, _} <- Poker.end_current_round_for_channel(channel_name),
          {:ok, response} <- Poker.start_round(channel_name, repo_and_issue, issue, response_url) do
-        json(conn, %{
-          response_type: "in_channel",
-          text: response
-        })
+      json(conn, %{
+        response_type: "in_channel",
+        text: response
+      })
     else
       {:error, error_message} ->
-        IO.puts "Error fetching issue from github"
+        IO.puts("Error fetching issue from github")
         text(conn, error_message)
+
       x ->
-        IO.inspect x
+        IO.inspect(x)
         text(conn, "Invalid parameters, repo/issue number is required")
     end
   end
