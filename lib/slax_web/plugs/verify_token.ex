@@ -6,7 +6,14 @@ defmodule Slax.Plugs.VerifySlackToken do
     options
   end
 
-  def call(%Plug.Conn{req_headers: req_headers} = conn, params) do
+  @doc """
+  Handles Github authorization callback, since this request does not come from Slack.
+  """
+  def call(%Plug.Conn{params: %{"code" => _code, "state" => _state}} = conn, _params) do
+    conn
+  end
+
+  def call(%Plug.Conn{req_headers: req_headers} = conn, _params) do
     header_map = Enum.into(req_headers, %{})
     %{"x-slack-request-timestamp" => timestamp, "x-slack-signature" => slack_sig} = header_map
 

@@ -3,7 +3,7 @@ defmodule SlaxWeb.Router do
 
   scope "/", SlaxWeb do
     post("/auth", AuthController, :start)
-    post("/auth/github_redirect", AuthController, :github_redirect)
+    get("/auth/github_redirect", AuthController, :github_redirect)
     get("/auth/github_callback", AuthController, :github_callback)
 
     post("/issue", IssueController, :start)

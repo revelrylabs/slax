@@ -36,6 +36,8 @@ defmodule SlaxWeb.AuthController do
   def github_callback(conn, %{"state" => state, "code" => code}) do
     github_creds = Application.get_env(:slax, Slax.Github)
 
+    IO.inspect(github_creds)
+
     access_token =
       Github.fetch_access_token(%{
         client_id: github_creds[:client_id],
@@ -43,6 +45,8 @@ defmodule SlaxWeb.AuthController do
         code: code,
         state: state
       })
+
+    IO.inspect(access_token)
 
     %{"login" => github_username} =
       Github.current_user_info(%{
