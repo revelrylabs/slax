@@ -14,4 +14,9 @@ defmodule Slax.Round do
 
     timestamps()
   end
+
+  def changeset(model, params \\ %{}) do
+    model
+    |> cast(params, [:channel, :closed, :issue, :response_url, :revealed, :value])
+  end
 end
