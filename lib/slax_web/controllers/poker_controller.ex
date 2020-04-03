@@ -4,7 +4,7 @@ defmodule SlaxWeb.PokerController do
   plug(Slax.Plugs.VerifySlackToken, token: :poker)
   plug(Slax.Plugs.VerifyUser)
 
-  alias Slax.Poker
+  alias Slax.{Poker, Estimates}
 
   def start(conn, %{"text" => ""}) do
     text(conn, """
@@ -63,6 +63,23 @@ defmodule SlaxWeb.PokerController do
     case Tentacat.Issues.find(client, org, repo, issue) do
       {200, issue, _http_response} -> {:ok, issue}
       {_response_code, %{"message" => error_message}, _http_response} -> {:error, error_message}
+    end
+  end
+
+  def start(conn, %{
+        "user_name" => user,
+        "channel_name" => channel_name,
+        "text" => "estimate " <> estimate_and_reason
+      }) do
+    {estimate, reason} = Integer.parse(estimate_and_reason)
+    round_id = Poker.get_current_round_for_channel(channel_name)
+
+    with {:ok, response} <- Estimates.validate_estimate(estimate, reason),
+         {:ok, _response} <- Estimates.register_estimate(user, estimate, reason, round_id) do
+      json(conn, %{
+        response_type: "in_channel",
+        text: response
+      })
     end
   end
 

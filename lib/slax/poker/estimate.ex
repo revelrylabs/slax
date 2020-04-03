@@ -7,9 +7,15 @@ defmodule Slax.Estimate do
   schema "estimates" do
     field(:user, :string)
     field(:value, :integer)
+    field(:reason, :string)
 
     belongs_to(:round_id, Slax.Round)
 
     timestamps()
+  end
+
+  def changeset(model, params \\ %{}) do
+    model
+    |> cast(params, [:user, :value, :reason])
   end
 end
