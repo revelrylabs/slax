@@ -12,6 +12,8 @@ defmodule Slax.Round do
     field(:revealed, :boolean)
     field(:value, :integer)
 
+    has_many(:estimates, Slax.Estimate)
+
     timestamps()
   end
 

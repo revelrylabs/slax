@@ -57,6 +57,6 @@ defmodule Slax.Poker do
       where: round.closed == false,
       where: round.channel == ^channel_name
     )
-    |> Repo.all()
+    |> Repo.one()
   end
 end

@@ -9,13 +9,13 @@ defmodule Slax.Estimate do
     field(:value, :integer)
     field(:reason, :string)
 
-    belongs_to(:round_id, Slax.Round)
+    belongs_to(:round, Slax.Round)
 
     timestamps()
   end
 
   def changeset(model, params \\ %{}) do
     model
-    |> cast(params, [:user, :value, :reason])
+    |> cast(params, [:user, :value, :reason, :round_id])
   end
 end

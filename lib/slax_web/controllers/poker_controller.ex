@@ -72,16 +72,21 @@ defmodule SlaxWeb.PokerController do
         "text" => "estimate " <> estimate_and_reason
       }) do
     {estimate, reason} = Integer.parse(estimate_and_reason)
-    round_id = Poker.get_current_round_for_channel(channel_name)
+    round_id = Poker.get_current_round_for_channel(channel_name).id
+    estimate_params = %{user: user, value: estimate, reason: reason}
 
-    with {:ok, response} <- Estimates.validate_estimate(estimate, reason),
-         {:ok, _response} <- Estimates.register_estimate(user, estimate, reason, round_id) do
-      json(conn, %{
-        response_type: "in_channel",
-        text: response
-      })
+    with {:ok, response} <- Estimates.validate_estimate(estimate),
+         {:ok, _response} <- Estimates.create_or_update_estimate(round_id, estimate_params) do
+      text(conn, response)
     end
   end
+
+  # defp notify_channel(conn, user) do
+  #   json(conn, %{
+  #     response_type: "in_channel",
+  #     text: "#{user} has estimated"
+  #   })
+  # end
 
   # def start(conn, %{"channel_name" => channel_name, "text" => "next"}) do
   #   next_issue = Poker.next_issue(channel_name)
