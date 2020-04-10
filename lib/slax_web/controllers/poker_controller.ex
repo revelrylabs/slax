@@ -51,6 +51,41 @@ defmodule SlaxWeb.PokerController do
     end
   end
 
+  def start(conn, %{
+        "user_name" => user,
+        "channel_name" => channel_name,
+        "text" => "estimate " <> estimate_and_reason
+      }) do
+    {estimate, reason} = Integer.parse(estimate_and_reason)
+    round_id = Poker.get_current_round_for_channel(channel_name).id
+    estimate_params = %{user: user, value: estimate, reason: reason}
+
+    with {:ok, response} <- Estimates.validate_estimate(estimate),
+         {:ok, _response} <- Estimates.create_or_update_estimate(round_id, estimate_params) do
+      Slack.post_message_to_channel(%{
+        channel_name: channel_name,
+        text: "_#{user} has estimated_"
+      })
+
+      text(conn, response)
+    end
+  end
+
+  def start(conn, %{
+        "user_name" => _user,
+        "channel_name" => channel_name,
+        "text" => "reveal"
+      }) do
+    current_estimates = Poker.get_current_estimates_for_channel(channel_name)
+
+    Slack.post_message_to_channel(%{
+      channel_name: channel_name,
+      text: current_estimates
+    })
+
+    text(conn, "")
+  end
+
   defp load_issue(access_token, repo_and_issue) do
     [org, repo, issue] =
       case String.split(repo_and_issue, "/") do
@@ -65,33 +100,6 @@ defmodule SlaxWeb.PokerController do
       {_response_code, %{"message" => error_message}, _http_response} -> {:error, error_message}
     end
   end
-
-  def start(conn, %{
-        "user_name" => user,
-        "channel_name" => channel_name,
-        "text" => "estimate " <> estimate_and_reason
-      }) do
-    {estimate, reason} = Integer.parse(estimate_and_reason)
-    round_id = Poker.get_current_round_for_channel(channel_name).id
-    estimate_params = %{user: user, value: estimate, reason: reason}
-
-    with {:ok, response} <- Estimates.validate_estimate(estimate),
-         {:ok, _response} <- Estimates.create_or_update_estimate(round_id, estimate_params) do
-      Slack.post_message_to_channel(%{
-        channel_name: channel_name,
-        text: "#{user} has estimated"
-      })
-
-      text(conn, response)
-    end
-  end
-
-  # defp notify_channel(conn, user) do
-  #   json(conn, %{
-  #     response_type: "in_channel",
-  #     text: "#{user} has estimated"
-  #   })
-  # end
 
   # def start(conn, %{"channel_name" => channel_name, "text" => "next"}) do
   #   next_issue = Poker.next_issue(channel_name)

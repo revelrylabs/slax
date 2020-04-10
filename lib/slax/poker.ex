@@ -57,6 +57,25 @@ defmodule Slax.Poker do
       where: round.closed == false,
       where: round.channel == ^channel_name
     )
+    |> preload([:estimates])
     |> Repo.one()
+  end
+
+  def get_current_estimates_for_channel(channel_name) do
+    estimates = get_current_round_for_channel(channel_name).estimates
+
+    response =
+      Enum.reduce(estimates, "", fn e, r ->
+        r =
+          r <>
+            """
+            #{e.user}: *#{e.value}*. #{e.reason}
+
+            """
+
+        r
+      end)
+
+    response
   end
 end
