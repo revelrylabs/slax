@@ -4,7 +4,7 @@ defmodule SlaxWeb.PokerController do
   plug(Slax.Plugs.VerifySlackToken, token: :poker)
   plug(Slax.Plugs.VerifyUser)
 
-  alias Slax.{Poker, Estimates}
+  alias Slax.{Poker, Estimates, Slack}
 
   def start(conn, %{"text" => ""}) do
     text(conn, """
@@ -77,6 +77,11 @@ defmodule SlaxWeb.PokerController do
 
     with {:ok, response} <- Estimates.validate_estimate(estimate),
          {:ok, _response} <- Estimates.create_or_update_estimate(round_id, estimate_params) do
+      Slack.post_message_to_channel(%{
+        channel_name: channel_name,
+        text: "#{user} has estimated"
+      })
+
       text(conn, response)
     end
   end
