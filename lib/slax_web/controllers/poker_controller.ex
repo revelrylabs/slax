@@ -22,7 +22,7 @@ defmodule SlaxWeb.PokerController do
 
     /poker reveal -- _Reveal the estimates for the current issue_.
 
-    /poker decide [1|2|3|5|8|13] -- _Finalize the points for the current issue._
+    /poker decide (organization)/repo/issue_number/[1|2|3|5|8|13] -- _Finalize the points for the current issue._
     """)
   end
 
@@ -57,17 +57,21 @@ defmodule SlaxWeb.PokerController do
         "text" => "estimate " <> estimate_and_reason
       }) do
     {estimate, reason} = Integer.parse(estimate_and_reason)
-    round_id = Poker.get_current_round_for_channel(channel_name).id
+    round = Poker.get_current_round_for_channel(channel_name)
     estimate_params = %{user: user, value: estimate, reason: reason}
 
-    with {:ok, response} <- Estimates.validate_estimate(estimate),
-         {:ok, _response} <- Estimates.create_or_update_estimate(round_id, estimate_params) do
-      Slack.post_message_to_channel(%{
-        channel_name: channel_name,
-        text: "_#{user} has estimated_"
-      })
+    if(round) do
+      with {:ok, response} <- Estimates.validate_estimate(estimate),
+           {:ok, _response} <- Estimates.create_or_update_estimate(round.id, estimate_params) do
+        Slack.post_message_to_channel(%{
+          channel_name: channel_name,
+          text: "_#{user} has estimated_"
+        })
 
-      text(conn, response)
+        text(conn, response)
+      end
+    else
+      text(conn, "Response not recorded. Has the current round started?")
     end
   end
 
@@ -94,7 +98,8 @@ defmodule SlaxWeb.PokerController do
       ) do
     access_token = conn.assigns.current_user.github_access_token
 
-    with {:ok, issue} <- decide_issue(access_token, repo_issue_and_score) do
+    with {:ok, issue} <- decide_issue(access_token, repo_issue_and_score),
+         {:ok, _number_closed} <- Poker.end_current_round_for_channel(channel_name) do
       %{"title" => title, "html_url" => url} = issue
 
       Slack.post_message_to_channel(%{

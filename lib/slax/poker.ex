@@ -69,7 +69,7 @@ defmodule Slax.Poker do
         r =
           r <>
             """
-            #{e.user}: *#{e.value}*. #{e.reason}
+            #{e.user}: *#{e.value}*. *#{e.reason}*
 
             """
 
