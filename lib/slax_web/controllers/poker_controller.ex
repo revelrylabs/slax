@@ -72,7 +72,6 @@ defmodule SlaxWeb.PokerController do
   end
 
   def start(conn, %{
-        "user_name" => _user,
         "channel_name" => channel_name,
         "text" => "reveal"
       }) do
@@ -82,6 +81,35 @@ defmodule SlaxWeb.PokerController do
       channel_name: channel_name,
       text: current_estimates
     })
+
+    text(conn, "")
+  end
+
+  def start(
+        conn,
+        %{
+          "channel_name" => channel_name,
+          "text" => "decide" <> repo_issue_and_score
+        }
+      ) do
+    access_token = conn.assigns.current_user.github_access_token
+
+    with {:ok, issue} <- decide_issue(access_token, repo_issue_and_score) do
+      %{"title" => title, "html_url" => url} = issue
+
+      Slack.post_message_to_channel(%{
+        channel_name: channel_name,
+        text: "Jackpot. Issue *#{title}* at #{url} has been scored!"
+      })
+    else
+      {:error, error_message} ->
+        IO.puts("Error fetching issue from github")
+        text(conn, error_message)
+
+      x ->
+        IO.inspect(x)
+        text(conn, "Invalid parameters, repo/issue_number/score is required")
+    end
 
     text(conn, "")
   end
@@ -96,6 +124,23 @@ defmodule SlaxWeb.PokerController do
     client = Tentacat.Client.new(%{access_token: access_token})
 
     case Tentacat.Issues.find(client, org, repo, issue) do
+      {200, issue, _http_response} -> {:ok, issue}
+      {_response_code, %{"message" => error_message}, _http_response} -> {:error, error_message}
+    end
+  end
+
+  defp decide_issue(access_token, repo_issue_and_score) do
+    repo_issue_and_score = String.trim(repo_issue_and_score)
+
+    [org, repo, issue, score] =
+      case String.split(repo_issue_and_score, "/") do
+        [org, repo, issue, score] -> [org, repo, issue, score]
+        [repo, issue, score] -> ["revelrylabs", repo, issue, score]
+      end
+
+    client = Tentacat.Client.new(%{access_token: access_token})
+
+    case Tentacat.Issues.update(client, org, repo, issue, %{labels: ["Score: #{score}"]}) do
       {200, issue, _http_response} -> {:ok, issue}
       {_response_code, %{"message" => error_message}, _http_response} -> {:error, error_message}
     end
