@@ -15,11 +15,7 @@ defmodule Slax.Slack.Test do
             %{
               status_code: 200,
               body: %{"ok" => true}
-            }} =
-             Slack.send_message("", %{
-               response_type: "in_channel",
-               text: "Hello"
-             })
+            }} = Slack.send_message("", "Hello")
   end
 
   def create_channel_setup(context) do
