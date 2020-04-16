@@ -7,23 +7,20 @@ defmodule SlaxWeb.PokerController do
   alias Slax.{Poker, Estimates, Slack}
 
   def start(conn, %{"text" => ""}) do
-    text(conn, """
+    text(conn, "
     *Poker commands:*
-    /poker start [repo/123] -- _Start a new round of planning poker for issue
-    123 of the repo repo_.
+    /poker start [repo/123] -- _Start a new round of planning poker for issue 123 of the repo repo._
 
-    /poker next  -- _Start a new round of planning poker for the next issue
-    with the SCORE label._
+    /poker next  -- _Start a new round of planning poker for the next issue with the SCORE label._
 
     /poker check -- _Remind yourself what round is being played._
 
-    /poker estimate [1|2|3|5|8|13] (reason) -- _Provide your complexity points for the
-    current issue_.
+    /poker estimate [1|2|3|5|8|13] (reason) -- _Provide your complexity points for the current issue._
 
-    /poker reveal -- _Reveal the estimates for the current issue_.
+    /poker reveal -- _Reveal the estimates for the current issue._
 
     /poker decide (organization)/repo/issue_number/[1|2|3|5|8|13] -- _Finalize the points for the current issue._
-    """)
+    ")
   end
 
   def start(conn, %{
@@ -146,8 +143,11 @@ defmodule SlaxWeb.PokerController do
     client = Tentacat.Client.new(%{access_token: access_token})
 
     case Tentacat.Issues.update(client, org, repo, issue, %{labels: ["Score: #{score}"]}) do
-      {200, issue, _http_response} -> {:ok, issue}
-      {_response_code, %{"message" => error_message}, _http_response} -> {:error, error_message}
+      {200, issue, _http_response} ->
+        {:ok, issue}
+
+      {_response_code, %{"message" => error_message}, _http_response} ->
+        {:error, error_message}
     end
   end
 

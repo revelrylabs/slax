@@ -1,7 +1,6 @@
 defmodule Slax.Poker do
-  alias Slax.{Github, Round, Repo}
-
-  import Ecto.Query
+  use Slax.Context
+  alias Slax.Round
 
   def start_round(
         channel_name,
@@ -62,20 +61,27 @@ defmodule Slax.Poker do
   end
 
   def get_current_estimates_for_channel(channel_name) do
-    estimates = get_current_round_for_channel(channel_name).estimates
+    round = get_current_round_for_channel(channel_name)
 
-    response =
-      Enum.reduce(estimates, "", fn e, r ->
-        r =
-          r <>
-            """
-            #{e.user}: *#{e.value}*. *#{e.reason}*
+    if round do
+      response =
+        Enum.reduce(round.estimates, "", fn e, r ->
+          r =
+            r <>
+              """
+              #{e.user}: *#{e.value}*. #{e.reason}
 
-            """
+              """
 
-        r
-      end)
+          r
+        end)
 
-    response
+      Changeset.change(round, revealed: true)
+      |> Repo.update()
+
+      response
+    else
+      "There doesn't seem to be a round active. Did you /poker start?"
+    end
   end
 end
