@@ -35,7 +35,7 @@ defmodule Slax.Plugs.VerifySlackToken do
         conn
 
       _ ->
-        "Invalid params"
+        text(conn, "Invalid params.") |> halt
     end
   end
 
