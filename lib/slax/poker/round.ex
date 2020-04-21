@@ -1,4 +1,4 @@
-defmodule Slax.Round do
+defmodule Slax.Poker.Round do
   @moduledoc false
 
   use Slax.Schema
@@ -12,7 +12,7 @@ defmodule Slax.Round do
     field(:revealed, :boolean)
     field(:value, :integer)
 
-    has_many(:estimates, Slax.Estimate)
+    has_many(:estimates, Slax.Poker.Estimate)
 
     timestamps()
   end

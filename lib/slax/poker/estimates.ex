@@ -1,6 +1,6 @@
-defmodule Slax.Estimates do
+defmodule Slax.Poker.Estimates do
   use Slax.Context
-  alias Slax.Estimate
+  alias Slax.Poker.Estimate
 
   @valid_estimates [1, 2, 3, 5, 8, 13, 666]
 

@@ -4,16 +4,14 @@ defmodule SlaxWeb.PokerController do
   plug(Slax.Plugs.VerifySlackToken, token: :poker)
   plug(Slax.Plugs.VerifyUser)
 
-  alias Slax.{Poker, Estimates, Slack}
+  alias Slax.Slack
+  alias Slax.Poker
+  alias Slax.Poker.Estimates
 
   def start(conn, %{"text" => ""}) do
     text(conn, "
     *Poker commands:*
     /poker start [repo/123] -- _Start a new round of planning poker for issue 123 of the repo repo._
-
-    /poker next  -- _Start a new round of planning poker for the next issue with the SCORE label._
-
-    /poker check -- _Remind yourself what round is being played._
 
     /poker estimate [1|2|3|5|8|13] (reason) -- _Provide your complexity points for the current issue._
 
@@ -116,6 +114,10 @@ defmodule SlaxWeb.PokerController do
     text(conn, "")
   end
 
+  def start(conn, _) do
+    text(conn, "Unknown command, try again")
+  end
+
   defp load_issue(access_token, repo_and_issue) do
     [org, repo, issue] =
       case String.split(repo_and_issue, "/") do
@@ -149,24 +151,5 @@ defmodule SlaxWeb.PokerController do
       {_response_code, %{"message" => error_message}, _http_response} ->
         {:error, error_message}
     end
-  end
-
-  # def start(conn, %{"channel_name" => channel_name, "text" => "next"}) do
-  #   next_issue = Poker.next_issue(channel_name)
-  #   |> Poker.start
-  #   case Poker.start(repo) do
-  #     {:ok, response} ->
-  #       json(conn, %{
-  #         response_type: "in_channel",
-  #         text: response
-  #       })
-
-  #     _ ->
-  #       text(conn, "Invalid parameters, repo/issue number is required")
-  #   end
-  # end
-
-  def start(conn, _) do
-    text(conn, "Unknown command, try again")
   end
 end

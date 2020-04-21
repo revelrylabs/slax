@@ -1,4 +1,4 @@
-defmodule Slax.Estimate do
+defmodule Slax.Poker.Estimate do
   @moduledoc false
 
   use Slax.Schema
@@ -9,7 +9,7 @@ defmodule Slax.Estimate do
     field(:value, :integer)
     field(:reason, :string)
 
-    belongs_to(:round, Slax.Round)
+    belongs_to(:round, Slax.Poker.Round)
 
     timestamps()
   end

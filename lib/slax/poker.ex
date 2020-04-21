@@ -1,6 +1,6 @@
 defmodule Slax.Poker do
   use Slax.Context
-  alias Slax.Round
+  alias Slax.Poker.Round
 
   def start_round(
         channel_name,
