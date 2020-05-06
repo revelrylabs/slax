@@ -1,0 +1,17 @@
+#!/bin/bash
+
+BUILD_PATH=$1
+DOCKER_REPO=$2
+DOCKER_HOST=$3
+
+HEAD_SHA=$(git rev-parse --short HEAD)
+
+IMAGE_TAG=$DOCKER_HOST/$DOCKER_REPO
+LATEST_TAG=$IMAGE_TAG:$TRAVIS_BRANCH-latest
+VERSIONED_TAG=$IMAGE_TAG:$TRAVIS_BRANCH-$HEAD_SHA
+
+docker pull $LATEST_TAG || true
+docker build --cache-from $LATEST_TAG -t $VERSIONED_TAG $BUILD_PATH || exit 1
+docker push $VERSIONED_TAG || exit 1
+docker tag $VERSIONED_TAG $LATEST_TAG
+docker push $LATEST_TAG

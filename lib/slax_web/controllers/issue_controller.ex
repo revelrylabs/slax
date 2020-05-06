@@ -20,8 +20,8 @@ defmodule SlaxWeb.IssueController do
             title: title,
             body: body,
             repo: repo,
-            labels: ["draft"],
-            assignees: [conn.assigns.current_user.github_username],
+            labels: [],
+            assignees: [],
             access_token: conn.assigns.current_user.github_access_token
           })
 
