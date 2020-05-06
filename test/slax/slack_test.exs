@@ -15,11 +15,7 @@ defmodule Slax.Slack.Test do
             %{
               status_code: 200,
               body: %{"ok" => true}
-            }} =
-             Slack.send_message("", %{
-               response_type: "in_channel",
-               text: "Hello"
-             })
+            }} = Slack.send_message("", "Hello")
   end
 
   def create_channel_setup(context) do
@@ -93,10 +89,11 @@ defmodule Slax.Slack.Test do
         {:ok, %HTTPoison.Response{status_code: 200, body: ~s<{"ok": true}>}}
       end)
 
-      assert :ok == Slack.post_message_to_channel(%{
-          text: "test message",
-          channel_name: "#channel"
-      })
+      assert :ok ==
+               Slack.post_message_to_channel(%{
+                 text: "test message",
+                 channel_name: "#channel"
+               })
     end
   end
 end

@@ -152,7 +152,7 @@ defmodule Slax.Commands.NewProject do
     end)
     |> Enum.split_with(fn
       {:ok, _, _} -> true
-      {:error, _,_} -> false
+      {:error, _, _} -> false
     end)
   end
 

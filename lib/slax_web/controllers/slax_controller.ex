@@ -15,10 +15,7 @@ defmodule SlaxWeb.SlaxController do
     Task.start_link(fn ->
       response = Commander.run(context, command_args)
 
-      Slack.send_message(response_url, %{
-        response_type: "in_channel",
-        text: response
-      })
+      Slack.send_message(response_url, response)
     end)
 
     send_resp(conn, 201, "")

@@ -14,7 +14,11 @@ defmodule SlaxWeb.BlockerController do
   > /blocker turn-on/off #Turn on/off the blockerbot for a particular channel and/or project
   """
 
-  def start(conn, %{"response_url" => response_url, "text" => "latency", "channel_name" => channel_name}) do
+  def start(conn, %{
+        "response_url" => response_url,
+        "text" => "latency",
+        "channel_name" => channel_name
+      }) do
     do_start(
       conn,
       :handle_get_blockers_request,
@@ -56,6 +60,7 @@ defmodule SlaxWeb.BlockerController do
       text: "No repos for this channel."
     })
   end
+
   defp respond_for_repos(repo_names, github_access_token, response_url) do
     Enum.each(repo_names, fn repo_name ->
       respond_for_repo(repo_name, github_access_token, response_url)
@@ -63,10 +68,9 @@ defmodule SlaxWeb.BlockerController do
   end
 
   defp respond_for_repo(repo_name, github_access_token, response_url) do
-    org_name =  Application.get_env(:slax, Github)[:org_name]
+    org_name = Application.get_env(:slax, Github)[:org_name]
 
-    formatted_response =
-      Latency.text_for_org_and_repo(org_name, repo_name, github_access_token)
+    formatted_response = Latency.text_for_org_and_repo(org_name, repo_name, github_access_token)
 
     Slack.send_message(response_url, %{
       response_type: "in_channel",

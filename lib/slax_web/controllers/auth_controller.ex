@@ -11,14 +11,14 @@ defmodule SlaxWeb.AuthController do
         text(conn, "*AuthBot services:*\n\n/auth github")
 
       "github" ->
-        text(conn, auth_url(conn, :github_redirect, %{state: user_id}))
+        github_redirect(conn, %{user_id: user_id})
 
       _ ->
         text(conn, "Unknown provider")
     end
   end
 
-  def github_redirect(conn, %{"state" => state}) do
+  def github_redirect(conn, %{user_id: state}) do
     client_id =
       Application.get_env(:slax, Slax.Github)
       |> Keyword.get(:client_id)
@@ -30,7 +30,7 @@ defmodule SlaxWeb.AuthController do
         state: state
       })
 
-    redirect(conn, external: authorization_url)
+    text(conn, authorization_url)
   end
 
   def github_callback(conn, %{"state" => state, "code" => code}) do

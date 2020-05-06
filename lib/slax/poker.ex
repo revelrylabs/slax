@@ -1,22 +1,28 @@
 defmodule Slax.Poker do
+  use Slax.Context
+  alias Slax.Poker.Round
 
-  alias Slax.{Github, Poker.Round, Repo}
-
-  import Ecto.Query
-
-  def start_round(channel_name, repo_and_issue, issue, response_url) do
+  def start_round(
+        channel_name,
+        repo_and_issue,
+        %{"title" => issue, "body" => issue_body},
+        response_url
+      ) do
     %Round{}
     |> Round.changeset(%{
       channel: channel_name,
       issue: issue,
-      response_url: response_url
+      response_url: response_url,
+      closed: false,
+      revealed: false,
+      value: nil
     })
     |> Repo.insert()
 
     response = """
       Planning poker for #{repo_and_issue}.
       ---
-      #{issue["body"]}
+      #{issue_body}
       ---
 
       Reminder: all of the work counts for the complexity score. Getting
@@ -41,6 +47,41 @@ defmodule Slax.Poker do
     |> case do
       {number_updated, _} -> {:ok, number_updated}
       _ -> {:error, "Could not close poker for #{channel_name}"}
+    end
+  end
+
+  def get_current_round_for_channel(channel_name) do
+    from(
+      round in Round,
+      where: round.closed == false,
+      where: round.channel == ^channel_name
+    )
+    |> preload([:estimates])
+    |> Repo.one()
+  end
+
+  def get_current_estimates_for_channel(channel_name) do
+    round = get_current_round_for_channel(channel_name)
+
+    if round do
+      response =
+        Enum.reduce(round.estimates, "", fn e, r ->
+          r =
+            r <>
+              """
+              #{e.user}: *#{e.value}*. #{e.reason}
+
+              """
+
+          r
+        end)
+
+      Changeset.change(round, revealed: true)
+      |> Repo.update()
+
+      response
+    else
+      "There doesn't seem to be a round active. Did you /poker start?"
     end
   end
 end

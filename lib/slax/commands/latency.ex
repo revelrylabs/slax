@@ -10,10 +10,11 @@ defmodule Slax.Commands.Latency do
     params = %{
       repo: repo_name,
       access_token: github_access_token,
-      org: org_name,
+      org: org_name
     }
 
     issues = Github.fetch_issues(params)
+
     events =
       params
       |> EventSink.fetch_issues_events(issues)
@@ -28,14 +29,14 @@ defmodule Slax.Commands.Latency do
     status_labels = ["in progress", "in review", "qa", "uat", "up next"]
 
     issue_events
-    |> Enum.filter(&(Enum.member?(["labeled", "unlabeled"], &1["action"])))
+    |> Enum.filter(&Enum.member?(["labeled", "unlabeled"], &1["action"]))
     |> Enum.filter(fn event ->
-        label_name =
-          event["label"]["name"]
-          |> String.downcase()
-          |> String.trim()
+      label_name =
+        event["label"]["name"]
+        |> String.downcase()
+        |> String.trim()
 
-        Enum.member?(status_labels, label_name)
+      Enum.member?(status_labels, label_name)
     end)
   end
 
@@ -44,9 +45,13 @@ defmodule Slax.Commands.Latency do
 
     issues
     |> Enum.map(fn issue ->
-      Map.put(issue, "events", Enum.filter(issues_events, fn issue_event ->
-        issue["number"] == issue_event["issue"]["number"]
-      end))
+      Map.put(
+        issue,
+        "events",
+        Enum.filter(issues_events, fn issue_event ->
+          issue["number"] == issue_event["issue"]["number"]
+        end)
+      )
     end)
   end
 
@@ -60,16 +65,19 @@ defmodule Slax.Commands.Latency do
       |> Enum.map(&format_issue(&1))
       |> Enum.join("")
 
-    date = DateTime.utc_now
-    today = date
-    |> Timex.weekday()
-    |> Timex.day_name()
+    date = DateTime.utc_now()
+
+    today =
+      date
+      |> Timex.weekday()
+      |> Timex.day_name()
+
     ":snail:  *Unmoved Issues for #{today}, #{date.month}/#{date.day}* :slowpoke:
     Ways to take ownership:
     - Update ticket to correct column
     - Pair
     - Comment blockers (even if you don't know)
-    - Escalate in channel (or another channel)\n\n"<> formatted_list
+    - Escalate in channel (or another channel)\n\n" <> formatted_list
   end
 
   defp format_issue(issue) do
@@ -81,19 +89,23 @@ defmodule Slax.Commands.Latency do
       case issue["assignees"] do
         [] ->
           "_No one._"
+
         _ ->
-          issue["assignees"] |> Enum.map(&(&1["login"]))
+          issue["assignees"] |> Enum.map(& &1["login"])
       end
 
     {:ok, update_time_string} = Relative.format(timestamp, "{relative}")
     {:ok, status_time_string} = Relative.format(status_timestamp, "{relative}")
 
-    issue_link = "<https://github.com/#{issue["org"]}/#{issue["repo"]}/issues/#{issue["number"]}|#{issue["org"]}/#{issue["repo"]}##{issue["number"]}>"
+    issue_link =
+      "<https://github.com/#{issue["org"]}/#{issue["repo"]}/issues/#{issue["number"]}|#{
+        issue["org"]
+      }/#{issue["repo"]}##{issue["number"]}>"
 
     "*#{issue["title"] |> String.trim()}* (#{issue_link})\n" <>
-    "Status: #{status} for #{status_time_string}\n" <>
-    "Last Updated: #{update_time_string}\n" <>
-    "Assigned to: #{assignees}\n\n"
+      "Status: #{status} for #{status_time_string}\n" <>
+      "Last Updated: #{update_time_string}\n" <>
+      "Assigned to: #{assignees}\n\n"
   end
 
   defp issue_is_latent(issue) do
@@ -104,7 +116,7 @@ defmodule Slax.Commands.Latency do
     status_seconds = DateTime.diff(DateTime.utc_now(), status_timestamp)
 
     Enum.member?(["in progress", "in review", "qa", "uat"], status) &&
-    status_seconds > eighteen_hours_in_seconds
+      status_seconds > eighteen_hours_in_seconds
   end
 
   defp calculate_status_from_events(events) do
@@ -112,26 +124,28 @@ defmodule Slax.Commands.Latency do
       case events do
         [] ->
           DateTime.utc_now() |> DateTime.to_iso8601()
+
         _ ->
           events
           |> Enum.at(0)
           |> Map.get("created_at")
       end
 
-    update_status_from_new_event =
-      fn event, status ->
-        case event["action"] do
-          "labeled" ->
-            [event["label"]["name"], event["created_at"]]
-          "unlabeled" ->
-            [old_status, _] = status
-            if old_status == event["label"]["name"] do
-              [nil, event["created_at"]]
-            else
-              status
-            end
-        end
+    update_status_from_new_event = fn event, status ->
+      case event["action"] do
+        "labeled" ->
+          [event["label"]["name"], event["created_at"]]
+
+        "unlabeled" ->
+          [old_status, _] = status
+
+          if old_status == event["label"]["name"] do
+            [nil, event["created_at"]]
+          else
+            status
+          end
       end
+    end
 
     events
     |> Enum.reduce([nil, first_timestamp], update_status_from_new_event)

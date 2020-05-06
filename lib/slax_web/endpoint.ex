@@ -28,6 +28,7 @@ defmodule SlaxWeb.Endpoint do
     Plug.Parsers,
     parsers: [:urlencoded, :multipart, :json],
     pass: ["*/*"],
+    body_reader: {SlaxWeb.CacheBodyReader, :read_body, []},
     json_decoder: Jason
   )
 

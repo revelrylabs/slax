@@ -3,7 +3,6 @@ defmodule Slax.ProjectRepos do
 
   alias Slax.{ProjectRepo, ProjectChannel}
 
-
   def get_blockerbot_repos() do
     ProjectRepo
     |> join(:left, [pr], pc in ProjectChannel, on: pr.project_id == pc.project_id)
