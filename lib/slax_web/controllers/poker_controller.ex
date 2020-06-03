@@ -119,17 +119,28 @@ defmodule SlaxWeb.PokerController do
   end
 
   defp load_issue(access_token, repo_and_issue) do
-    [org, repo, issue] =
-      case String.split(repo_and_issue, "/") do
-        [org, repo, issue] -> [org, repo, issue]
-        [repo, issue] -> ["revelrylabs", repo, issue]
-      end
+    # First try to parse the org, repo and issue
+    repo_and_issue
+    |> String.split(["/", "#"])
+    |> case do
+      [org, repo, issue] -> {org, repo, issue}
+      [repo, issue] -> {"revelrylabs", repo, issue}
+      _ -> {:error, "Could not parse repo and issue, use repo/issues or org/repo/issue"}
+    end
+    |> case do
+      {org, repo, issue} ->
+        client = Tentacat.Client.new(%{access_token: access_token})
 
-    client = Tentacat.Client.new(%{access_token: access_token})
+        case Tentacat.Issues.find(client, org, repo, issue) do
+          {200, issue, _http_response} ->
+            {:ok, issue}
 
-    case Tentacat.Issues.find(client, org, repo, issue) do
-      {200, issue, _http_response} -> {:ok, issue}
-      {_response_code, %{"message" => error_message}, _http_response} -> {:error, error_message}
+          {_response_code, %{"message" => error_message}, _http_response} ->
+            {:error, error_message}
+        end
+
+      {:error, _message} = error ->
+        error
     end
   end
 
