@@ -18,6 +18,8 @@ defmodule SlaxWeb.PokerController do
     /poker reveal -- _Reveal the estimates for the current issue._
 
     /poker decide [1|2|3|5|8|13] -- _Finalize the points for the current issue._
+
+    /poker quit -- _Ends the current round of poker_
     ")
   end
 
@@ -37,7 +39,7 @@ defmodule SlaxWeb.PokerController do
         text(conn, message)
 
       other_error ->
-        text(conn, "Something went wrong: #{inspect other_error}")
+        text(conn, "Something went wrong: #{inspect(other_error)}")
     end
   end
 
@@ -126,6 +128,16 @@ defmodule SlaxWeb.PokerController do
       nil ->
         text(conn, "There doesn't seem to be a round active. Did you /poker start?")
 
+      {:error, message} ->
+        text(conn, message)
+    end
+  end
+
+  def start(conn, %{"channel_name" => channel_name, "text" => "quit"}) do
+    with round = %Poker.Round{} <- Poker.get_current_round_for_channel(channel_name),
+         {:ok, _} <- Poker.end_current_round_for_channel(channel_name) do
+      text(conn, "Poker closed for #{round.issue}")
+    else
       {:error, message} ->
         text(conn, message)
     end

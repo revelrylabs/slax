@@ -12,8 +12,13 @@ defmodule Slax.Poker do
     })
     |> Repo.insert()
 
+    labels = Enum.map_join(issue["labels"], ", ", & &1["name"])
+    pr = if Map.has_key?(issue, "pull_request"), do: "(PR) "
+
     response = """
       Planning poker for #{repo_and_issue}.
+      ---
+      #{pr}#{issue["number"]}: #{issue["title"]} (#{labels})
       ---
       #{issue["body"]}
       #{issue["html_url"]}
