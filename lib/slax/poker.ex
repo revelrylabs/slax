@@ -1,30 +1,27 @@
 defmodule Slax.Poker do
   use Slax.Context
-  alias Slax.Poker.Round
+  alias Slax.{Github, Poker.Round}
 
-  def start_round(
-        channel_name,
-        repo_and_issue,
-        %{"title" => issue, "body" => issue_body},
-        response_url
-      ) do
+  def start_round(channel_name, issue) do
+    repo_and_issue = Regex.replace(~r".*?(\w+)/(\w+)/issues/(\d+)$", issue["url"], "\\1/\\2/\\3")
+
     %Round{}
     |> Round.changeset(%{
       channel: channel_name,
-      issue: issue,
-      response_url: response_url,
-      closed: false,
-      revealed: false,
-      value: nil
+      issue: repo_and_issue
     })
     |> Repo.insert()
+
+
 
     response = """
       Planning poker for #{repo_and_issue}.
       ---
-      #{issue_body}
-      ---
+      #{issue["body"]}
+      #{issue["html_url"]}
+      This issue has #{issue["comments"]} #{Inflex.inflect("comment", issue["comments"])}
 
+      ---
       Reminder: all of the work counts for the complexity score. Getting
       clarity on the issue, project management, development, writing tests,
       design, QA, UAT, release to production, and any other work all count
@@ -60,28 +57,17 @@ defmodule Slax.Poker do
     |> Repo.one()
   end
 
-  def get_current_estimates_for_channel(channel_name) do
-    round = get_current_round_for_channel(channel_name)
+  def decide(round, score) do
+    {org, repo, issue} = Github.parse_repo_org_issue(round.issue)
 
-    if round do
-      response =
-        Enum.reduce(round.estimates, "", fn e, r ->
-          r =
-            r <>
-              """
-              #{e.user}: *#{e.value}*. #{e.reason}
+    client = Tentacat.Client.new(%{access_token: Github.api_token()})
 
-              """
+    case Tentacat.Issues.update(client, org, repo, issue, %{labels: ["Score: #{score}"]}) do
+      {200, _issue, _http_response} ->
+        :ok
 
-          r
-        end)
-
-      Changeset.change(round, revealed: true)
-      |> Repo.update()
-
-      response
-    else
-      "There doesn't seem to be a round active. Did you /poker start?"
+      {_response_code, %{"message" => error_message}, _http_response} ->
+        {:error, error_message}
     end
   end
 end

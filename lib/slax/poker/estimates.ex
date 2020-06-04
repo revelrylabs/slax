@@ -5,10 +5,10 @@ defmodule Slax.Poker.Estimates do
   @valid_estimates [1, 2, 3, 5, 8, 13, 666]
 
   def validate_estimate(estimate) do
-    valid = Enum.member?(@valid_estimates, estimate)
-
-    case valid do
-      true -> {:ok, "Recorded, your estimate is #{estimate}."}
+    @valid_estimates
+    |> Enum.member?(estimate)
+    |> case do
+      true -> :ok
       _ -> {:error, "Valid estimates are [1, 2, 3, 5, 8, 13, 666]"}
     end
   end

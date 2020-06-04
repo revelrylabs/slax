@@ -6,10 +6,10 @@ defmodule Slax.Poker.Round do
   @type t :: %__MODULE__{}
   schema "rounds" do
     field(:channel, :string)
-    field(:closed, :boolean)
+    field(:closed, :boolean, default: false)
     field(:issue, :string)
     field(:response_url, :string)
-    field(:revealed, :boolean)
+    field(:revealed, :boolean, default: false)
     field(:value, :integer)
 
     has_many(:estimates, Slax.Poker.Estimate)

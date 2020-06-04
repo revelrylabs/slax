@@ -23,7 +23,6 @@ defmodule Slax.Mixfile do
   end
 
   # Configuration for the OTP application.
-  #
   # Type `mix help compile.app` for more information.
   def application do
     [
@@ -61,7 +60,8 @@ defmodule Slax.Mixfile do
       {:quantum, "~> 2.3"},
       {:timex, "~> 3.0"},
       {:credo, "~> 1.0.0", only: [:dev, :test], runtime: false},
-      {:tentacat, "~> 1.6.0"}
+      {:tentacat, "~> 1.6.0"},
+      {:inflex, "~> 2.0.0"}
     ]
   end
 

@@ -4,9 +4,9 @@ defmodule SlaxWeb.PokerController do
   plug(Slax.Plugs.VerifySlackToken, token: :poker)
   plug(Slax.Plugs.VerifyUser)
 
-  alias Slax.Slack
-  alias Slax.Poker
+  alias Slax.{Github, Poker, Slack}
   alias Slax.Poker.Estimates
+  alias Slax.Helpers.Text
 
   def start(conn, %{"text" => ""}) do
     text(conn, "
@@ -23,14 +23,11 @@ defmodule SlaxWeb.PokerController do
 
   def start(conn, %{
         "text" => "start " <> repo_and_issue,
-        "channel_name" => channel_name,
-        "response_url" => response_url
+        "channel_name" => channel_name
       }) do
-    access_token = conn.assigns.current_user.github_access_token
-
-    with {:ok, issue} <- load_issue(access_token, repo_and_issue),
+    with {:ok, issue} <- load_issue(repo_and_issue),
          {:ok, _} <- Poker.end_current_round_for_channel(channel_name),
-         {:ok, response} <- Poker.start_round(channel_name, repo_and_issue, issue, response_url) do
+         {:ok, response} <- Poker.start_round(channel_name, issue) do
       json(conn, %{
         response_type: "in_channel",
         text: response
@@ -51,22 +48,33 @@ defmodule SlaxWeb.PokerController do
         "channel_name" => channel_name,
         "text" => "estimate " <> estimate_and_reason
       }) do
-    {estimate, reason} = Integer.parse(estimate_and_reason)
-    round = Poker.get_current_round_for_channel(channel_name)
-    estimate_params = %{user: user, value: estimate, reason: reason}
+    with {:parse, {estimate, reason}} <- {:parse, Integer.parse(estimate_and_reason)},
+         :ok <- Estimates.validate_estimate(estimate),
+         round = %Poker.Round{} <- Poker.get_current_round_for_channel(channel_name),
+         {:ok, _response} <-
+           Estimates.create_or_update_estimate(round.id, %{
+             user: user,
+             value: estimate,
+             reason: reason
+           }) do
+      has_have = if Enum.count(round.estimates) > 1, do: "have", else: "has"
+      estimators = Enum.map(round.estimates, & &1.user) ++ [user]
 
-    if(round) do
-      with {:ok, response} <- Estimates.validate_estimate(estimate),
-           {:ok, _response} <- Estimates.create_or_update_estimate(round.id, estimate_params) do
-        Slack.post_message_to_channel(%{
-          channel_name: channel_name,
-          text: "_#{user} has estimated_"
-        })
+      Slack.post_message_to_channel(%{
+        channel_name: channel_name,
+        text: "_#{Text.to_sentence(estimators)} #{has_have} estimated_"
+      })
 
-        text(conn, response)
-      end
+      text(conn, "Ok, your estimate for #{round.issue} is #{estimate}.")
     else
-      text(conn, "Response not recorded. Has the current round started?")
+      {:error, message} ->
+        text(conn, message)
+
+      {:parse, :error} ->
+        text(conn, "Could not parse estimate and/or reason")
+
+      nil ->
+        text(conn, "There isn't a round of poker for this channel")
     end
   end
 
@@ -74,62 +82,67 @@ defmodule SlaxWeb.PokerController do
         "channel_name" => channel_name,
         "text" => "reveal"
       }) do
-    current_estimates = Poker.get_current_estimates_for_channel(channel_name)
+    case Poker.get_current_round_for_channel(channel_name) do
+      nil ->
+        text(conn, "There doesn't seem to be a round active. Did you /poker start?")
 
-    Slack.post_message_to_channel(%{
-      channel_name: channel_name,
-      text: current_estimates
-    })
+      %{estimates: []} ->
+        text(conn, "No one has estimated yet")
 
-    text(conn, "")
+      round ->
+        estimates = Enum.map(round.estimates, &"#{&1.user}=#{&1.value}")
+
+        message = "Estimates for round: #{estimates}"
+
+        message =
+          if Enum.count(round.estimates, &(!is_nil(&1.reason))) > 0 do
+            reasons = Enum.map(round.estimates, &"#{&1.user} (#{&1.value}): #{&1.reason}")
+            "#{message}\n---\n#{Enum.join(reasons, "\n")}"
+          else
+            message
+          end
+
+        Slack.post_message_to_channel(%{
+          channel_name: channel_name,
+          text: message
+        })
+
+        text(conn, "")
+    end
   end
 
-  def start(
-        conn,
-        %{
-          "channel_name" => channel_name,
-          "text" => "decide" <> repo_issue_and_score
-        }
-      ) do
-    access_token = conn.assigns.current_user.github_access_token
-
-    with {:ok, issue} <- decide_issue(access_token, repo_issue_and_score),
-         {:ok, _number_closed} <- Poker.end_current_round_for_channel(channel_name) do
-      %{"title" => title, "html_url" => url} = issue
-
+  def start(conn, %{"channel_name" => channel_name, "text" => "decide " <> score}) do
+    with {:parse, {score, _}} <- {:parse, Integer.parse(score)},
+         round = %Poker.Round{} <- Poker.get_current_round_for_channel(channel_name),
+         :ok <- Poker.decide(round, score) do
       Slack.post_message_to_channel(%{
         channel_name: channel_name,
-        text: "Jackpot. Issue *#{title}* at #{url} has been scored!"
+        text: "Complexity of #{round.issue} is #{score}."
       })
+
+      text(conn, "")
     else
-      {:error, error_message} ->
-        IO.puts("Error fetching issue from github")
-        text(conn, error_message)
+      {:parse, :error} ->
+        text(conn, "Could not parse score")
 
-      x ->
-        IO.inspect(x)
-        text(conn, "Invalid parameters, repo/issue_number/score is required")
+      nil ->
+        text(conn, "There doesn't seem to be a round active. Did you /poker start?")
+
+      {:error, message} ->
+        text(conn, message)
     end
-
-    text(conn, "")
   end
 
   def start(conn, _) do
     text(conn, "Unknown command, try again")
   end
 
-  defp load_issue(access_token, repo_and_issue) do
-    # First try to parse the org, repo and issue
+  defp load_issue(repo_and_issue) do
     repo_and_issue
-    |> String.split(["/", "#"])
-    |> case do
-      [org, repo, issue] -> {org, repo, issue}
-      [repo, issue] -> {"revelrylabs", repo, issue}
-      _ -> {:error, "Could not parse repo and issue, use repo/issues or org/repo/issue"}
-    end
+    |> Github.parse_repo_org_issue()
     |> case do
       {org, repo, issue} ->
-        client = Tentacat.Client.new(%{access_token: access_token})
+        client = Tentacat.Client.new(%{access_token: Github.api_token()})
 
         case Tentacat.Issues.find(client, org, repo, issue) do
           {200, issue, _http_response} ->
@@ -141,26 +154,6 @@ defmodule SlaxWeb.PokerController do
 
       {:error, _message} = error ->
         error
-    end
-  end
-
-  defp decide_issue(access_token, repo_issue_and_score) do
-    repo_issue_and_score = String.trim(repo_issue_and_score)
-
-    [org, repo, issue, score] =
-      case String.split(repo_issue_and_score, "/") do
-        [org, repo, issue, score] -> [org, repo, issue, score]
-        [repo, issue, score] -> ["revelrylabs", repo, issue, score]
-      end
-
-    client = Tentacat.Client.new(%{access_token: access_token})
-
-    case Tentacat.Issues.update(client, org, repo, issue, %{labels: ["Score: #{score}"]}) do
-      {200, issue, _http_response} ->
-        {:ok, issue}
-
-      {_response_code, %{"message" => error_message}, _http_response} ->
-        {:error, error_message}
     end
   end
 end
