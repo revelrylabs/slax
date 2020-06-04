@@ -17,7 +17,7 @@ defmodule SlaxWeb.PokerController do
 
     /poker reveal -- _Reveal the estimates for the current issue._
 
-    /poker decide (organization)/repo/issue_number/[1|2|3|5|8|13] -- _Finalize the points for the current issue._
+    /poker decide [1|2|3|5|8|13] -- _Finalize the points for the current issue._
     ")
   end
 
@@ -33,13 +33,11 @@ defmodule SlaxWeb.PokerController do
         text: response
       })
     else
-      {:error, error_message} ->
-        IO.puts("Error fetching issue from github")
-        text(conn, error_message)
+      {:error, message} ->
+        text(conn, message)
 
-      x ->
-        IO.inspect(x)
-        text(conn, "Invalid parameters, repo/issue number is required")
+      other_error ->
+        text(conn, "Something went wrong: #{inspect other_error}")
     end
   end
 

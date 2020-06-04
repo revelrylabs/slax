@@ -12,8 +12,6 @@ defmodule Slax.Poker do
     })
     |> Repo.insert()
 
-
-
     response = """
       Planning poker for #{repo_and_issue}.
       ---
