@@ -48,6 +48,8 @@ defmodule Slax.Commands.GithubCommands do
       ) do
     repo = "#{org_name}/#{project_name}"
 
+    :timer.sleep(1500)
+
     case Github.fetch_tree(%{access_token: github_access_token, repo: story_repo}) do
       {:ok, data} ->
         {blobs, tree_errors} = process_tree(data, story_repo, story_paths, github_access_token)
