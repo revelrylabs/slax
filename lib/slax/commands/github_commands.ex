@@ -37,7 +37,7 @@ defmodule Slax.Commands.GithubCommands do
   @doc """
   Pulls all issue templates from a story repo that are included in `story_paths`.
   It  then uses these templates to create issues in a newly created github repository,
-  If there is no github repository the function will exit early
+  If there is no github repository the function will exit early. The sleep avoids github rate limit abuse err.
   """
   def create_reusable_stories(
         %{project_name: project_name, github_repo: _} = results,
