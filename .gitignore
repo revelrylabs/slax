@@ -3,6 +3,10 @@
 /db
 /deps
 /*.ez
+slax.iml
+
+#IDE
+.idea/
 
 # Generate on crash by the VM
 erl_crash.dump
