@@ -60,7 +60,7 @@ defmodule Slax.Mixfile do
       {:stream_data, "~> 0.4.3", only: :test},
       {:quantum, "~> 2.3"},
       {:timex, "~> 3.0"},
-      {:credo, "~> 1.0.0", only: [:dev, :test], runtime: false}
+      {:credo, "~> 1.5.6", only: [:dev, :test], runtime: false}
     ]
   end
 
