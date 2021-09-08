@@ -1,7 +1,0 @@
-#!/bin/bash
-
-mix ecto.drop
-MIX_ENV=test mix ecto.drop
-
-rm _build
-rm deps

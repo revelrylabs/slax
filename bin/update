@@ -1,6 +1,0 @@
-#!/bin/bash
-
-sh ./bin/bootstrap
-
-echo "Updating Database"
-mix ecto.migrate
