@@ -1,0 +1,45 @@
+<%= if not is_nil(live_flash(@flash, :error)) do %>
+  <div class="bg-red-600" x-transition>
+    <div class="max-w-7xl mx-auto py-3 px-3 sm:px-6 lg:px-8">
+      <div class="flex items-center justify-between flex-wrap">
+        <div class="w-0 flex-1 flex items-center">
+          <p class="ml-3 font-medium text-white truncate">
+            <%= live_flash(@flash, :error)%>
+          </p>
+        </div>
+        <div class="order-2 flex-shrink-0 sm:order-3 sm:ml-3">
+          <button type="button" class="-mr-1 flex p-2 rounded-md hover:bg-red-500 focus:outline-none focus:ring-2 focus:ring-white sm:-mr-2" phx-click="lv:clear-flash"
+            phx-value-key="error">
+            <svg class="text-purple -300 w-6 " xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+            </svg>
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+<% end %>
+
+<%= if not is_nil(live_flash(@flash, :info)) do %>
+  <div class="bg-indigo-600" x-transition>
+    <div class="max-w-7xl mx-auto py-3 px-3 sm:px-6 lg:px-8">
+      <div class="flex items-center justify-between flex-wrap">
+        <div class="w-0 flex-1 flex items-center">
+          <p class="ml-3 font-medium text-white truncate">
+            <%= live_flash(@flash, :info)%>
+          </p>
+        </div>
+        <div class="order-2 flex-shrink-0 sm:order-3 sm:ml-3">
+          <button type="button" class="-mr-1 flex p-2 rounded-md hover:bg-indigo-500 focus:outline-none focus:ring-2 focus:ring-white sm:-mr-2" phx-click="lv:clear-flash"
+            phx-value-key="info">
+            <svg class="text-purple -300 w-6 " xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+            </svg>
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+<% end %>
+
+<%= @inner_content %>

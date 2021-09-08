@@ -1,0 +1,11 @@
+{
+  "elixirLS.fetchDeps": false,
+  "[elixir]": {
+    "editor.formatOnSave": true
+  },
+  "[javascript]": {
+    "editor.codeActionsOnSave": {
+      "source.fixAll.eslint": true
+    },
+  }
+}

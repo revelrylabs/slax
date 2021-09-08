@@ -1,0 +1,40 @@
+dist: xenial
+language: elixir
+
+elixir:
+  - "1.12.1"
+
+otp_release:
+  - "24.0.2"
+
+addons:
+  postgresql: "10"
+
+cache:
+  directories:
+    - _build
+    - deps
+    - assets/node_modules
+
+install:
+  - psql -c 'create database slax_test;' -U postgres
+
+before_script:
+  - mix local.hex --force
+  - mix local.rebar --force
+  - mix deps.get
+  - npm install --prefix assets
+
+services:
+  - postgresql
+
+script:
+  - npm test --prefix assets
+  - mix checks
+  - MIX_ENV="test" mix test
+
+deploy: 
+  provider: script
+  script: bash bin/deploy.sh
+  on:
+    branch: main

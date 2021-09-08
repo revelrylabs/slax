@@ -1,0 +1,13 @@
+@import "tailwindcss/base";
+@import "tailwindcss/components";
+@import "tailwindcss/utilities";
+
+[x-cloak] {
+  display: none !important;
+}
+
+@media (min-width: 640px) {
+  [x-flex-above-small] {
+    display: flex !important;
+  }
+}
