@@ -41,7 +41,7 @@ defmodule Slax.Mixfile do
   # Type `mix help deps` for examples and options.
   defp deps do
     [
-      {:phoenix, "~> 1.5.0", override: true},
+      {:phoenix, "~> 1.6.0", override: true},
       {:phoenix_pubsub, "~> 2.0"},
       {:phoenix_ecto, "~> 4.0"},
       {:ecto_sql, "~> 3.6.2"},
@@ -50,7 +50,7 @@ defmodule Slax.Mixfile do
       {:plug_cowboy, "~> 2.5"},
       {:plug, "~> 1.12.1"},
       {:httpoison, "~> 1.5"},
-      {:yaml_front_matter, "~> 0.3.0"},
+      {:yaml_front_matter, "~> 1.0"},
       {:ex_doc, "~> 0.25", only: :dev, runtime: false},
       {:excoveralls, "~> 0.8", only: :test},
       {:mox, "~> 0.3", only: :test},
@@ -58,7 +58,7 @@ defmodule Slax.Mixfile do
       {:distillery, "~> 2.1"},
       {:ex_machina, "~> 2.2", only: :test},
       {:stream_data, "~> 0.4.3", only: :test},
-      {:quantum, "~> 2.3"},
+      {:quantum, "~> 3.0"},
       {:timex, "~> 3.7"},
       {:credo, "~> 1.5.0", only: [:dev, :test], runtime: false}
     ]

@@ -1,4 +1,4 @@
-use Mix.Config
+import Config
 
 config :slax, Slax.Repo,
   url: System.get_env("DATABASE_URL"),
