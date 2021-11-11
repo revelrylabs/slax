@@ -1,18 +1,5 @@
 import Config
 
-config :slax, Slax.Repo,
-  url: System.get_env("DATABASE_URL"),
-  pool_size: String.to_integer(System.get_env("POOL_SIZE") || "10")
-
-port = String.to_integer(System.get_env("PORT"))
-
-config :slax, SlaxWeb.Endpoint,
-  http: [port: port, compress: true],
-  url: [scheme: "https", host: System.get_env("APP_DOMAIN"), port: 443, compress: true],
-  force_ssl: [rewrite_on: [:x_forwarded_proto]],
-  root: ".",
-  secret_key_base: System.get_env("SECRET_KEY_BASE")
-
 config :slax, :lintron,
   secret: System.get_env("LINTRON_SECRET"),
   url: System.get_env("LINTRON_URL")
@@ -52,4 +39,4 @@ config :slax, Slax.Slack,
     blocker: System.get_env("BLOCKER_SLACK_TOKEN")
   ]
 
-  config :slax, Slax.EventSink, issue_events_secret: System.get_env("ISSUE_EVENTS_SECRET")
+config :slax, Slax.EventSink, issue_events_secret: System.get_env("ISSUE_EVENTS_SECRET")
