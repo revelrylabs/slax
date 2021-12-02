@@ -31,12 +31,8 @@ jobs:
     if: branch = master
     script: skip
     deploy:
-      - provider: deis
-        controller: https://deis.prod.revelry.net
-        app: slax
-        cli_version: v2.19.4
-        username: "$DEIS_USERNAME"
-        password: "$DEIS_PASSWORD"
+      - provider: script
+        script: echo 'Automatic deployment is configured directly in Heroku'
         on:
           branch: master
 notifications:
