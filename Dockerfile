@@ -20,13 +20,29 @@ RUN mix do local.rebar --force, local.hex --force, deps.get --only prod, deps.co
 # Add the files to the image
 COPY . .
 
-ENV PORT 5000
-
 # Compile app
 RUN mix do compile, release
+
+#
+# END BUILDER
+#
+
+FROM debian:buster-slim
+
+RUN apt-get -qq update
+RUN apt-get -qq install -y locales locales-all openssl
+
+# Set LOCALE to UTF8
+RUN locale-gen en_US.UTF-8
+ENV LANG='en_US.UTF-8' LANGUAGE='en_US:en' LC_ALL='en_US.UTF-8'
+
+ENV MIX_ENV="prod" PORT="5000"
 
 # Exposes this port from the docker container to the host machine
 EXPOSE 5000
 
+WORKDIR /app
+COPY --from=builder /opt/app/_build/prod/rel/slax ./
+
 # The command to run when this image starts up
-# CMD ["_build/prod/rel/slax/bin/slax", "start"]
+CMD ["./bin/slax", "start"]

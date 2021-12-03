@@ -1,6 +1,17 @@
 import Config
 
 if config_env() == :prod do
+  config :slax, Slax.Repo,
+    url: System.get_env("DATABASE_URL"),
+    pool_size: String.to_integer(System.get_env("POOL_SIZE") || "10")
+
+  port = String.to_integer(System.get_env("PORT"))
+
+  config :slax, SlaxWeb.Endpoint,
+    http: [port: port, compress: true],
+    url: [scheme: "https", host: System.get_env("APP_DOMAIN"), port: 443, compress: true],
+    secret_key_base: System.get_env("SECRET_KEY_BASE")
+
   config :slax, :lintron,
     secret: System.get_env("LINTRON_SECRET"),
     url: System.get_env("LINTRON_URL")
