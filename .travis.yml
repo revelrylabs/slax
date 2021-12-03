@@ -26,10 +26,6 @@ jobs:
     script:
     - MIX_ENV=test mix coveralls.json
     - coveralls-multi
-  - stage: deploy-production
-    name: Deploy to Production
-    if: branch = master
-    script: skip
     deploy:
       - provider: script
         script: echo 'Automatic deployment is configured directly in Heroku'
