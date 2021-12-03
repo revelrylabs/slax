@@ -2,4 +2,4 @@ build:
   docker:
     web: Dockerfile
 run:
-  web: _build/prod/rel/slax/bin/slax foreground
+  web: bin/slax start
