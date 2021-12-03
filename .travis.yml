@@ -24,6 +24,7 @@ jobs:
     - mix local.rebar --force
     - mix deps.get
     script:
+    - mix format --check-formatted
     - MIX_ENV=test mix coveralls.json
     - coveralls-multi
     deploy:
