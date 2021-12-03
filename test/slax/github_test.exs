@@ -99,7 +99,6 @@ defmodule Slax.Github.Test do
       access_token: "token"
     }
 
-
     url = "/repos/#{params[:org]}/#{params[:repo]}/issues"
 
     {:ok, context |> Map.put(:params, params) |> Map.put(:url, url)}

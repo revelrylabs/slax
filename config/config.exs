@@ -3,7 +3,7 @@
 #
 # This configuration file is loaded before any dependency and
 # is restricted to this project.
-use Mix.Config
+import Config
 
 config :phoenix, :json_library, Jason
 
@@ -15,7 +15,7 @@ config :slax, SlaxWeb.Endpoint,
   url: [host: "localhost"],
   secret_key_base: "N4gXL4rdXzHD9kNbCBAaEKShN+mxlgX0biU+eMpc766DF1TYFf2o9kkDLvHNfv1Y",
   render_errors: [view: SlaxWeb.ErrorView, accepts: ~w(json)],
-  pubsub: [name: Slax.PubSub, adapter: Phoenix.PubSub.PG2]
+  pubsub_server: Slax.PubSub
 
 # Configures Elixir's Logger
 config :logger, :console,
@@ -64,6 +64,7 @@ config :slax, Slax.Slack,
     blocker: System.get_env("BLOCKER_SLACK_TOKEN"),
     inspire: System.get_env("INSPIRE_SLACK_TOKEN")
   ]
+
 config :slax, Slax.Scheduler,
   jobs: [
     # schedule for 9:25 monday thru friday (14:30 UTC)
@@ -72,7 +73,6 @@ config :slax, Slax.Scheduler,
       task: {Slax.Scheduler, :start, []}
     ]
   ]
-
 
 # Import environment specific config. This must remain at the bottom
 # of this file so it overrides the configuration defined above.

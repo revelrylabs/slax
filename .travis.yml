@@ -7,9 +7,9 @@ jobs:
     name: Unit Tests
     language: elixir
     elixir:
-    - '1.8'
+    - '1.12.3'
     otp_release:
-    - '21.1'
+    - '24.1'
     cache:
       directories:
       - _build
@@ -24,12 +24,9 @@ jobs:
     - mix local.rebar --force
     - mix deps.get
     script:
+    - mix format --check-formatted
     - MIX_ENV=test mix coveralls.json
     - coveralls-multi
-  - stage: deploy-production
-    name: Deploy to Production
-    if: branch = master
-    script: skip
     deploy:
       - provider: script
         script: echo 'Automatic deployment is configured directly in Heroku'

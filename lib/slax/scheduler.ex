@@ -2,8 +2,7 @@ defmodule Slax.Scheduler do
   @moduledoc """
   Run the unmoved issue report on a schedule.
   """
-  use Quantum.Scheduler,
-    otp_app: :slax
+  use Quantum, otp_app: :slax
 
   alias Slax.{Github, ProjectRepos, Slack}
   alias Slax.Commands.{Latency}

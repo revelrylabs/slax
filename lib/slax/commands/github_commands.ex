@@ -117,7 +117,7 @@ defmodule Slax.Commands.GithubCommands do
     blobs
     |> Enum.map(fn {:ok, path, content} ->
       with {:ok, issue} <- Base.decode64(content |> String.replace("\n", "")),
-           {:ok, {:ok, front_matter}, body} <- YamlFrontMatter.parse(issue) do
+           {:ok, front_matter, body} <- YamlFrontMatter.parse(issue) do
         {:ok, path, front_matter, body}
       else
         :error ->
