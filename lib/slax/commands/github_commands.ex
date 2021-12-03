@@ -37,7 +37,7 @@ defmodule Slax.Commands.GithubCommands do
   @doc """
   Pulls all issue templates from a story repo that are included in `story_paths`.
   It  then uses these templates to create issues in a newly created github repository,
-  If there is no github repository the function will exit early
+  If there is no github repository the function will exit early. The sleep avoids github rate limit abuse err.
   """
   def create_reusable_stories(
         %{project_name: project_name, github_repo: _} = results,
@@ -47,6 +47,8 @@ defmodule Slax.Commands.GithubCommands do
         story_paths
       ) do
     repo = "#{org_name}/#{project_name}"
+
+    :timer.sleep(1500)
 
     case Github.fetch_tree(%{access_token: github_access_token, repo: story_repo}) do
       {:ok, data} ->
@@ -115,7 +117,7 @@ defmodule Slax.Commands.GithubCommands do
     blobs
     |> Enum.map(fn {:ok, path, content} ->
       with {:ok, issue} <- Base.decode64(content |> String.replace("\n", "")),
-           {:ok, {:ok, front_matter}, body} <- YamlFrontMatter.parse(issue) do
+           {:ok, front_matter, body} <- YamlFrontMatter.parse(issue) do
         {:ok, path, front_matter, body}
       else
         :error ->

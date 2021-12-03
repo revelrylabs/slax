@@ -18,7 +18,7 @@ defmodule Slax.EventSink do
   def fetch_issues_events(params, issues) when is_list(issues) do
     issue_ids =
       issues
-      |> Enum.map(&(&1["number"]))
+      |> Enum.map(& &1["number"])
       |> Enum.join(",")
 
     signature =
@@ -28,13 +28,15 @@ defmodule Slax.EventSink do
       )
       |> Base.url_encode64()
 
-    url = "https://event-sink.prod.revelry.net/api/issue/events/#{params[:org]}/#{params[:repo]}?issue_ids=#{issue_ids}&signature=#{signature}"
+    url =
+      "https://event-sink.prod.revelry.net/api/issue/events/#{params[:org]}/#{params[:repo]}?issue_ids=#{issue_ids}&signature=#{signature}"
 
     response = Http.get(url)
 
     case response do
       {:ok, %{body: body}} ->
         body
+
       {:error, %{body: body}} ->
         body
     end

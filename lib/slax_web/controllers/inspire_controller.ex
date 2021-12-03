@@ -6,11 +6,12 @@ defmodule SlaxWeb.InspireController do
 
   def start(conn, %{"text" => text, "channel_name" => channel_name}) do
     if Regex.match?(~r/inspire/i, text) do
-      %HTTPoison.Response{body: inspiration} = HTTPoison.get!("https://inspirobot.me/api?generate=true")
+      %HTTPoison.Response{body: inspiration} =
+        HTTPoison.get!("https://inspirobot.me/api?generate=true")
 
       Slack.post_message_to_channel(%{
         channel_name: channel_name,
-        text: inspiration,
+        text: inspiration
       })
     end
 

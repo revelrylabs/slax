@@ -128,8 +128,6 @@ defmodule Slax.Github do
   Fetch issues from a repo created by a specific user
   """
   def fetch_issues(params) do
-
-
     "#{api_url()}/repos/#{params[:org]}/#{params[:repo]}/issues"
     |> fetch_issues_from_url(params)
   end
@@ -145,13 +143,14 @@ defmodule Slax.Github do
           Map.merge(issue, %{"org" => params[:org], "repo" => params[:repo]})
         end)
 
-      {:error, %{status_code: 301, body: body, headers: headers}}->
+      {:error, %{status_code: 301, body: _body, headers: headers}} ->
         location =
           headers
-          |> Enum.find_value(fn({header, value}) ->
+          |> Enum.find_value(fn {header, value} ->
             case header do
               "Location" ->
                 value
+
               _ ->
                 false
             end

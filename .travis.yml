@@ -7,9 +7,9 @@ jobs:
     name: Unit Tests
     language: elixir
     elixir:
-    - '1.8'
+    - '1.12.3'
     otp_release:
-    - '21.1'
+    - '24.1'
     cache:
       directories:
       - _build
@@ -24,19 +24,12 @@ jobs:
     - mix local.rebar --force
     - mix deps.get
     script:
+    - mix format --check-formatted
     - MIX_ENV=test mix coveralls.json
     - coveralls-multi
-  - stage: deploy-production
-    name: Deploy to Production
-    if: branch = master
-    script: skip
     deploy:
-      - provider: deis
-        controller: https://deis.prod.revelry.net
-        app: slax
-        cli_version: v2.19.4
-        username: "$DEIS_USERNAME"
-        password: "$DEIS_PASSWORD"
+      - provider: script
+        script: echo 'Automatic deployment is configured directly in Heroku'
         on:
           branch: master
 notifications:
