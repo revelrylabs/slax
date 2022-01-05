@@ -18,9 +18,12 @@ defmodule SlaxWeb.ConnCase do
   using do
     quote do
       # Import conveniences for testing with connections
-      use Phoenix.ConnTest
 
       alias Slax.Repo
+
+      import Phoenix.ConnTest
+      import Plug.Conn
+
       import Ecto
       import Ecto.Changeset
       import Ecto.Query

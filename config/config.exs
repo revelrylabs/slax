@@ -3,7 +3,7 @@
 #
 # This configuration file is loaded before any dependency and
 # is restricted to this project.
-use Mix.Config
+import Config
 
 config :phoenix, :json_library, Jason
 
@@ -15,7 +15,7 @@ config :slax, SlaxWeb.Endpoint,
   url: [host: "localhost"],
   secret_key_base: "N4gXL4rdXzHD9kNbCBAaEKShN+mxlgX0biU+eMpc766DF1TYFf2o9kkDLvHNfv1Y",
   render_errors: [view: SlaxWeb.ErrorView, accepts: ~w(json)],
-  pubsub: [name: Slax.PubSub, adapter: Phoenix.PubSub.PG2]
+  pubsub_server: Slax.PubSub
 
 # Configures Elixir's Logger
 config :logger, :console,

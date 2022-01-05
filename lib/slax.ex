@@ -4,13 +4,11 @@ defmodule Slax do
   # See http://elixir-lang.org/docs/stable/elixir/Application.html
   # for more information on OTP Applications
   def start(_type, _args) do
-    import Supervisor.Spec
-
     # Define workers and child supervisors to be supervised
     children = [
-      supervisor(Slax.Repo, []),
-      supervisor(SlaxWeb.Endpoint, []),
-      worker(Slax.Scheduler, [])
+      Slax.Repo,
+      SlaxWeb.Endpoint,
+      Slax.Scheduler
     ]
 
     opts = [strategy: :one_for_one, name: Slax.Supervisor]

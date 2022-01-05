@@ -29,9 +29,7 @@ defmodule Slax.EventSink do
       |> Base.url_encode64()
 
     url =
-      "https://event-sink.prod.revelry.net/api/issue/events/#{params[:org]}/#{params[:repo]}?issue_ids=#{
-        issue_ids
-      }&signature=#{signature}"
+      "https://event-sink.prod.revelry.net/api/issue/events/#{params[:org]}/#{params[:repo]}?issue_ids=#{issue_ids}&signature=#{signature}"
 
     response = Http.get(url)
 
