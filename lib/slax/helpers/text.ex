@@ -17,6 +17,7 @@ defmodule Slax.Helpers.Text do
   def to_sentence([]), do: ""
   def to_sentence([single]), do: single
   def to_sentence([one, two]), do: "#{one} and #{two}"
+
   def to_sentence(list) do
     {last, rest} = List.pop_at(list, -1)
     "#{Enum.join(rest, ", ")}, and #{last}"
