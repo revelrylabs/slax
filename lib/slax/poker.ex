@@ -65,7 +65,7 @@ defmodule Slax.Poker do
 
     client = Tentacat.Client.new(%{access_token: Github.api_token()})
 
-    case Tentacat.Issues.update(client, org, repo, issue, %{labels: ["Score: #{score}"]}) do
+    case Tentacat.Issues.update(client, org, repo, issue, %{labels: ["Points: #{score}"]}) do
       {200, _issue, _http_response} ->
         :ok
 
