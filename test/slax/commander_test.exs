@@ -24,7 +24,7 @@ defmodule Slax.Commander.Test do
   end
 
   property "roll will always be between 1 and n" do
-    check all sides <- integer(1..1000) do
+    check all(sides <- integer(1..1000)) do
       result = Commander.run(%{}, ["roll", to_string(sides)])
       [_, num] = String.split(result, ": ")
       {result, _} = Integer.parse(num)
