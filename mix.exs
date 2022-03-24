@@ -47,7 +47,7 @@ defmodule Slax.Mixfile do
       {:postgrex, ">= 0.0.0"},
       {:gettext, "~> 0.18"},
       {:plug_cowboy, "~> 2.5"},
-      {:plug, "~> 1.12.1"},
+      {:plug, "~> 1.13.4"},
       {:httpoison, "~> 1.5"},
       {:yaml_front_matter, "~> 1.0"},
       {:ex_doc, "~> 0.25", only: :dev, runtime: false},
