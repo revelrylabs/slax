@@ -18,6 +18,17 @@ defmodule Slax.Github do
     config()[:oauth_url]
   end
 
+  defp default_org() do
+    config()[:org_name]
+  end
+
+  @doc """
+  Public function to allow other modules to use the default Github api key
+  """
+  def api_token() do
+    config()[:api_token]
+  end
+
   @timeout_length 10_000
 
   @doc """
@@ -453,5 +464,28 @@ defmodule Slax.Github do
       "Content-Type": "application/json",
       "User-Agent": "Content Bot 1.0"
     ]
+  end
+
+  @doc """
+  Extract the the organization, repository and issue number from a string
+
+  ## Examples
+
+      iex> parse_repo_org_issue("revelrylabs/slax/1")
+      {"revelrylabs", "slax", "1"}
+      iex> parse_repo_org_issue("slax/1")
+      {"revelrylabs", "slax", "1"}
+      iex> parse_repo_org_issue("")
+      {:error, "Could not parse repo and issue, use repo/issue or org/repo/issue"}
+
+  """
+  def parse_repo_org_issue(string) do
+    string
+    |> String.split(["/", "#"])
+    |> case do
+      [org, repo, issue] -> {org, repo, issue}
+      [repo, issue] -> {default_org(), repo, issue}
+      _ -> {:error, "Could not parse repo and issue, use repo/issue or org/repo/issue"}
+    end
   end
 end

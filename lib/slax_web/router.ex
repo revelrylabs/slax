@@ -13,6 +13,7 @@ defmodule SlaxWeb.Router do
     post("/sprint", SprintController, :start)
     post("/slax", SlaxController, :start)
     post("/blocker", BlockerController, :start)
+    post("/poker", PokerController, :start)
     post("/inspire", InspireController, :start)
   end
 end

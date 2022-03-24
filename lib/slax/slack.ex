@@ -65,7 +65,7 @@ defmodule Slax.Slack do
   Sends a message to slack with the given url
   """
   def send_message(url, message) do
-    request = Jason.encode!(message)
+    request = Jason.encode!(%{text: message})
 
     Http.post(
       url,
