@@ -9,8 +9,7 @@ defmodule Slax do
       Slax.Repo,
       SlaxWeb.Endpoint,
       Slax.Scheduler,
-      SlaxWeb.WebsocketListener
-    ]
+    ] ++ optional_children()
 
     opts = [strategy: :one_for_one, name: Slax.Supervisor]
     Supervisor.start_link(children, opts)
@@ -19,5 +18,13 @@ defmodule Slax do
   def config_change(changed, _new, removed) do
     SlaxWeb.Endpoint.config_change(changed, removed)
     :ok
+  end
+
+  defp optional_children() do
+    if Application.get_env(:slax, SlaxWeb.WebsocketListener, [])[:enabled] do
+      [SlaxWeb.WebsocketListener]
+    else
+      []
+    end
   end
 end
