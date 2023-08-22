@@ -15,7 +15,8 @@ defmodule SlaxWeb.Issue do
         Regex.replace(~r".*/repos/(\S+)/(\S+)/issues/(\d+)$", issue["url"], "\\1/\\2/\\3")
 
       Slack.post_message_to_thread(%{
-        text: "<#{issue["html_url"]}|#{repo_and_issue}>: #{issue["title"]} #{labels_for_issue(issue)}",
+        text:
+          "<#{issue["html_url"]}|#{repo_and_issue}>: #{issue["title"]} #{labels_for_issue(issue)}",
         channel: channel,
         thread_ts: ts
       })
