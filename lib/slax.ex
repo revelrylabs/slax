@@ -8,7 +8,8 @@ defmodule Slax do
     children = [
       Slax.Repo,
       SlaxWeb.Endpoint,
-      Slax.Scheduler
+      Slax.Scheduler,
+      SlaxWeb.WebsocketListener
     ]
 
     opts = [strategy: :one_for_one, name: Slax.Supervisor]
