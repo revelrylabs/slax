@@ -5,11 +5,12 @@ defmodule Slax do
   # for more information on OTP Applications
   def start(_type, _args) do
     # Define workers and child supervisors to be supervised
-    children = [
-      Slax.Repo,
-      SlaxWeb.Endpoint,
-      Slax.Scheduler,
-    ] ++ optional_children()
+    children =
+      [
+        Slax.Repo,
+        SlaxWeb.Endpoint,
+        Slax.Scheduler
+      ] ++ optional_children()
 
     opts = [strategy: :one_for_one, name: Slax.Supervisor]
     Supervisor.start_link(children, opts)
