@@ -82,7 +82,9 @@ defmodule Slax.Slack do
       URI.encode_query(
         token: api_token(),
         text: text,
-        channel: channel_name
+        channel: channel_name,
+        unfurl_links: false,
+        unfurl_media: false
       )
 
     {:ok, response} =
@@ -95,6 +97,33 @@ defmodule Slax.Slack do
     case response do
       %{body: %{"ok" => false, "error" => error}} ->
         IO.puts("Error for #{channel_name}: #{error}")
+
+      _ ->
+        :ok
+    end
+  end
+
+  def post_message_to_thread(%{text: text, channel: channel, thread_ts: thread_ts}) do
+    request =
+      URI.encode_query(
+        token: api_token(),
+        text: text,
+        channel: channel,
+        thread_ts: thread_ts,
+        unfurl_links: false,
+        unfurl_media: false
+      )
+
+    {:ok, response} =
+      Http.post(
+        "#{api_url()}/chat.postMessage",
+        request,
+        "Content-Type": "application/x-www-form-urlencoded"
+      )
+
+    case response do
+      %{body: %{"ok" => false, "error" => error}} ->
+        IO.puts("Error for #{channel}: #{error}")
 
       _ ->
         :ok
