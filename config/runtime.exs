@@ -40,6 +40,7 @@ if config_env() == :prod do
   config :slax, Slax.Slack,
     api_url: "https://slack.com/api",
     api_token: System.get_env("SLACK_TOKEN"),
+    app_token: System.get_env("SLACK_APP_TOKEN"),
     tokens: [
       comment: System.get_env("COMMENT_SLACK_TOKEN"),
       issue: System.get_env("ISSUE_SLACK_TOKEN"),
