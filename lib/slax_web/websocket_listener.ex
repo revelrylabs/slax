@@ -41,7 +41,7 @@ defmodule SlaxWeb.WebsocketListener do
   end
 
   def handle_info({_, pid, stream_ref, {:text, event}}, socket) do
-    {:ok, decoded_event} = Jason.decode(event)
+    decoded_event = Jason.decode!(event)
     handle_message(pid, stream_ref, decoded_event)
     {:noreply, socket}
   end

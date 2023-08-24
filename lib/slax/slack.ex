@@ -87,15 +87,15 @@ defmodule Slax.Slack do
         unfurl_media: false
       )
 
-    {:ok, response} =
-      Http.post(
-        "#{api_url()}/chat.postMessage",
-        request,
-        "Content-Type": "application/x-www-form-urlencoded"
-      )
+    case Http.post(
+           "#{api_url()}/chat.postMessage",
+           request,
+           "Content-Type": "application/x-www-form-urlencoded"
+         ) do
+      {:ok, %{body: %{"ok" => false, "error" => error}}} ->
+        IO.puts("Error for #{channel_name}: #{error}")
 
-    case response do
-      %{body: %{"ok" => false, "error" => error}} ->
+      {:error, error} ->
         IO.puts("Error for #{channel_name}: #{error}")
 
       _ ->
@@ -114,16 +114,16 @@ defmodule Slax.Slack do
         unfurl_media: false
       )
 
-    {:ok, response} =
-      Http.post(
-        "#{api_url()}/chat.postMessage",
-        request,
-        "Content-Type": "application/x-www-form-urlencoded"
-      )
+    case Http.post(
+           "#{api_url()}/chat.postMessage",
+           request,
+           "Content-Type": "application/x-www-form-urlencoded"
+         ) do
+      {:ok, %{body: %{"ok" => false, "error" => error}}} ->
+        IO.puts("Error for #{channel}/#{thread_ts}: #{error}")
 
-    case response do
-      %{body: %{"ok" => false, "error" => error}} ->
-        IO.puts("Error for #{channel}: #{error}")
+      {:error, error} ->
+        IO.puts("Error for #{channel}/#{thread_ts}: #{error}")
 
       _ ->
         :ok
