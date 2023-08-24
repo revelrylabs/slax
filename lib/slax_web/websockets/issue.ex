@@ -23,7 +23,6 @@ defmodule SlaxWeb.Issue do
       })
     else
       false ->
-        Logger.info("No matching pattern: #{text}")
         nil
 
       {:error, repo_and_issue} ->
@@ -48,7 +47,6 @@ defmodule SlaxWeb.Issue do
       })
     else
       false ->
-        Logger.info("No matching pattern: #{text}")
         nil
 
       {:error, repo_text} ->
@@ -70,7 +68,8 @@ defmodule SlaxWeb.Issue do
           {200, issue, _http_response} ->
             {:ok, issue}
 
-          {_response_code, %{"message" => _error_message}, _http_response} ->
+          {_response_code, %{"message" => error_message}, _http_response} ->
+            Logger.info(error_message)
             {:error, repo_and_issue}
         end
 
