@@ -3,7 +3,8 @@ defmodule Slax.Poker do
   alias Slax.{Github, Poker.Round}
 
   def start_round(channel_name, issue) do
-    repo_and_issue = Regex.replace(~r".*?(\w+)/(\w+)/issues/(\d+)$", issue["url"], "\\1/\\2/\\3")
+    repo_and_issue =
+      Regex.replace(~r".*/repos/(\S+)/(\S+)/issues/(\d+)$", issue["url"], "\\1/\\2/\\3")
 
     %Round{}
     |> Round.changeset(%{
