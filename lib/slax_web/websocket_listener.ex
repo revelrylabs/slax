@@ -1,5 +1,6 @@
 defmodule SlaxWeb.WebsocketListener do
   use GenServer
+  require Logger
 
   alias Slax.Http
   alias SlaxWeb.Issue
@@ -26,7 +27,7 @@ defmodule SlaxWeb.WebsocketListener do
       :gun.open(:binary.bin_to_list("wss-primary.slack.com"), 443, %{
         transport: :tls,
         protocols: [:http],
-        tls_opts: [verify: :verify_none, log_level: :debug]
+        tls_opts: [verify: :verify_none]
       })
 
     {:ok, :http} = :gun.await_up(pid, 10_000)
@@ -65,6 +66,7 @@ defmodule SlaxWeb.WebsocketListener do
          "envelope_id" => envelope_id,
          "payload" => %{"event" => event}
        }) do
+    Logger.info(event)
     Issue.handle_event(event)
 
     with {:ok, response} <- Jason.encode(%{envelope_id: envelope_id}) do

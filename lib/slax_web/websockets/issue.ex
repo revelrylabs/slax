@@ -1,4 +1,5 @@
 defmodule SlaxWeb.Issue do
+  require Logger
   alias Slax.{Github, Slack}
 
   def handle_event(%{"subtype" => subtype}) when subtype in ["bot_message", "message_changed"],
@@ -22,6 +23,7 @@ defmodule SlaxWeb.Issue do
       })
     else
       false ->
+        Logger.info("No matching pattern: #{text}")
         nil
 
       {:error, repo_and_issue} ->
@@ -46,6 +48,7 @@ defmodule SlaxWeb.Issue do
       })
     else
       false ->
+        Logger.info("No matching pattern: #{text}")
         nil
 
       {:error, repo_text} ->
