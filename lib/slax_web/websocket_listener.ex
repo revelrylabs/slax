@@ -41,8 +41,13 @@ defmodule SlaxWeb.WebsocketListener do
   end
 
   def handle_info({_, pid, stream_ref, {:text, event}}, socket) do
-    decoded_event = Jason.decode!(event)
-    handle_message(pid, stream_ref, decoded_event)
+    with {:ok, decoded_event} <- Jason.decode(event) do
+      handle_message(pid, stream_ref, decoded_event)
+    else
+      _ ->
+        nil
+    end
+
     {:noreply, socket}
   end
 
@@ -62,8 +67,12 @@ defmodule SlaxWeb.WebsocketListener do
        }) do
     Issue.handle_event(event)
 
-    response = Jason.encode!(%{envelope_id: envelope_id})
-    :gun.ws_send(pid, stream_ref, {:text, response})
+    with {:ok, response} <- Jason.encode(%{envelope_id: envelope_id}) do
+      :gun.ws_send(pid, stream_ref, {:text, response})
+    else
+      _ ->
+        nil
+    end
   end
 
   defp handle_message(pid, stream_ref, %{
@@ -71,7 +80,12 @@ defmodule SlaxWeb.WebsocketListener do
          "envelope_id" => envelope_id,
          "payload" => payload
        }) do
-    response = Jason.encode!(%{envelope_id: envelope_id, payload: Poker.start(payload)})
-    :gun.ws_send(pid, stream_ref, {:text, response})
+    with {:ok, response} <-
+           Jason.encode(%{envelope_id: envelope_id, payload: Poker.start(payload)}) do
+      :gun.ws_send(pid, stream_ref, {:text, response})
+    else
+      _ ->
+        nil
+    end
   end
 end
