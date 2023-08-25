@@ -11,15 +11,7 @@ defmodule SlaxWeb.Issue do
 
   def handle_event(%{"thread_ts" => ts, "channel" => channel, "text" => text, "type" => "message"}) do
     with issues when issues != [] <- Regex.scan(~r{([\w-]+/)?([\w-]+)?(#[0-9]+)}, text) do
-      reply =
-        issues
-        |> Enum.map(fn issue ->
-          issue
-          |> List.first()
-          |> load_issue()
-        end)
-        |> Enum.join("\n")
-
+      reply = load_issues_from_scan(issues)
       Slack.post_message_to_thread(%{text: reply, channel: channel, thread_ts: ts})
     else
       [] ->
@@ -29,15 +21,7 @@ defmodule SlaxWeb.Issue do
 
   def handle_event(%{"channel" => channel, "text" => text, "type" => "message"}) do
     with issues when issues != [] <- Regex.scan(~r{([\w-]+/)?([\w-]+)?(#[0-9]+)}, text) do
-      reply =
-        issues
-        |> Enum.map(fn issue ->
-          issue
-          |> List.first()
-          |> load_issue()
-        end)
-        |> Enum.join("\n")
-
+      reply = load_issues_from_scan(issues)
       Slack.post_message_to_channel(%{text: reply, channel_name: channel})
     else
       [] ->
@@ -63,6 +47,12 @@ defmodule SlaxWeb.Issue do
       {:error, message} = error ->
         message
     end
+  end
+
+  defp load_issues_from_scan(issues) do
+    issues
+    |> Enum.map(fn [issue | _] -> load_issue(issue) end)
+    |> Enum.join("\n")
   end
 
   defp labels_for_issue(issue) do
