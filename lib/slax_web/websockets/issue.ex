@@ -10,50 +10,38 @@ defmodule SlaxWeb.Issue do
   def handle_event(%{"bot_id" => bot_id}) when not is_nil(bot_id), do: nil
 
   def handle_event(%{"thread_ts" => ts, "channel" => channel, "text" => text, "type" => "message"}) do
-    with true <- String.match?(text, ~r{([\S-]+/)?([\S-]+)?(#[0-9]+)}),
-         {:ok, issue} <- load_issue(text) do
-      repo_and_issue =
-        Regex.replace(~r".*/repos/(\S+)/(\S+)/issues/(\d+)$", issue["url"], "\\1/\\2/\\3")
+    with issues when issues != [] <- Regex.scan(~r{([\w-]+/)?([\w-]+)?(#[0-9]+)}, text) do
+      reply =
+        issues
+        |> Enum.map(fn issue ->
+          issue
+          |> List.first()
+          |> load_issue()
+        end)
+        |> Enum.join("\n")
 
-      Slack.post_message_to_thread(%{
-        text:
-          "<#{issue["html_url"]}|#{repo_and_issue}>: #{issue["title"]} #{labels_for_issue(issue)}",
-        channel: channel,
-        thread_ts: ts
-      })
+      Slack.post_message_to_thread(%{text: reply, channel: channel, thread_ts: ts})
     else
-      false ->
+      [] ->
         nil
-
-      {:error, repo_and_issue} ->
-        Slack.post_message_to_thread(%{
-          text: "Issue #{repo_and_issue}: not found",
-          channel: channel,
-          thread_ts: ts
-        })
     end
   end
 
   def handle_event(%{"channel" => channel, "text" => text, "type" => "message"}) do
-    with true <- String.match?(text, ~r{([\S-]+/)?([\S-]+)?(#[0-9]+)}),
-         {:ok, issue} <- load_issue(text) do
-      repo_and_issue =
-        Regex.replace(~r".*/repos/(\S+)/(\S+)/issues/(\d+)$", issue["url"], "\\1/\\2/\\3")
+    with issues when issues != [] <- Regex.scan(~r{([\w-]+/)?([\w-]+)?(#[0-9]+)}, text) do
+      reply =
+        issues
+        |> Enum.map(fn issue ->
+          issue
+          |> List.first()
+          |> load_issue()
+        end)
+        |> Enum.join("\n")
 
-      Slack.post_message_to_channel(%{
-        text:
-          "<#{issue["html_url"]}|#{repo_and_issue}>: #{issue["title"]} #{labels_for_issue(issue)}",
-        channel_name: channel
-      })
+      Slack.post_message_to_channel(%{text: reply, channel_name: channel})
     else
-      false ->
+      [] ->
         nil
-
-      {:error, repo_text} ->
-        Slack.post_message_to_channel(%{
-          text: "Issue #{repo_text}: not found",
-          channel_name: channel
-        })
     end
   end
 
@@ -66,15 +54,14 @@ defmodule SlaxWeb.Issue do
 
         case Tentacat.Issues.find(client, org, repo, issue) do
           {200, issue, _http_response} ->
-            {:ok, issue}
+            "<#{issue["html_url"]}|#{repo_and_issue}>: #{issue["title"]} #{labels_for_issue(issue)}"
 
           {_response_code, %{"message" => error_message}, _http_response} ->
-            Logger.info(error_message)
-            {:error, repo_and_issue}
+            "Issue #{repo_and_issue}: not found"
         end
 
-      {:error, _message} = error ->
-        {:error, repo_and_issue}
+      {:error, message} = error ->
+        message
     end
   end
 
