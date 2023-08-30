@@ -66,7 +66,6 @@ defmodule SlaxWeb.WebsocketListener do
          "envelope_id" => envelope_id,
          "payload" => %{"event" => event}
        }) do
-    Logger.info(event)
     Issue.handle_event(event)
 
     with {:ok, response} <- Jason.encode(%{envelope_id: envelope_id}) do
