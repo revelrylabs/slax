@@ -66,7 +66,8 @@ defmodule Slax.Poker do
     client = Tentacat.Client.new(%{access_token: Github.api_token()})
 
     with {200, labels, _http_response} <- Tentacat.Issues.Labels.list(client, org, repo, issue),
-         :ok <- maybe_remove_label(client, org, repo, issue, labels),
+         points_label <- find_points_label(labels),
+         :ok <- maybe_remove_label(client, org, repo, issue, points_label),
          {200, _issue, _http_response} <-
            Tentacat.Issues.Labels.add(client, org, repo, issue, ["Points: #{score}"]) do
       :ok
@@ -76,18 +77,25 @@ defmodule Slax.Poker do
     end
   end
 
-  defp maybe_remove_label(client, org, repo, issue, labels) do
+  defp find_points_label(labels) do
     with %{"name" => label} <-
            Enum.find(labels, fn
              %{"name" => "Points: " <> _number} -> true
              %{"name" => _} -> false
-           end),
-         {200, _, _} <- Tentacat.Issues.Labels.remove(client, org, repo, issue, URI.encode(label)) do
-      :ok
+           end) do
+      label
     else
       nil ->
-        :ok
+        nil
+    end
+  end
 
+  defp maybe_remove_label(_client, _org, _repo, _issue, nil), do: :ok
+
+  defp maybe_remove_label(client, org, repo, issue, label) do
+    with {200, _, _} <- Tentacat.Issues.Labels.remove(client, org, repo, issue, URI.encode(label)) do
+      :ok
+    else
       {_response_code, %{"message" => error_message}, _http_response} ->
         {_response_code, %{"message" => error_message}, _http_response}
     end
