@@ -18,22 +18,31 @@ defmodule SlaxWeb.Issue.Test do
     assert Issue.handle_event(event4) == nil
   end
 
-  test "test regex", _ do
-    assert [["slax-test#1", "", "slax-test", "#1"]] ==
-             Issue.scan_text("some extra text slax-test#1 some extra text")
+  test "test regex to match issue pattern", _ do
+    strings_with_matching_pattern = [
+      {"some extra text slax-test#1 some extra text", [["slax-test#1", "", "slax-test", "#1"]]},
+      {"slax-test#1 some extra text test#2",
+       [["slax-test#1", "", "slax-test", "#1"], ["test#2", "", "test", "#2"]]},
+      {"extra org/repo#1 extra", [["org/repo#1", "org/", "repo", "#1"]]}
+    ]
 
-    assert [["slax-test#1", "", "slax-test", "#1"], ["test#2", "", "test", "#2"]] ==
-             Issue.scan_text("slax-test#1 some extra text test#2")
+    Enum.each(strings_with_matching_pattern, fn {string, result} ->
+      assert result == Issue.scan_text_for_issue(string)
+    end)
 
-    assert [["org/repo#1", "org/", "repo", "#1"]] == Issue.scan_text("garbage org/repo#1 garb")
+    strings_with_no_matching_pattern = [
+      "test#number",
+      "test #number",
+      "test # number",
+      "#number",
+      "#1",
+      "test #1",
+      "/1",
+      "test/1"
+    ]
 
-    assert [] == Issue.scan_text("test#number")
-    assert [] == Issue.scan_text("test #number")
-    assert [] == Issue.scan_text("test # number")
-    assert [] == Issue.scan_text("#number")
-    assert [] == Issue.scan_text("#1")
-    assert [] == Issue.scan_text("test #1")
-    assert [] == Issue.scan_text("/1")
-    assert [] == Issue.scan_text("test/1")
+    Enum.each(strings_with_no_matching_pattern, fn string ->
+      assert [] == Issue.scan_text_for_issue(string)
+    end)
   end
 end
