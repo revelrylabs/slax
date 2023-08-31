@@ -10,7 +10,7 @@ defmodule SlaxWeb.Issue do
   def handle_event(%{"bot_id" => bot_id}) when not is_nil(bot_id), do: nil
 
   def handle_event(%{"thread_ts" => ts, "channel" => channel, "text" => text, "type" => "message"}) do
-    with issues when issues != [] <- Regex.scan(~r{([\w-]+/)?([\w-]+)(#[0-9]+)}, text) do
+    with issues when issues != [] <- scan_text_for_issue(text) do
       reply = load_issues_from_scan(issues)
       Slack.post_message_to_thread(%{text: reply, channel: channel, thread_ts: ts})
     else
@@ -20,13 +20,17 @@ defmodule SlaxWeb.Issue do
   end
 
   def handle_event(%{"channel" => channel, "text" => text, "type" => "message"}) do
-    with issues when issues != [] <- Regex.scan(~r{([\w-]+/)?([\w-]+)(#[0-9]+)}, text) do
+    with issues when issues != [] <- scan_text_for_issue(text) do
       reply = load_issues_from_scan(issues)
       Slack.post_message_to_channel(%{text: reply, channel_name: channel})
     else
       [] ->
         nil
     end
+  end
+
+  def scan_text_for_issue(text) do
+    Regex.scan(~r{([\w-]+/)?([\w-]+)(#[0-9]+)}, text)
   end
 
   defp load_issue(repo_and_issue) do
