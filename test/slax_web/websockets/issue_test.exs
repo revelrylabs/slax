@@ -36,18 +36,4 @@ defmodule SlaxWeb.Issue.Test do
     assert [] == Issue.scan_text("/1")
     assert [] == Issue.scan_text("test/1")
   end
-
-  #  TODO: For when Tentacat is mocked
-  # test "send issue", %{conn: conn} do
-  #   event1 = %{"thread_ts" => 123, "channel" => 123, "text" => "test#1", "type" => "message"}
-  #   event2 = %{"channel" => 123, "text" => "test#1", "type" => "message"}
-
-  #   Slax.HttpMock
-  #   |> expect(:post, 2, fn _, _, _, _ ->
-  #     {:ok, %HTTPoison.Response{status_code: 200, body: ~s<{"ok": true}>}}
-  #   end)
-
-  #   Issue.handle_event(event1)
-  #   Issue.handle_event(event2)
-  # end
 end
