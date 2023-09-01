@@ -55,6 +55,7 @@ defmodule SlaxWeb.Issue do
 
   defp load_issues_from_scan(issues) do
     issues
+    |> Enum.uniq()
     |> Enum.map(fn [issue | _] -> load_issue(issue) end)
     |> Enum.join("\n")
   end
