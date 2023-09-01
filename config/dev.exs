@@ -24,8 +24,7 @@ config :phoenix, :stacktrace_depth, 20
 config :slax, Slax.Repo,
   database: "slax_dev",
   hostname: "localhost",
-  port: 5432,
-  pool: Ecto.Adapters.SQL.Sandbox
+  port: 5432
 
 if File.exists?(Path.join([__DIR__, "dev.secret.exs"])) do
   import_config "dev.secret.exs"
