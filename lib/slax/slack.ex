@@ -129,4 +129,77 @@ defmodule Slax.Slack do
         :ok
     end
   end
+
+  def open_modal(%{trigger_id: trigger_id, view: view}) do
+    request =
+      Jason.encode!(%{
+        trigger_id: trigger_id,
+        view: view
+      })
+
+    case Http.post(
+           "#{api_url()}/views.open",
+           request,
+           "Content-Type": "application/json",
+           Authorization: "Bearer #{api_token()}"
+         ) do
+      {:ok, %{body: %{"ok" => false, "error" => error}}} ->
+        IO.puts("Error for #{trigger_id}: #{error}")
+
+      {:error, error} ->
+        IO.puts("Error for #{trigger_id}: #{error}")
+
+      _ ->
+        :ok
+    end
+  end
+
+  def push_modal(%{trigger_id: trigger_id, view: view}) do
+    request =
+      Jason.encode!(%{
+        trigger_id: trigger_id,
+        view: view
+      })
+
+    case Http.post(
+           "#{api_url()}/views.push",
+           request,
+           "Content-Type": "application/json",
+           Authorization: "Bearer #{api_token()}"
+         ) do
+      {:ok, %{body: %{"ok" => false, "error" => error}}} ->
+        IO.puts("Error for #{trigger_id}: #{error}")
+
+      {:error, error} ->
+        IO.puts("Error for #{trigger_id}: #{error}")
+
+      _ ->
+        :ok
+    end
+  end
+
+  def update_modal(%{trigger_id: trigger_id, view: view, view_id: view_id}) do
+    request =
+      Jason.encode!(%{
+        trigger_id: trigger_id,
+        view_id: view_id,
+        view: view
+      })
+
+    case Http.post(
+           "#{api_url()}/views.update",
+           request,
+           "Content-Type": "application/json",
+           Authorization: "Bearer #{api_token()}"
+         ) do
+      {:ok, %{body: %{"ok" => false, "error" => error}}} ->
+        IO.puts("Error for #{trigger_id}: #{error}")
+
+      {:error, error} ->
+        IO.puts("Error for #{trigger_id}: #{error}")
+
+      _ ->
+        :ok
+    end
+  end
 end
