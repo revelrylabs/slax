@@ -8,6 +8,8 @@ defmodule Slax.ProjectRepo do
     belongs_to(:project, Slax.Project)
     field(:org_name, :string)
     field(:repo_name, :string)
+    field(:token, :string)
+    field(:expiration_date, :date)
 
     timestamps()
   end
