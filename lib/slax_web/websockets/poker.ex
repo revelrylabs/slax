@@ -22,7 +22,7 @@ defmodule SlaxWeb.Poker do
         "text" => "start " <> repo_and_issue,
         "channel_name" => channel_name
       }) do
-    with {:ok, issue} <- load_issue(repo_and_issue),
+    with {:ok, issue} <- Github.load_issue(repo_and_issue),
          {:ok, _} <- Poker.end_current_round_for_channel(channel_name),
          {:ok, response} <- Poker.start_round(channel_name, issue) do
       %{
@@ -140,25 +140,5 @@ defmodule SlaxWeb.Poker do
 
   def start(_, _) do
     %{text: "Unknown command, try again"}
-  end
-
-  defp load_issue(repo_and_issue) do
-    repo_and_issue
-    |> Github.parse_repo_org_issue()
-    |> case do
-      {org, repo, issue} ->
-        client = Tentacat.Client.new(%{access_token: Github.api_token()})
-
-        case Tentacat.Issues.find(client, org, repo, issue) do
-          {200, issue, _http_response} ->
-            {:ok, issue}
-
-          {_response_code, %{"message" => error_message}, _http_response} ->
-            {:error, error_message}
-        end
-
-      {:error, _message} = error ->
-        error
-    end
   end
 end
