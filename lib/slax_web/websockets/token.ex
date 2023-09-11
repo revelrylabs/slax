@@ -42,11 +42,11 @@ defmodule SlaxWeb.Token do
            "expiration_datepicker" => %{"selected_date" => expiration_date}
          } <- parse_state_values(values),
          {:ok, date} <- Date.from_iso8601(expiration_date) do
-          repos_options
-          |> Enum.map(& &1["value"])
-          |> ProjectRepos.add_token_to_repos(token, date)
-
+      repos_options
+      |> Enum.map(& &1["value"])
+      |> ProjectRepos.add_token_to_repos(token, date)
     end
+
     :ok
   end
 
