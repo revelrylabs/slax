@@ -3,7 +3,7 @@ defmodule Slax.Github do
   Functions for working with the Github API
   """
 
-  alias Slax.Http
+  alias Slax.{Http, ProjectRepos}
   alias Slax.Http.Error
 
   defp config() do
@@ -486,6 +486,33 @@ defmodule Slax.Github do
       [org, repo, issue] -> {org, repo, issue}
       [repo, issue] -> {default_org(), repo, issue}
       _ -> {:error, "Could not parse repo and issue, use repo/issue or org/repo/issue"}
+    end
+  end
+
+  @doc """
+  Loads specified issue returning informational errors
+  """
+  def load_issue(repo_and_issue) do
+    with {org, repo, issue} <- parse_repo_org_issue(repo_and_issue),
+         %{token: token} when not is_nil(token) <- ProjectRepos.get_by_repo(repo),
+         client <- Tentacat.Client.new(%{access_token: token}),
+         {200, issue, _http_response} <- Tentacat.Issues.find(client, org, repo, issue) do
+      {:ok, issue}
+    else
+      {:error, _message} = error ->
+        error
+
+      {_response_code, %{"message" => "Bad credentials"}, _http_response} ->
+        {:error, "Access token invalid"}
+
+      {_response_code, %{"message" => error_message}, _http_response} ->
+        {:error, error_message}
+
+      nil ->
+        {:error, "No project repo set"}
+
+      %{token: nil} ->
+        {:error, "No access token"}
     end
   end
 end
