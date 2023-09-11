@@ -503,16 +503,16 @@ defmodule Slax.Github do
         error
 
       {_response_code, %{"message" => "Bad credentials"}, _http_response} ->
-        {:error, "Access token invalid"}
+        {:error, "Access token invalid for #{repo_and_issue}"}
 
       {_response_code, %{"message" => error_message}, _http_response} ->
         {:error, error_message}
 
       nil ->
-        {:error, "No project repo set"}
+        {:error, "No project repo set for #{repo_and_issue}"}
 
       %{token: nil} ->
-        {:error, "No access token"}
+        {:error, "No access token for #{repo_and_issue}"}
     end
   end
 end
