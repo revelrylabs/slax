@@ -58,4 +58,8 @@ defmodule Slax.ProjectRepos do
     ProjectRepo
     |> Repo.all()
   end
+
+  def get_by_repo(repo_name) do
+    Repo.get_by(ProjectRepo, repo_name: repo_name)
+  end
 end
