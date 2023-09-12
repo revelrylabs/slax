@@ -522,7 +522,7 @@ defmodule Slax.Github do
         {token, ""}
 
       _ ->
-        {api_token(), "(Please setup a fine grained access token)"}
+        {api_token(), "(Please setup a fine grained access token with /token)"}
     end
   end
 end
