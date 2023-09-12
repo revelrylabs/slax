@@ -1,6 +1,6 @@
 defmodule Slax.Poker do
   use Slax.Context
-  alias Slax.{Github, Poker.Round}
+  alias Slax.{Github, Poker.Round, ProjectRepos}
 
   def start_round(channel_name, issue) do
     repo_and_issue =
@@ -64,7 +64,13 @@ defmodule Slax.Poker do
   def decide(round, score) do
     {org, repo, issue} = Github.parse_repo_org_issue(round.issue)
 
-    client = Tentacat.Client.new(%{access_token: Github.api_token()})
+    client = case ProjectRepos.get_by_repo(repo) do
+      %{token: token} when not is_nil(token) ->
+        Tentacat.Client.new(%{access_token: token})
+
+      _ ->
+        Tentacat.Client.new(%{access_token: Github.api_token()})
+    end
 
     case Tentacat.Issues.update(client, org, repo, issue, %{labels: ["Points: #{score}"]}) do
       {200, _issue, _http_response} ->

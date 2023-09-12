@@ -494,10 +494,10 @@ defmodule Slax.Github do
   """
   def load_issue(repo_and_issue) do
     with {org, repo, issue} <- parse_repo_org_issue(repo_and_issue),
-         %{token: token} when not is_nil(token) <- ProjectRepos.get_by_repo(repo),
+         {token, warning_message} <- retrieve_token(repo),
          client <- Tentacat.Client.new(%{access_token: token}),
          {200, issue, _http_response} <- Issues.find(client, org, repo, issue) do
-      {:ok, issue}
+      {:ok, issue, warning_message}
     else
       {:error, _message} = error ->
         error
@@ -513,6 +513,16 @@ defmodule Slax.Github do
 
       %{token: nil} ->
         {:error, "No access token for #{repo_and_issue}"}
+    end
+  end
+
+  defp retrieve_token(repo) do
+    case ProjectRepos.get_by_repo(repo) do
+      %{token: token} when not is_nil(token) ->
+        {token, ""}
+
+      _ ->
+        {api_token(), "(Please setup a fine grained access token)"}
     end
   end
 end

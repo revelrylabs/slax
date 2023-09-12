@@ -38,8 +38,8 @@ defmodule SlaxWeb.Issue do
     |> Enum.uniq()
     |> Enum.map(fn [repo_and_issue | _] ->
       case Github.load_issue(repo_and_issue) do
-        {:ok, issue} ->
-          "<#{issue["html_url"]}|#{repo_and_issue}>: #{issue["title"]} #{labels_for_issue(issue)}"
+        {:ok, issue, warning_message} ->
+          "<#{issue["html_url"]}|#{repo_and_issue}>: #{issue["title"]} #{labels_for_issue(issue)} #{warning_message}"
 
         {:error, error} ->
           error

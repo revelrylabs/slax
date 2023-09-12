@@ -22,12 +22,12 @@ defmodule SlaxWeb.Poker do
         "text" => "start " <> repo_and_issue,
         "channel_name" => channel_name
       }) do
-    with {:ok, issue} <- Github.load_issue(repo_and_issue),
+    with {:ok, issue, warning_message} <- Github.load_issue(repo_and_issue),
          {:ok, _} <- Poker.end_current_round_for_channel(channel_name),
          {:ok, response} <- Poker.start_round(channel_name, issue) do
       %{
         response_type: "in_channel",
-        text: response
+        text: response <> warning_message
       }
     else
       {:error, message} ->
