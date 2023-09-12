@@ -3,7 +3,7 @@ defmodule Slax.Github do
   Functions for working with the Github API
   """
 
-  alias Slax.{Http, ProjectRepos}
+  alias Slax.{Http, ProjectRepos, Tentacat.Issues}
   alias Slax.Http.Error
 
   defp config() do
@@ -496,7 +496,7 @@ defmodule Slax.Github do
     with {org, repo, issue} <- parse_repo_org_issue(repo_and_issue),
          %{token: token} when not is_nil(token) <- ProjectRepos.get_by_repo(repo),
          client <- Tentacat.Client.new(%{access_token: token}),
-         {200, issue, _http_response} <- Tentacat.Issues.find(client, org, repo, issue) do
+         {200, issue, _http_response} <- Issues.find(client, org, repo, issue) do
       {:ok, issue}
     else
       {:error, _message} = error ->

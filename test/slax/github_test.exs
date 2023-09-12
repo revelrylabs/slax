@@ -1,6 +1,6 @@
 defmodule Slax.Github.Test do
   use Slax.ModelCase, async: true
-  alias Slax.Github
+  alias Slax.{Github}
   import Mox
 
   # Make sure mocks are verified when the test exits
@@ -540,6 +540,53 @@ defmodule Slax.Github.Test do
       end)
 
       assert Github.add_team_to_repo(params) == {:error, "Invalid"}
+    end
+  end
+
+  def load_issue_setup(context) do
+    project = insert(:project)
+    insert(:project_repo, project: project, token: "success", repo_name: "success")
+    insert(:project_repo, project: project, token: "failure", repo_name: "failure")
+    insert(:project_repo, project: project, token: nil, repo_name: "nil")
+
+    params = %{
+      repo_and_issue_success: "success/1",
+      repo_and_issue_failure: "failure/1",
+      repo_and_issue_nil: "nil/1",
+      repo_and_issue_na: "na/1"
+    }
+
+    {:ok, context |> Map.put(:params, params)}
+  end
+
+  describe "load_issue/1" do
+    setup [:load_issue_setup]
+
+    test "success", %{params: %{repo_and_issue_success: repo_and_issue}} do
+      expect(Slax.Tentacat.IssuesMock, :find, fn _, _, _, _ ->
+        {200, %{issue: "success"}, %{}}
+      end)
+
+      assert {:ok, %{issue: "success"}} == Github.load_issue(repo_and_issue)
+    end
+
+    test "failure: access token invalid", %{params: %{repo_and_issue_failure: repo_and_issue}} do
+      expect(Slax.Tentacat.IssuesMock, :find, fn _, _, _, _ ->
+        {401, %{"message" => "Bad credentials"}, %{}}
+      end)
+
+      assert {:error, "Access token invalid for #{repo_and_issue}"} ==
+               Github.load_issue(repo_and_issue)
+    end
+
+    test "failure: no access token", %{params: %{repo_and_issue_nil: repo_and_issue}} do
+      assert {:error, "No access token for #{repo_and_issue}"} ==
+               Github.load_issue(repo_and_issue)
+    end
+
+    test "failure: no project repo", %{params: %{repo_and_issue_na: repo_and_issue}} do
+      assert {:error, "No project repo set for #{repo_and_issue}"} ==
+               Github.load_issue(repo_and_issue)
     end
   end
 end
