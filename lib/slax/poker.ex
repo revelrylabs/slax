@@ -64,13 +64,14 @@ defmodule Slax.Poker do
   def decide(round, score) do
     {org, repo, issue} = Github.parse_repo_org_issue(round.issue)
 
-    client = case ProjectRepos.get_by_repo(repo) do
-      %{token: token} when not is_nil(token) ->
-        Tentacat.Client.new(%{access_token: token})
+    client =
+      case ProjectRepos.get_by_repo(repo) do
+        %{token: token} when not is_nil(token) ->
+          Tentacat.Client.new(%{access_token: token})
 
-      _ ->
-        Tentacat.Client.new(%{access_token: Github.api_token()})
-    end
+        _ ->
+          Tentacat.Client.new(%{access_token: Github.api_token()})
+      end
 
     case Tentacat.Issues.update(client, org, repo, issue, %{labels: ["Points: #{score}"]}) do
       {200, _issue, _http_response} ->
