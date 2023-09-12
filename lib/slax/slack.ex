@@ -75,7 +75,7 @@ defmodule Slax.Slack do
   end
 
   @doc """
-    posts text to a given channel
+    Posts text to a given channel
   """
   def post_message_to_channel(%{text: text, channel_name: channel_name}) do
     request =
@@ -103,6 +103,9 @@ defmodule Slax.Slack do
     end
   end
 
+  @doc """
+    Posts text to a given channel and thread
+  """
   def post_message_to_thread(%{text: text, channel: channel, thread_ts: thread_ts}) do
     request =
       URI.encode_query(
@@ -130,6 +133,9 @@ defmodule Slax.Slack do
     end
   end
 
+  @doc """
+    Opens a modal view
+  """
   def open_modal(%{trigger_id: trigger_id, view: view}) do
     request =
       Jason.encode!(%{
@@ -154,6 +160,9 @@ defmodule Slax.Slack do
     end
   end
 
+  @doc """
+    Pushes a new modal view on to the modal stack (max 3)
+  """
   def push_modal(%{trigger_id: trigger_id, view: view}) do
     request =
       Jason.encode!(%{
@@ -178,6 +187,9 @@ defmodule Slax.Slack do
     end
   end
 
+  @doc """
+    Updates an existing modal view
+  """
   def update_modal(%{trigger_id: trigger_id, view: view, view_id: view_id}) do
     request =
       Jason.encode!(%{
