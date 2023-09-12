@@ -1,6 +1,5 @@
 defmodule SlaxWeb.Token do
   alias Slax.{Projects, ProjectRepos, Slack}
-  require Logger
 
   def handle_payload(%{
         "trigger_id" => trigger_id,
@@ -34,8 +33,6 @@ defmodule SlaxWeb.Token do
           }
         }
       }) do
-    Logger.info(IO.inspect(values))
-
     with %{
            "repos_select" => %{"selected_options" => repos_options},
            "token_input" => %{"value" => token},
