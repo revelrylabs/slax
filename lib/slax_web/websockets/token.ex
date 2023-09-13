@@ -107,6 +107,13 @@ defmodule SlaxWeb.Token do
   end
 
   defp build_token_view() do
+    project_repos = case ProjectRepos.get_all() do
+      [] ->
+        [%{org_name: "example", repo_name: "example", id: "example"}]
+
+      project_repos ->
+        project_repos
+    end
     %{
       type: "modal",
       callback_id: "token_view",
@@ -130,7 +137,7 @@ defmodule SlaxWeb.Token do
               emoji: true
             },
             options:
-              Enum.map(ProjectRepos.get_all(), fn repo ->
+              Enum.map(project_repos, fn repo ->
                 %{
                   text: %{type: "plain_text", text: "#{repo.org_name}/#{repo.repo_name}"},
                   value: "#{repo.id}"
@@ -193,6 +200,14 @@ defmodule SlaxWeb.Token do
   end
 
   defp build_repo_view() do
+    projects = case Projects.get_all() do
+      [] ->
+        [%{name: "example", id: "example"}]
+
+      projects ->
+        projects
+    end
+
     %{
       type: "modal",
       callback_id: "repo_view",
@@ -217,7 +232,7 @@ defmodule SlaxWeb.Token do
               emoji: true
             },
             options:
-              Enum.map(Projects.get_all(), fn project ->
+              Enum.map(projects, fn project ->
                 %{text: %{type: "plain_text", text: project.name}, value: "#{project.id}"}
               end)
           },
