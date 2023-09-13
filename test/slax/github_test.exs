@@ -567,7 +567,7 @@ defmodule Slax.Github.Test do
         {200, %{issue: "success"}, %{}}
       end)
 
-      assert {:ok, %{issue: "success"}} == Github.load_issue(repo_and_issue)
+      assert {:ok, %{issue: "success"}, ""} == Github.load_issue(repo_and_issue)
     end
 
     test "failure: access token invalid", %{params: %{repo_and_issue_failure: repo_and_issue}} do
@@ -580,13 +580,28 @@ defmodule Slax.Github.Test do
     end
 
     test "failure: no access token", %{params: %{repo_and_issue_nil: repo_and_issue}} do
-      assert {:error, "No access token for #{repo_and_issue}"} ==
+      expect(Slax.Tentacat.IssuesMock, :find, fn _, _, _, _ ->
+        {200, %{issue: "success"}, %{}}
+      end)
+
+      assert {:ok, %{issue: "success"}, "(Please setup a fine grained access token with /token)"} ==
                Github.load_issue(repo_and_issue)
+
+      # NOTE: remove expect and add back these asserts once the guard is removed and the app no longer uses the generic access token
+      # assert {:error, "No access token for #{repo_and_issue}"} ==
+      #          Github.load_issue(repo_and_issue)
     end
 
     test "failure: no project repo", %{params: %{repo_and_issue_na: repo_and_issue}} do
-      assert {:error, "No project repo set for #{repo_and_issue}"} ==
+      expect(Slax.Tentacat.IssuesMock, :find, fn _, _, _, _ ->
+        {200, %{issue: "success"}, %{}}
+      end)
+
+      assert {:ok, %{issue: "success"}, "(Please setup a fine grained access token with /token)"} ==
                Github.load_issue(repo_and_issue)
+
+      # assert {:error, "No project repo set for #{repo_and_issue}"} ==
+      #          Github.load_issue(repo_and_issue)
     end
   end
 end
