@@ -169,7 +169,11 @@ defmodule SlaxWeb.Token do
           type: "input",
           element: %{
             type: "plain_text_input",
-            action_id: "token_input"
+            action_id: "token_input",
+            placeholder: %{
+              type: "plain_text",
+              text: "Github fine-grained access token"
+            }
           },
           label: %{
             type: "plain_text",
@@ -247,7 +251,11 @@ defmodule SlaxWeb.Token do
           optional: true,
           element: %{
             type: "plain_text_input",
-            action_id: "project_name_input"
+            action_id: "project_name_input",
+            placeholder: %{
+              type: "plain_text",
+              text: "project"
+            }
           },
           label: %{
             type: "plain_text",
@@ -259,7 +267,11 @@ defmodule SlaxWeb.Token do
           type: "input",
           element: %{
             type: "plain_text_input",
-            action_id: "repo_name_input"
+            action_id: "repo_name_input",
+            placeholder: %{
+              type: "plain_text",
+              text: "org/repo"
+            }
           },
           label: %{
             type: "plain_text",
