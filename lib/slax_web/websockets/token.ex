@@ -107,13 +107,15 @@ defmodule SlaxWeb.Token do
   end
 
   defp build_token_view() do
-    project_repos = case ProjectRepos.get_all() do
-      [] ->
-        [%{org_name: "example", repo_name: "example", id: "example"}]
+    project_repos =
+      case ProjectRepos.get_all() do
+        [] ->
+          [%{org_name: "example", repo_name: "example", id: "example"}]
 
-      project_repos ->
-        project_repos
-    end
+        project_repos ->
+          project_repos
+      end
+
     %{
       type: "modal",
       callback_id: "token_view",
@@ -204,13 +206,14 @@ defmodule SlaxWeb.Token do
   end
 
   defp build_repo_view() do
-    projects = case Projects.get_all() do
-      [] ->
-        [%{name: "example", id: "example"}]
+    projects =
+      case Projects.get_all() do
+        [] ->
+          [%{name: "example", id: "example"}]
 
-      projects ->
-        projects
-    end
+        projects ->
+          projects
+      end
 
     %{
       type: "modal",
