@@ -23,7 +23,7 @@ defmodule Slax.Release do
   end
 
   defp load_app do
-    Application.load(@app)
     Application.ensure_started(:ssl)
+    Application.load(@app)
   end
 end
