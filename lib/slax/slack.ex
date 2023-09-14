@@ -2,6 +2,7 @@ defmodule Slax.Slack do
   @moduledoc """
   Functions for workig with the Slack API
   """
+  require Logger
   alias Slax.Http
 
   defp config() do
@@ -93,10 +94,10 @@ defmodule Slax.Slack do
            "Content-Type": "application/x-www-form-urlencoded"
          ) do
       {:ok, %{body: %{"ok" => false, "error" => error}}} ->
-        IO.puts("Error for #{channel_name}: #{error}")
+        Logger.error("Error for #{channel_name}: #{error}")
 
       {:error, error} ->
-        IO.puts("Error for #{channel_name}: #{error}")
+        Logger.error("Error for #{channel_name}: #{error}")
 
       _ ->
         :ok
@@ -123,10 +124,10 @@ defmodule Slax.Slack do
            "Content-Type": "application/x-www-form-urlencoded"
          ) do
       {:ok, %{body: %{"ok" => false, "error" => error}}} ->
-        IO.puts("Error for #{channel}/#{thread_ts}: #{error}")
+        Logger.error("Error for #{channel}/#{thread_ts}: #{error}")
 
       {:error, error} ->
-        IO.puts("Error for #{channel}/#{thread_ts}: #{error}")
+        Logger.error("Error for #{channel}/#{thread_ts}: #{error}")
 
       _ ->
         :ok
@@ -150,10 +151,10 @@ defmodule Slax.Slack do
            Authorization: "Bearer #{api_token()}"
          ) do
       {:ok, %{body: %{"ok" => false, "error" => error}}} ->
-        IO.puts("Error for #{trigger_id}: #{error}")
+        Logger.error("Error for #{trigger_id}: #{error}")
 
       {:error, error} ->
-        IO.puts("Error for #{trigger_id}: #{error}")
+        Logger.error("Error for #{trigger_id}: #{error}")
 
       _ ->
         :ok
@@ -177,10 +178,10 @@ defmodule Slax.Slack do
            Authorization: "Bearer #{api_token()}"
          ) do
       {:ok, %{body: %{"ok" => false, "error" => error}}} ->
-        IO.puts("Error for #{trigger_id}: #{error}")
+        Logger.error("Error for #{trigger_id}: #{error}")
 
       {:error, error} ->
-        IO.puts("Error for #{trigger_id}: #{error}")
+        Logger.error("Error for #{trigger_id}: #{error}")
 
       _ ->
         :ok
@@ -205,10 +206,10 @@ defmodule Slax.Slack do
            Authorization: "Bearer #{api_token()}"
          ) do
       {:ok, %{body: %{"ok" => false, "error" => error}}} ->
-        IO.puts("Error for #{trigger_id}: #{error}")
+        Logger.error("Error for #{trigger_id}: #{error}")
 
       {:error, error} ->
-        IO.puts("Error for #{trigger_id}: #{error}")
+        Logger.error("Error for #{trigger_id}: #{error}")
 
       _ ->
         :ok

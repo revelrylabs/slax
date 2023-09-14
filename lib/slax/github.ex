@@ -3,8 +3,10 @@ defmodule Slax.Github do
   Functions for working with the Github API
   """
 
-  alias Slax.{Http, ProjectRepos, Tentacat.Issues}
+  alias Slax.Http
   alias Slax.Http.Error
+  alias Slax.ProjectRepos
+  alias Slax.Tentacat.Issues
 
   defp config() do
     Application.get_env(:slax, __MODULE__)
@@ -486,6 +488,16 @@ defmodule Slax.Github do
       [org, repo, issue] -> {org, repo, issue}
       [repo, issue] -> {default_org(), repo, issue}
       _ -> {:error, "Could not parse repo and issue, use repo/issue or org/repo/issue"}
+    end
+  end
+
+  def parse_repo_org(string) do
+    case String.split(string, "/") do
+      [org_name, repo_name] ->
+        {org_name, repo_name}
+
+      [repo_name] ->
+        {default_org(), repo_name}
     end
   end
 

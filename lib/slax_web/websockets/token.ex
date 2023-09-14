@@ -1,5 +1,13 @@
 defmodule SlaxWeb.Token do
-  alias Slax.{Projects, ProjectRepos, Slack}
+  @moduledoc """
+  A module that handles Slack websocket payloads for token interactions and
+  builds modal views for slack https://api.slack.com/reference/surfaces/views
+  """
+
+  alias Slax.Projects
+  alias Slax.ProjectRepos
+  alias Slax.Slack
+  alias Slax.Github
 
   def handle_payload(%{
         "trigger_id" => trigger_id,
@@ -64,7 +72,7 @@ defmodule SlaxWeb.Token do
          } <-
            parse_state_values(values) do
       # don't create project, create repo and attach it to project
-      {org_name, repo_name} = parse_org_and_repo(repo_name_input["value"])
+      {org_name, repo_name} = Github.parse_repo_org(repo_name_input["value"])
 
       ProjectRepos.create(%{
         org_name: org_name,
@@ -78,7 +86,7 @@ defmodule SlaxWeb.Token do
         "project_select" => _project_select
       } ->
         # create project with project name, create repo and attach it to project
-        {org_name, repo_name} = parse_org_and_repo(repo_name_input["value"])
+        {org_name, repo_name} = Github.parse_repo_org(repo_name_input["value"])
 
         ProjectRepos.create_repo_with_project(%{
           project_name: project_name,
@@ -94,16 +102,6 @@ defmodule SlaxWeb.Token do
     values
     |> Map.values()
     |> Enum.reduce(%{}, fn value, acc -> Map.merge(acc, value) end)
-  end
-
-  defp parse_org_and_repo(org_and_repo) do
-    case String.split(org_and_repo, "/") do
-      [org_name, repo_name] ->
-        {org_name, repo_name}
-
-      [repo_name] ->
-        {"revelrylabs", repo_name}
-    end
   end
 
   defp build_token_view() do
