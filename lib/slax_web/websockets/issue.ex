@@ -10,8 +10,8 @@ defmodule SlaxWeb.Issue do
   def handle_event(%{"bot_id" => bot_id}) when not is_nil(bot_id), do: nil
 
   def handle_event(%{"thread_ts" => ts, "channel" => channel, "text" => text, "type" => "message"}) do
-    with issues when issues != [] <- scan_text_for_issue(text) do
-      reply = load_issues_from_scan(issues)
+    with repo_and_issues when repo_and_issues != [] <- scan_text_for_issue(text) do
+      reply = load_issues_from_scan(repo_and_issues)
       Slack.post_message_to_thread(%{text: reply, channel: channel, thread_ts: ts})
     else
       [] ->
@@ -20,8 +20,8 @@ defmodule SlaxWeb.Issue do
   end
 
   def handle_event(%{"channel" => channel, "text" => text, "type" => "message"}) do
-    with issues when issues != [] <- scan_text_for_issue(text) do
-      reply = load_issues_from_scan(issues)
+    with repo_and_issues when repo_and_issues != [] <- scan_text_for_issue(text) do
+      reply = load_issues_from_scan(repo_and_issues)
       Slack.post_message_to_channel(%{text: reply, channel_name: channel})
     else
       [] ->
@@ -33,30 +33,18 @@ defmodule SlaxWeb.Issue do
     Regex.scan(~r{([\w-]+/)?([\w-]+)(#[0-9]+)}, text)
   end
 
-  defp load_issue(repo_and_issue) do
-    repo_and_issue
-    |> Github.parse_repo_org_issue()
-    |> case do
-      {org, repo, issue} ->
-        client = Tentacat.Client.new(%{access_token: Github.api_token()})
-
-        case Tentacat.Issues.find(client, org, repo, issue) do
-          {200, issue, _http_response} ->
-            "<#{issue["html_url"]}|#{repo_and_issue}>: #{issue["title"]} #{labels_for_issue(issue)}"
-
-          {_response_code, %{"message" => error_message}, _http_response} ->
-            "Issue #{repo_and_issue}: not found"
-        end
-
-      {:error, message} = error ->
-        message
-    end
-  end
-
-  defp load_issues_from_scan(issues) do
-    issues
+  defp load_issues_from_scan(repo_and_issues) do
+    repo_and_issues
     |> Enum.uniq()
-    |> Enum.map(fn [issue | _] -> load_issue(issue) end)
+    |> Enum.map(fn [repo_and_issue | _] ->
+      case Github.load_issue(repo_and_issue) do
+        {:ok, issue, warning_message} ->
+          "<#{issue["html_url"]}|#{repo_and_issue}>: #{issue["title"]} #{labels_for_issue(issue)} #{warning_message}"
+
+        {:error, error} ->
+          error
+      end
+    end)
     |> Enum.join("\n")
   end
 

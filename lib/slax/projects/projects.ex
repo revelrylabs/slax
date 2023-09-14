@@ -10,4 +10,29 @@ defmodule Slax.Projects do
     |> preload([:repos])
     |> Repo.one()
   end
+
+  def create(project) do
+    project
+    |> Project.changeset()
+    |> Repo.insert()
+  end
+
+  def get_or_create_by_name(project_name) do
+    case get_by_name(project_name) do
+      nil ->
+        create(%{name: project_name})
+
+      project ->
+        {:ok, project}
+    end
+  end
+
+  def get_by_name(project_name) do
+    Repo.get_by(Project, name: project_name)
+  end
+
+  def get_all() do
+    Project
+    |> Repo.all()
+  end
 end

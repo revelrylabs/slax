@@ -5,6 +5,7 @@ defmodule SlaxWeb.WebsocketListener do
   alias Slax.Http
   alias SlaxWeb.Issue
   alias SlaxWeb.Poker
+  alias SlaxWeb.Token
 
   defp config() do
     Application.get_env(:slax, Slax.Slack)
@@ -85,6 +86,28 @@ defmodule SlaxWeb.WebsocketListener do
            Jason.encode(%{envelope_id: envelope_id, payload: Poker.start(payload)}) do
       :gun.ws_send(pid, stream_ref, {:text, response})
     else
+      _ ->
+        nil
+    end
+  end
+
+  defp handle_message(pid, stream_ref, %{
+         "type" => "interactive",
+         "envelope_id" => envelope_id,
+         "payload" => payload
+       }) do
+    with %{} = view <- Token.handle_payload(payload),
+         {:ok, response} <-
+           Jason.encode(%{
+             envelope_id: envelope_id,
+             payload: %{response_action: "update", view: view}
+           }) do
+      :gun.ws_send(pid, stream_ref, {:text, response})
+    else
+      :ok ->
+        response = Jason.encode!(%{envelope_id: envelope_id})
+        :gun.ws_send(pid, stream_ref, {:text, response})
+
       _ ->
         nil
     end
