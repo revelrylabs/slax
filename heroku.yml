@@ -5,4 +5,5 @@ run:
   web: bin/slax start
 release:
   image: web
-  command: bin/slax eval Slax.Release.migrate()
+  command: 
+    - bin/slax eval Slax.Release.migrate()
