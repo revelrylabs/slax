@@ -27,7 +27,7 @@ defmodule Slax.Mixfile do
   def application do
     [
       mod: {Slax, []},
-      extra_applications: [:logger]
+      extra_applications: [:logger, :ssl]
     ]
   end
 
