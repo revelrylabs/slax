@@ -90,10 +90,7 @@ defmodule Slax.Slack.Test do
       end)
 
       assert :ok ==
-               Slack.post_message_to_channel(%{
-                 text: "test message",
-                 channel_name: "#channel"
-               })
+               Slack.post_message_to_channel("test message", "#channel")
     end
   end
 

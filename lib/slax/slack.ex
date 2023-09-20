@@ -13,6 +13,10 @@ defmodule Slax.Slack do
     config()[:api_url]
   end
 
+  defp default_channel() do
+    config()[:channel_name]
+  end
+
   defp api_token() do
     config()[:api_token]
   end
@@ -78,7 +82,7 @@ defmodule Slax.Slack do
   @doc """
     Posts text to a given channel
   """
-  def post_message_to_channel(%{text: text, channel_name: channel_name}) do
+  def post_message_to_channel(text, channel_name \\ default_channel()) do
     request =
       URI.encode_query(
         token: api_token(),

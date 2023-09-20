@@ -53,6 +53,7 @@ config :slax, Slax.Github,
 
 config :slax, Slax.Slack,
   api_url: "https://slack.com/api",
+  channel_name: System.get_env("SLACK_CHANNEL_NAME"),
   api_signing_secret: System.get_env("SLACK_SIGNING_SECRET"),
   tokens: [
     slax: System.get_env("SLAX_SLACK_TOKEN"),

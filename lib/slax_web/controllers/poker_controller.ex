@@ -60,10 +60,10 @@ defmodule SlaxWeb.PokerController do
       has_have = if Enum.count(round.estimates) > 1, do: "have", else: "has"
       estimators = Enum.map(round.estimates, & &1.user) ++ [user]
 
-      Slack.post_message_to_channel(%{
-        channel_name: channel_name,
-        text: "_#{Text.to_sentence(estimators)} #{has_have} estimated_"
-      })
+      Slack.post_message_to_channel(
+        "_#{Text.to_sentence(estimators)} #{has_have} estimated_",
+        channel_name
+      )
 
       text(conn, "Ok, your estimate for #{round.issue} is #{estimate}.")
     else
@@ -102,10 +102,7 @@ defmodule SlaxWeb.PokerController do
             message
           end
 
-        Slack.post_message_to_channel(%{
-          channel_name: channel_name,
-          text: message
-        })
+        Slack.post_message_to_channel(message, channel_name)
 
         text(conn, "")
     end
@@ -115,10 +112,7 @@ defmodule SlaxWeb.PokerController do
     with {:parse, {score, _}} <- {:parse, Integer.parse(score)},
          round = %Poker.Round{} <- Poker.get_current_round_for_channel(channel_name),
          :ok <- Poker.decide(round, score) do
-      Slack.post_message_to_channel(%{
-        channel_name: channel_name,
-        text: "Complexity of #{round.issue} is #{score}."
-      })
+      Slack.post_message_to_channel("Complexity of #{round.issue} is #{score}.", channel_name)
 
       text(conn, "")
     else
