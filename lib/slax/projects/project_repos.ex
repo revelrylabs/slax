@@ -54,11 +54,29 @@ defmodule Slax.ProjectRepos do
     |> Repo.transaction()
   end
 
+  def get(id, preloads \\ []) do
+    ProjectRepo
+    |> Repo.get(id)
+    |> Repo.preload(preloads)
+  end
+
   def get_all() do
     Repo.all(ProjectRepo)
   end
 
   def get_by_repo(repo_name) do
     Repo.get_by(ProjectRepo, repo_name: repo_name)
+  end
+
+  def list_needs_reminder_message() do
+    now = DateTime.utc_now()
+    threshold = Timex.shift(now, days: 3)
+
+    query =
+      from(r in ProjectRepo,
+        where: r.expiration_date <= ^threshold and r.expiration_date >= ^now
+      )
+
+    Repo.all(query)
   end
 end
