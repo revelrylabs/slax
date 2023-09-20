@@ -43,7 +43,7 @@ defmodule Slax.Mixfile do
       {:phoenix, "~> 1.6.0", override: true},
       {:phoenix_pubsub, "~> 2.0"},
       {:phoenix_ecto, "~> 4.0"},
-      {:ecto_sql, "~> 3.6.2"},
+      {:ecto_sql, "~> 3.10.2"},
       {:postgrex, ">= 0.0.0"},
       {:gettext, "~> 0.18"},
       {:plug_cowboy, "~> 2.5"},
@@ -61,7 +61,8 @@ defmodule Slax.Mixfile do
       {:tentacat, "~> 1.6.0"},
       {:inflex, "~> 2.0.0"},
       {:credo, "~> 1.5.0", only: [:dev, :test], runtime: false},
-      {:gun, "~> 2.0.1"}
+      {:gun, "~> 2.0.1"},
+      {:oban, "~> 2.13"}
     ]
   end
 

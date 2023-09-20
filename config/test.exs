@@ -37,3 +37,5 @@ config :slax, Slax.Slack,
 config :slax, Slax.Github, org_name: "organization"
 
 config :slax, SlaxWeb.WebsocketListener, enabled: false
+
+config :slax, Oban, testing: :inline
