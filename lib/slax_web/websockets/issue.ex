@@ -22,7 +22,7 @@ defmodule SlaxWeb.Issue do
   def handle_event(%{"channel" => channel, "text" => text, "type" => "message"}) do
     with repo_and_issues when repo_and_issues != [] <- scan_text_for_issue(text) do
       reply = load_issues_from_scan(repo_and_issues)
-      Slack.post_message_to_channel(%{text: reply, channel_name: channel})
+      Slack.post_message_to_channel(reply, channel)
     else
       [] ->
         nil

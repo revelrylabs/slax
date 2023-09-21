@@ -9,7 +9,8 @@ defmodule Slax do
       [
         Slax.Repo,
         SlaxWeb.Endpoint,
-        Slax.Scheduler
+        Slax.Scheduler,
+        {Oban, Application.fetch_env!(:slax, Oban)}
       ] ++ optional_children()
 
     opts = [strategy: :one_for_one, name: Slax.Supervisor]

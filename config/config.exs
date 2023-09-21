@@ -53,6 +53,7 @@ config :slax, Slax.Github,
 
 config :slax, Slax.Slack,
   api_url: "https://slack.com/api",
+  channel_name: System.get_env("SLACK_CHANNEL_NAME"),
   api_signing_secret: System.get_env("SLACK_SIGNING_SECRET"),
   tokens: [
     slax: System.get_env("SLAX_SLACK_TOKEN"),
@@ -76,6 +77,16 @@ config :slax, Slax.Scheduler,
   ]
 
 config :slax, SlaxWeb.WebsocketListener, enabled: true
+
+config :slax, Oban,
+  repo: Slax.Repo,
+  plugins: [
+    {Oban.Plugins.Cron,
+     crontab: [
+       {"0 17 * * 1-5", Slax.ProjectRepos.Worker}
+     ]}
+  ],
+  queues: [project_repos: [limit: 1]]
 
 # Import environment specific config. This must remain at the bottom
 # of this file so it overrides the configuration defined above.
