@@ -20,7 +20,9 @@ defmodule Slax.Factory do
     %ProjectRepo{
       project: build(:project),
       repo_name: "girl u know its true",
-      org_name: "milivanili"
+      org_name: "milivanili",
+      token: "token",
+      expiration_date: DateTime.utc_now()
     }
   end
 
