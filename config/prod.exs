@@ -15,7 +15,6 @@ config :logger, level: :info
 config :slax, Slax.Repo,
   url: System.get_env("DATABASE_URL"),
   pool_size: String.to_integer(System.get_env("POOL_SIZE") || "10"),
-  queue_target: 5000,
   ssl: true
 
 # ## SSL Support
