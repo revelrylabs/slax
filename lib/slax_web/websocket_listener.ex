@@ -26,9 +26,18 @@ defmodule SlaxWeb.WebsocketListener do
 
     {:ok, pid} =
       :gun.open(:binary.bin_to_list("wss-primary.slack.com"), 443, %{
+        connect_timeout: 60000,
+        retry: 10,
+        retry_timeout: 300,
         transport: :tls,
         protocols: [:http],
-        tls_opts: [verify: :verify_none]
+        http_opts: %{version: :"HTTP/1.1"},
+        tls_opts: [
+          verify: :verify_none,
+          cacerts: :certifi.cacerts(),
+          depth: 99,
+          reuse_sessions: false
+        ]
       })
 
     {:ok, :http} = :gun.await_up(pid, 10_000)

@@ -39,11 +39,7 @@ defmodule Slax.Projects.Worker.Test do
       string1 =
         "token=token&text=Access+token%28s%29+for+the+following+repos+will+expire+on+#{expiration1}%3A+%60org1%2Frepo1%60+%60org2%2Frepo2%60.+Please+replace+them+using+the+%2Ftoken+command&channel=&unfurl_links=false&unfurl_media=false"
 
-      expect(Slax.HttpMock, :post, fn _, ^string3, _, _ ->
-        {:ok, %HTTPoison.Response{status_code: 200, body: ~s<{"ok": true}>}}
-      end)
-
-      expect(Slax.HttpMock, :post, fn _, ^string1, _, _ ->
+      expect(Slax.HttpMock, :post, 2, fn _, string, _, _ when string in [string1, string3] ->
         {:ok, %HTTPoison.Response{status_code: 200, body: ~s<{"ok": true}>}}
       end)
 
