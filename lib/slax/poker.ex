@@ -78,16 +78,12 @@ defmodule Slax.Poker do
   end
 
   defp find_points_label(labels) do
-    with %{"name" => label} <-
-           Enum.find(labels, fn
-             %{"name" => "Points: " <> _number} -> true
-             %{"name" => _} -> false
-           end) do
-      label
-    else
-      nil ->
-        nil
-    end
+    points_label = Enum.find(labels, fn
+      %{"name" => "Points: " <> _number} -> true
+      _ -> false
+    end)
+    
+    if points_label, do: points_label["name"], else: nil
   end
 
   defp maybe_remove_label(_client, _org, _repo, _issue, nil), do: :ok
