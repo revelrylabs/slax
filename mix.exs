@@ -64,7 +64,6 @@ defmodule Slax.Mixfile do
       {:gun, "~> 2.0.1"},
       {:oban, "~> 2.13"},
       {:certifi, "~> 2.8.0"},
-      {:castore, "~> 1.0"}
     ]
   end
 
