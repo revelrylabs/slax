@@ -1,0 +1,183 @@
+name: Monthly Maintenence
+on:
+  schedule:
+    - cron: '0 0 1 * *'
+jobs:
+  create_issue:
+    name: create_issue
+    runs-on: ubuntu-latest
+    permissions:
+      issues: write
+    steps:
+      - name: Get current month and year
+        id: date
+        run: echo "::set-output name=date::$(date +'%B %Y')"
+      - name: Get previous month
+        id: prevdate
+        run: echo "::set-output name=prevdate::$(date -d 'last month' +'%Y-%m-%dT%H:%M:%SZ')"
+      - name: Get open alerts
+        id: open_alerts
+        uses: octokit/request-action@v2.1.9
+        env:
+          GITHUB_TOKEN: ${{ secrets.MONTHLY_AUTOMATION }}
+        with:
+          route: GET /repos/{owner}/{repo}/dependabot/alerts
+          owner: revelrylabs
+          repo: slax
+          state: "open"
+          sort: "updated"
+          per_page: 100
+      - name: Set open input
+        id: open_input
+        run: |
+            if [ steps.open_alerts.outputs.data.length > 0 ]; then
+              echo 'alerts<<EOF' >> $GITHUB_OUTPUT
+              echo '[${{ toJSON(fromJSON(steps.open_alerts.outputs.data).*.updated_at) }}, ${{ toJSON(fromJSON(steps.open_alerts.outputs.data).*.security_advisory.*.severity) }}, ${{ toJSON(fromJSON(steps.open_alerts.outputs.data).*.html_url) }}]' >> $GITHUB_OUTPUT
+              echo 'EOF' >> $GITHUB_OUTPUT
+            else
+              echo "alerts=[]" >> $GITHUB_OUTPUT
+            fi
+      - name: Build objects for open alerts
+        id: open_objects
+        uses: edwardgeorge/jq-action@main
+        with:
+          input: ${{ steps.open_input.outputs.alerts }}
+          script: '[.[0] as $times | .[1] as $severities | .[2] as $urls | foreach range(0; $times|length) as $i  ( {}; . = { "time": $times[$i], "severity": $severities[$i], "url": $urls[$i] } )]'
+      - name: Get new open alerts
+        id: new_open_alerts
+        uses: edwardgeorge/jq-action@main
+        with:
+          input: ${{ steps.open_objects.outputs.output }}
+          script: 'map(select(.time >= "${{ steps.prevdate.outputs.prevdate }}"))'
+      - name: Get urls
+        id: urls
+        uses: edwardgeorge/jq-action@main
+        with:
+          input: ${{ steps.new_open_alerts.outputs.output }}
+          script: '.[].url'
+          raw-output: "true"
+      - name: Get number of new alerts
+        id: total_open_alerts
+        uses: edwardgeorge/jq-action@main
+        with:
+          input: ${{ steps.new_open_alerts.outputs.output }}
+          script: 'length'
+      - name: Get number of critical alerts
+        id: open_critical_alerts
+        uses: edwardgeorge/jq-action@main
+        with:
+          input: ${{ steps.new_open_alerts.outputs.output }}
+          script: 'map(select(.severity == "critical")) | length'
+      - name: Get number of high alerts
+        id: open_high_alerts
+        uses: edwardgeorge/jq-action@main
+        with:
+          input: ${{ steps.new_open_alerts.outputs.output }}
+          script: 'map(select(.severity == "high")) | length'
+      - name: Get number of moderate alerts
+        id: open_moderate_alerts
+        uses: edwardgeorge/jq-action@main
+        with:
+          input: ${{ steps.new_open_alerts.outputs.output }}
+          script: 'map(select(.severity == "medium")) | length'
+      - name: Get number of low alerts
+        id: open_low_alerts
+        uses: edwardgeorge/jq-action@main
+        with:
+          input: ${{ steps.new_open_alerts.outputs.output }}
+          script: 'map(select(.severity == "low")) | length'
+      - name: Get fixed alerts
+        id: fixed_alerts
+        uses: octokit/request-action@v2.1.9
+        env:
+          GITHUB_TOKEN: ${{ secrets.MONTHLY_AUTOMATION }}
+        with:
+          route: GET /repos/{owner}/{repo}/dependabot/alerts
+          owner: revelrylabs
+          repo: slax
+          state: "fixed"
+          sort: "updated"
+          per_page: 100
+      - name: Set fixed input
+        id: fixed_input
+        run: |
+            if [ steps.fixed_alerts.outputs.data.length > 0 ]; then
+              echo 'alerts<<EOF' >> $GITHUB_OUTPUT
+              echo '[${{ toJSON(fromJSON(steps.fixed_alerts.outputs.data).*.fixed_at) }}, ${{ toJSON(fromJSON(steps.fixed_alerts.outputs.data).*.security_advisory.*.severity) }}]' >> $GITHUB_OUTPUT
+              echo 'EOF' >> $GITHUB_OUTPUT
+            else
+              echo "alerts=[]" >> $GITHUB_OUTPUT
+            fi
+      - name: Build objects for fixed alerts
+        id: fixed_objects
+        uses: edwardgeorge/jq-action@main
+        with:
+          input: ${{ steps.fixed_input.outputs.alerts }}
+          script: '[.[0] as $times | .[1] as $severities | foreach range(0; $times|length) as $i  ( {}; . = { "time": $times[$i], "severity": $severities[$i] } )]'
+      - name: Get new fixed alerts
+        id: new_fixed_alerts
+        uses: edwardgeorge/jq-action@main
+        with:
+          input: ${{ steps.fixed_objects.outputs.output }}
+          script: 'map(select(.time >= "${{ steps.prevdate.outputs.prevdate }}"))'
+      - name: Get number of new fixed alerts
+        id: total_fixed_alerts
+        uses: edwardgeorge/jq-action@main
+        with:
+          input: ${{ steps.new_fixed_alerts.outputs.output }}
+          script: 'length'
+      - name: Get number of critical alerts
+        id: fixed_critical_alerts
+        uses: edwardgeorge/jq-action@main
+        with:
+          input: ${{ steps.new_fixed_alerts.outputs.output }}
+          script: 'map(select(.severity == "critical")) | length'
+      - name: Get number of high alerts
+        id: fixed_high_alerts
+        uses: edwardgeorge/jq-action@main
+        with:
+          input: ${{ steps.new_fixed_alerts.outputs.output }}
+          script: 'map(select(.severity == "high")) | length'
+      - name: Get number of moderate alerts
+        id: fixed_moderate_alerts
+        uses: edwardgeorge/jq-action@main
+        with:
+          input: ${{ steps.new_fixed_alerts.outputs.output }}
+          script: 'map(select(.severity == "medium")) | length'
+      - name: Get number of low alerts
+        id: fixed_low_alerts
+        uses: edwardgeorge/jq-action@main
+        with:
+          input: ${{ steps.new_fixed_alerts.outputs.output }}
+          script: 'map(select(.severity == "low")) | length'
+      - name: Create monthly maintenence issue
+        uses: imjohnbo/issue-bot@v3
+        with:
+          labels: "dependencies, maintenance"
+          title: 'Slax - Maintenance - ${{ steps.date.outputs.date }}'
+          token: ${{ secrets.MONTHLY_AUTOMATION }}
+          body: |-
+            _requires [Slax dependabot alerts](https://github.com/revelrylabs/slax/security/dependabot)_ <!-- Link to project's dependabot alerts -->
+
+            ## Background
+            Slax currently has ${{steps.total_open_alerts.outputs.output}} new security vulnerabilities (${{steps.open_critical_alerts.outputs.output}} critical, ${{steps.open_high_alerts.outputs.output}} high, ${{steps.open_moderate_alerts.outputs.output}} moderate, and ${{steps.open_low_alerts.outputs.output}} low). The purpose of this ticket is to address Slax's security vulnerabilities.
+
+            ${{steps.urls.outputs.output}}
+
+            Closed last month: ${{steps.total_fixed_alerts.outputs.output}}
+            Critical: ${{steps.fixed_critical_alerts.outputs.output}}
+            High: ${{steps.fixed_high_alerts.outputs.output}}
+            Moderate: ${{steps.fixed_moderate_alerts.outputs.output}}
+            Low: ${{steps.fixed_low_alerts.outputs.output}}
+
+            ### Scenario: Update security vulnerabilities
+            Given I am an Engineer
+            - [ ] When I manually address dependency conflicts listed [here](https://github.com/revelrylabs/slax/security/dependabot)<!-- Link to project's dependabot alerts -->
+            - [ ] Then I test by running locally
+            - [ ] And I merge to develop and test in staging
+            - [ ] And I merge to main and test in production
+
+            ### QA / UAT Note
+            Remember to add a comment when passing this forward with links to:
+            - [ ] the review app
+            - [ ] the pull request itself
