@@ -11,7 +11,7 @@ jobs:
   issue_opened:
     name: issue_opened
     runs-on: ubuntu-latest
-    if: github.event_name == 'issues' && github.event.action == 'opened'
+    if: github.event_name == 'issues' && github.event.action == 'opened' && join(github.event.issue.labels) == ''
     steps:
       - name: Move new issues to Backlog
         uses: leonsteinhaeuser/project-beta-automations@v2.1.0
@@ -48,13 +48,12 @@ jobs:
           project_id: 13
           resource_node_id: ${{ github.event.pull_request.node_id }}${{ github.event.issue.node_id }}
           status_value: Ready to Work # Target status
-  monthly_maintenance:
-    name: monthly_maintenance
+  maintenance:
+    name: maintenance
     runs-on: ubuntu-latest
-    needs: issue_opened
-    if: github.event.action == 'labeled' && contains(github.event.issue.title, 'Slax - Maintenance')
+    if: github.event.action == 'labeled' && github.event.label.name == 'maintenance'
     steps:
-      - name: Move monthly maintenance issues to Maintenance
+      - name: Move maintenance labeled issues to Maintenance status
         uses: leonsteinhaeuser/project-beta-automations@v2.1.0
         with:
           gh_token: ${{ secrets.GH_TOKEN }}
