@@ -154,7 +154,7 @@ jobs:
         uses: imjohnbo/issue-bot@v3
         with:
           labels: "dependencies, maintenance"
-          title: 'Rev Time - Maintenance - ${{ steps.date.outputs.date }}'
+          title: 'Slax - Maintenance - ${{ steps.date.outputs.date }}'
           token: ${{ secrets.MONTHLY_AUTOMATION }}
           body: |-
             _requires [Slax dependabot alerts](https://github.com/revelrylabs/slax/security/dependabot)_ <!-- Link to project's dependabot alerts -->
