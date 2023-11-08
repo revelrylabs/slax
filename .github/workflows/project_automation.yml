@@ -11,7 +11,7 @@ jobs:
   issue_opened:
     name: issue_opened
     runs-on: ubuntu-latest
-    if: github.event_name == 'issues' && github.event.action == 'opened' && !(contains(github.event.issue.labels.*.name, 'maintenance') || contains(github.event.issue.labels.*.name, 'dependencies') || contains(github.event.issue.labels.*.name, 'needs investigation') || contains(github.event.issue.labels.*.name, 'approved'))
+    if: github.event_name == 'issues' && github.event.action == 'opened' && !(contains(github.event.issue.labels.*.name, 'maintenance') || contains(github.event.issue.labels.*.name, 'needs investigation') || contains(github.event.issue.labels.*.name, 'approved'))
     steps:
       - name: Move new issues to Backlog
         uses: leonsteinhaeuser/project-beta-automations@v2.1.0
