@@ -11,7 +11,6 @@ A Phoenix app that supports the following slash commands from Slack:
 ```
 git clone https://github.com/revelrylabs/slax
 ./bin/setup
-./bin/server
 ```
 
 ## Configuration
@@ -52,8 +51,17 @@ config :slax, Slax.Github,
 - Generate an app-level token with the "connections:write" scope and copy the generated token into `config/dev.secret.exs`
 - Go to the `Install App` menu and copy the Bot User OAuth Token into `config/dev.secret.exs`
 
+```elixir
+config :slax, Slax.Slack,
+  api_url: "https://slack.com/api",
+  api_token: "<bot_user_oauth_token>",
+  channel_name: "testing-slax",
+  app_token: "<app_level_token>"
+```
+
 ## Usage / Commands
 
+```./bin/server```
 All commands provide usage details when executing them without any parameters.
 
 ### Issue & PR lookup
