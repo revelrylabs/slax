@@ -16,9 +16,9 @@ git clone https://github.com/revelrylabs/slax
 ## Configuration
 
 The [/bin/setup](https://github.com/revelrylabs/slax/blob/master/bin/setup) script should add a `config/dev.secret.exs` file. Use this to put secrets into.
-[/config/runtime.exs](https://github.com/revelrylabs/slax/blob/master/config/runtime.exs) is a good example of what secrets are needed as that file is used to setup secrets in produciton.
+[/config/runtime.exs](https://github.com/revelrylabs/slax/blob/master/config/runtime.exs) is a good example of what secrets are needed as that file is used to setup secrets in produciton. (only the configs listed in the following sections are needed for the currently used functionality)
 
-You will need to create a GitHub OAuth app in order to use the GitHub functionality, including authentication.
+You will need to create a GitHub OAuth app in order to use the GitHub functionality, including authentication, and a Slack workspace and app.
 
 ### Create Github OAuth App
 
@@ -55,7 +55,7 @@ config :slax, Slax.Github,
 config :slax, Slax.Slack,
   api_url: "https://slack.com/api",
   api_token: "<bot_user_oauth_token>",
-  channel_name: "testing-slax",
+  channel_name: "<default_post_channel>",
   app_token: "<app_level_token>"
 ```
 
