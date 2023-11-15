@@ -42,9 +42,30 @@ config :slax, Slax.Github,
   org_teams: ["<my_org_team>"]
 ```
 
+### Create Slack App
+- Go to https://slack.com/get-started#/createnew and create a workspace for testing
+- Go to https://api.slack.com/apps
+- Click "Create New App" and select "From an app manifest"
+- Select your new Slack workspace
+- Copy slack-manifest.yml into the field and create the App
+- Click "Install to Workspace" and allow it in your workspace
+- Generate an app-level token with the "connections:write" scope and copy the generated token into `config/dev.secret.exs`
+- Go to the `Install App` menu and copy the Bot User OAuth Token into `config/dev.secret.exs`
+
 ## Usage / Commands
 
 All commands provide usage details when executing them without any parameters.
+
+### Issue & PR lookup
+With the websocket connection slax parses every message for the specified patterns corresponding to an issue `org/repo#1` `repo#1` or a PR `org/repo$1` `repo$1`
+
+### /poker
+This command is the interaction point for the poker feature and when just typing `/poker` it will respond with a help message on how to use it
+
+### /token
+This is a slack shortcut that is an interactive series of modals to setup project repo connections in the database as well as store fine grained access tokens to enable issue lookup and poker functionality
+
+### _The following commands have not been tested or used in a while_
 
 ### /auth
 
