@@ -32,7 +32,7 @@ jobs:
         run: |
             if [ steps.open_alerts.outputs.data.length > 0 ]; then
               echo 'alerts<<EOF' >> $GITHUB_OUTPUT
-              echo '[${{ toJSON(fromJSON(steps.open_alerts.outputs.data).*.updated_at) }}, ${{ toJSON(fromJSON(steps.open_alerts.outputs.data).*.security_advisory.*.severity) }}, ${{ toJSON(fromJSON(steps.open_alerts.outputs.data).*.html_url) }}]' >> $GITHUB_OUTPUT
+              echo '[${{ toJSON(fromJSON(steps.open_alerts.outputs.data).*.updated_at) }}, ${{ toJSON(fromJSON(steps.open_alerts.outputs.data).*.security_advisory.severity) }}, ${{ toJSON(fromJSON(steps.open_alerts.outputs.data).*.html_url) }}]' >> $GITHUB_OUTPUT
               echo 'EOF' >> $GITHUB_OUTPUT
             else
               echo "alerts=[]" >> $GITHUB_OUTPUT
@@ -103,7 +103,7 @@ jobs:
         run: |
             if [ steps.fixed_alerts.outputs.data.length > 0 ]; then
               echo 'alerts<<EOF' >> $GITHUB_OUTPUT
-              echo '[${{ toJSON(fromJSON(steps.fixed_alerts.outputs.data).*.fixed_at) }}, ${{ toJSON(fromJSON(steps.fixed_alerts.outputs.data).*.security_advisory.*.severity) }}]' >> $GITHUB_OUTPUT
+              echo '[${{ toJSON(fromJSON(steps.fixed_alerts.outputs.data).*.fixed_at) }}, ${{ toJSON(fromJSON(steps.fixed_alerts.outputs.data).*.security_advisory.severity) }}]' >> $GITHUB_OUTPUT
               echo 'EOF' >> $GITHUB_OUTPUT
             else
               echo "alerts=[]" >> $GITHUB_OUTPUT
