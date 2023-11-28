@@ -123,7 +123,7 @@ defmodule SlaxWeb.Token do
       },
       title: %{
         type: "plain_text",
-        text: "Example Modal"
+        text: "Token Modal"
       },
       blocks: [
         %{
@@ -222,7 +222,7 @@ defmodule SlaxWeb.Token do
       },
       title: %{
         type: "plain_text",
-        text: "Example Modal"
+        text: "Repo Modal"
       },
       blocks: [
         %{
