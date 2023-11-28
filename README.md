@@ -63,6 +63,7 @@ config :slax, Slax.Slack,
 
 ```./bin/server```
 All commands provide usage details when executing them without any parameters.
+> **_NOTE:_** Issue / PR lookup and pokerbot require a fine grained access token be setup for the specified repos with the `/token` command
 
 ### /token
 This is a slack shortcut that is an interactive series of modals to setup project repo connections in the database as well as store fine grained access tokens to enable issue lookup and poker functionality. **This is necessary** for proper functionality of Issue/PR lookup and Poker.
@@ -71,6 +72,7 @@ The first modal you see lets you select a Repo and attach an access token and ex
 The second modal is accessed by clicking Create Repo and lets you either select or create a new Project and attach a Repo to the Project
 
 To generate a fine grained access token go to https://github.com/settings/tokens?type=beta and fill out the form. Check `Only Select Repositories` and select the desired repo(s). Under Repository Permissions, give at least Read and write to `Issues` and Read only to `Pull Requests`. Extra setup video for Github Access tokens with different permissions: https://www.loom.com/share/43993db839d14fbd86a9ce344e17b7fb
+> **_NOTE:_**  For third party organizations, fine grained access tokens must be enabled.
 
 ### Issue & PR lookup
 With the websocket connection slax parses every message for the specified patterns corresponding to an issue `org/repo#1` `repo#1` or a PR `org/repo$1` `repo$1`.
