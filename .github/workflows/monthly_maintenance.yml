@@ -1,7 +1,11 @@
 name: Monthly Maintenence
+# on:
+#   schedule:
+#     - cron: '0 0 1 * *'
 on:
-  schedule:
-    - cron: '0 0 1 * *'
+  push:
+    branches:
+      - test_maintenance
 jobs:
   create_issue:
     name: create_issue
