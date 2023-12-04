@@ -95,7 +95,7 @@ defmodule SlaxWeb.Poker do
           if Enum.count(round.estimates, &(!is_nil(&1.reason))) > 0 do
             reasons =
               sorted_estimates
-              |> Enum.filter(& !is_nil(&1.reason))
+              |> Enum.filter(&(!is_nil(&1.reason)))
               |> Enum.map(&"#{&1.user} (#{&1.value}): #{&1.reason}")
 
             "#{message}\n---\n#{Enum.join(reasons, "\n")}"
