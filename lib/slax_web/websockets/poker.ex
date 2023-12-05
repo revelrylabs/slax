@@ -56,7 +56,7 @@ defmodule SlaxWeb.Poker do
       estimators = Enum.map(round.estimates, & &1.user) ++ [user]
 
       Slack.post_message_to_channel(
-        "_#{Text.to_sentence(estimators)} #{has_have} estimated_",
+        "_#{Text.to_sentence(estimators)} #{has_have} estimated_ (#{length(estimators)})",
         channel_name
       )
 
@@ -85,17 +85,12 @@ defmodule SlaxWeb.Poker do
         %{text: "No one has estimated yet"}
 
       round ->
-        estimates = Enum.map(round.estimates, &"#{&1.user}=#{&1.value}")
+        estimates =
+          round.estimates
+          |> Enum.sort_by(& &1.value)
+          |> Enum.map(&"#{&1.user} (#{&1.value})#{if &1.reason, do: ': #{&1.reason}'}")
 
-        message = "Estimates for round: #{estimates}"
-
-        message =
-          if Enum.count(round.estimates, &(!is_nil(&1.reason))) > 0 do
-            reasons = Enum.map(round.estimates, &"#{&1.user} (#{&1.value}): #{&1.reason}")
-            "#{message}\n---\n#{Enum.join(reasons, "\n")}"
-          else
-            message
-          end
+        message = "Estimates for round:\n---\n#{Enum.join(estimates, "\n")}"
 
         Slack.post_message_to_channel(message, channel_name)
 
