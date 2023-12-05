@@ -85,12 +85,12 @@ defmodule SlaxWeb.Poker do
         %{text: "No one has estimated yet"}
 
       round ->
-        reasons =
+        estimates =
           round.estimates
           |> Enum.sort_by(& &1.value)
           |> Enum.map(&"#{&1.user} (#{&1.value})#{if &1.reason, do: ':'} #{&1.reason}")
 
-        message = "Estimates for round:\n---\n#{Enum.join(reasons, "\n")}"
+        message = "Estimates for round:\n---\n#{Enum.join(estimates, "\n")}"
 
         Slack.post_message_to_channel(message, channel_name)
 
