@@ -6,6 +6,7 @@ defmodule SlaxWeb.WebsocketListener do
   alias SlaxWeb.Issue
   alias SlaxWeb.Poker
   alias SlaxWeb.Token
+  alias SlaxWeb.Disable
 
   defp config() do
     Application.get_env(:slax, Slax.Slack)
@@ -105,7 +106,7 @@ defmodule SlaxWeb.WebsocketListener do
          "envelope_id" => envelope_id,
          "payload" => payload
        }) do
-    with %{} = view <- Token.handle_payload(payload),
+    with %{} = view <- determine_payload(payload),
          {:ok, response} <-
            Jason.encode(%{
              envelope_id: envelope_id,
@@ -120,5 +121,25 @@ defmodule SlaxWeb.WebsocketListener do
       _ ->
         nil
     end
+  end
+
+  defp determine_payload(%{"callback_id" => "access_token"} = payload) do
+    Token.handle_payload(payload)
+  end
+
+  defp determine_payload(%{"callback_id" => "disable_slax"} = payload) do
+    Disable.handle_payload(payload)
+  end
+
+  defp determine_payload(%{"view" => %{"callback_id" => "token_view"}} = payload) do
+    Token.handle_payload(payload)
+  end
+
+  defp determine_payload(%{"view" => %{"callback_id" => "repo_view"}} = payload) do
+    Token.handle_payload(payload)
+  end
+
+  defp determine_payload(%{"view" => %{"callback_id" => "disable_view"}} = payload) do
+    Disable.handle_payload(payload)
   end
 end

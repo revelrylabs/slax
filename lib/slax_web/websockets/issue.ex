@@ -22,6 +22,7 @@ defmodule SlaxWeb.Issue do
   end
 
   def handle_event(%{"channel" => channel, "text" => text, "type" => "message"}) do
+    IO.inspect(channel)
     issues_scan = scan_text_for_issue(text)
     prs_scan = scan_text_for_pr(text)
 
