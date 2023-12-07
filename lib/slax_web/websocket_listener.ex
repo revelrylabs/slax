@@ -131,6 +131,10 @@ defmodule SlaxWeb.WebsocketListener do
     Disable.handle_payload(payload)
   end
 
+  defp determine_payload(%{"callback_id" => "enable_slax"} = payload) do
+    Disable.handle_payload(payload)
+  end
+
   defp determine_payload(%{"view" => %{"callback_id" => "token_view"}} = payload) do
     Token.handle_payload(payload)
   end
@@ -140,6 +144,10 @@ defmodule SlaxWeb.WebsocketListener do
   end
 
   defp determine_payload(%{"view" => %{"callback_id" => "disable_view"}} = payload) do
+    Disable.handle_payload(payload)
+  end
+
+  defp determine_payload(%{"view" => %{"callback_id" => "enable_view"}} = payload) do
     Disable.handle_payload(payload)
   end
 end
