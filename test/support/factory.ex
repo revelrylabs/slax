@@ -36,7 +36,7 @@ defmodule Slax.Factory do
 
   def channel_factory do
     %Channel{
-      channel_id: "abcdefg",
+      channel_id: "ABCDEFG",
       name: "test",
       disabled: false
     }
