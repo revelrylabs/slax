@@ -9,6 +9,14 @@ features:
       type: global
       callback_id: access_token
       description: Register access token
+    - name: Disable Slax
+      type: global
+      callback_id: disable_slax
+      description: Disable Slax in a specific channel
+    - name: Enable Slax
+      type: global
+      callback_id: enable_slax
+      description: Enable Slax in a specific channel
   slash_commands:
     - command: /poker
       description: poker
@@ -22,6 +30,7 @@ oauth_config:
       - chat:write
       - chat:write.public
       - commands
+      - channels:read
 settings:
   event_subscriptions:
     user_events:
