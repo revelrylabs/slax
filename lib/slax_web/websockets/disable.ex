@@ -38,12 +38,13 @@ defmodule SlaxWeb.Disable do
         }
       }) do
     with %{
-           "channel_select" => %{"selected_option" => channel}
+           "channel_select" => %{
+             "selected_option" => %{"text" => %{"text" => name}, "value" => channel_id}
+           }
          } <-
            parse_state_values(values) do
-
-      Channels.create_or_update_channel(channel["value"], %{
-        name: channel["text"]["text"],
+      Channels.create_or_update_channel(channel_id, %{
+        name: name,
         disabled: true
       })
 
@@ -62,12 +63,13 @@ defmodule SlaxWeb.Disable do
         }
       }) do
     with %{
-           "channel_select" => %{"selected_option" => channel}
+           "channel_select" => %{
+             "selected_option" => %{"text" => %{"text" => name}, "value" => channel_id}
+           }
          } <-
            parse_state_values(values) do
-
-      Channels.create_or_update_channel(channel["value"], %{
-        name: channel["text"]["text"],
+      Channels.create_or_update_channel(channel_id, %{
+        name: name,
         disabled: false
       })
 
