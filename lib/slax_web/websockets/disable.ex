@@ -5,7 +5,7 @@ defmodule SlaxWeb.Disable do
   """
 
   alias Slax.Slack
-  alias Slax.Channels.Channels
+  alias Slax.Channels
 
   def handle_payload(%{
         "trigger_id" => trigger_id,

@@ -18,6 +18,15 @@ defmodule SlaxWeb.Issue.Test do
     assert Issue.handle_event(event4) == nil
   end
 
+  test "ignores disabled channel", _ do
+    channel = insert(:channel, disabled: true)
+    event1 = %{"channel" => channel.channel_id, "text" => "test#123", "type" => "message"}
+    event2 = %{"channel" => channel.channel_id, "text" => "test$123", "type" => "message"}
+
+    assert Issue.handle_event(event1) == nil
+    assert Issue.handle_event(event2) == nil
+  end
+
   test "test regex to match issue pattern", _ do
     strings_with_matching_pattern = [
       {"some extra text slax-test#1 some extra text", [["slax-test#1", "", "slax-test", "#1"]]},

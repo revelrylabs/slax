@@ -224,6 +224,7 @@ defmodule Slax.Slack do
     response =
       Http.get(
         "#{api_url()}/conversations.list",
+        exclude_archived: true,
         "Content-Type": "application/json",
         Authorization: "Bearer #{api_token()}"
       )

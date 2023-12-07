@@ -1,7 +1,7 @@
-defmodule Slax.Channels.Channels do
+defmodule Slax.Channels do
   use Slax.Context
 
-  alias Slax.Channels.Channel
+  alias Slax.Channel
 
   def create_or_update_channel(channel_id, %{name: name} = attrs) do
     case Repo.get_by(Channel, %{channel_id: channel_id, name: name}) do

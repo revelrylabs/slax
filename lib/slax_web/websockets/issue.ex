@@ -1,7 +1,7 @@
 defmodule SlaxWeb.Issue do
   require Logger
   alias Slax.{Github, Slack}
-  alias Slax.Channels.Channels
+  alias Slax.Channels
 
   def handle_event(%{"subtype" => subtype})
       when subtype in ["bot_message", "message_changed", "message_deleted"],

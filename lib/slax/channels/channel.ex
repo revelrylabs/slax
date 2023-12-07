@@ -1,4 +1,4 @@
-defmodule Slax.Channels.Channel do
+defmodule Slax.Channel do
   use Slax.Schema
 
   @type t :: %__MODULE__{}
