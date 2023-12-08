@@ -12,7 +12,7 @@ defmodule Slax.Channel do
 
   def changeset(channel, params \\ %{}) do
     channel
-      |> cast(params, [:channel_id, :name, :disabled])
-      |> unique_constraint(:channel_id)
+    |> cast(params, [:channel_id, :name, :disabled])
+    |> unique_constraint(:channel_id)
   end
 end

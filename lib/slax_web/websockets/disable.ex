@@ -37,12 +37,11 @@ defmodule SlaxWeb.Disable do
           }
         }
       }) do
-    with %{
-           "channel_select" => %{
-             "selected_option" => %{"text" => %{"text" => name}, "value" => channel_id}
-           }
-         } <-
-           parse_state_values(values) do
+        with %{
+          channel_id: channel_id,
+          name: name
+        } <-
+          parse_state_values(Map.values(values)) do
       Channels.create_or_update_channel(channel_id, %{
         name: name,
         disabled: true
@@ -63,11 +62,10 @@ defmodule SlaxWeb.Disable do
         }
       }) do
     with %{
-           "channel_select" => %{
-             "selected_option" => %{"text" => %{"text" => name}, "value" => channel_id}
-           }
+           channel_id: channel_id,
+           name: name
          } <-
-           parse_state_values(values) do
+           parse_state_values(Map.values(values)) do
       Channels.create_or_update_channel(channel_id, %{
         name: name,
         disabled: false
@@ -78,9 +76,22 @@ defmodule SlaxWeb.Disable do
   end
 
   defp parse_state_values(values) do
-    values
-    |> Map.values()
-    |> Enum.reduce(%{}, fn value, acc -> Map.merge(acc, value) end)
+    with [
+           %{
+             "channel_select" => %{
+               "selected_option" => %{
+                 "text" => name,
+                 "value" => channel_id
+               },
+               "type" => "static_select"
+             }
+           }
+         ] <- values do
+      Map.new(%{
+        name: name["text"],
+        channel_id: channel_id
+      })
+    end
   end
 
   defp build_disable_view(%{trigger_id: trigger_id}) do
