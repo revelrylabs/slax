@@ -29,4 +29,10 @@ defmodule Slax.Channels do
     |> where([c], c.disabled == true)
     |> Repo.all()
   end
+
+  def get_enabled() do
+    Channel
+    |> where([c], c.disabled == false)
+    |> Repo.all()
+  end
 end
