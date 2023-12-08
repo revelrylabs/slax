@@ -1,7 +1,6 @@
 defmodule SlaxWeb.Issue do
   require Logger
   alias Slax.{Github, Slack}
-  alias Slax.Channels
 
   def handle_event(%{"subtype" => subtype})
       when subtype in ["bot_message", "message_changed", "message_deleted"],
@@ -12,28 +11,24 @@ defmodule SlaxWeb.Issue do
   def handle_event(%{"bot_id" => bot_id}) when not is_nil(bot_id), do: nil
 
   def handle_event(%{"thread_ts" => ts, "channel" => channel, "text" => text, "type" => "message"}) do
-    unless !is_nil(Channels.get_by_channel_id(channel)) and Channels.disabled?(channel) do
-      issues_scan = scan_text_for_issue(text)
-      prs_scan = scan_text_for_pr(text)
+    issues_scan = scan_text_for_issue(text)
+    prs_scan = scan_text_for_pr(text)
 
-      reply = load_issues_from_scan(issues_scan) <> "\n" <> load_prs_from_scan(prs_scan)
+    reply = load_issues_from_scan(issues_scan) <> "\n" <> load_prs_from_scan(prs_scan)
 
-      unless reply == "\n" do
-        Slack.post_message_to_thread(%{text: reply, channel: channel, thread_ts: ts})
-      end
+    unless reply == "\n" do
+      Slack.post_message_to_thread(%{text: reply, channel: channel, thread_ts: ts})
     end
   end
 
   def handle_event(%{"channel" => channel, "text" => text, "type" => "message"}) do
-    unless !is_nil(Channels.get_by_channel_id(channel)) and Channels.disabled?(channel) do
-      issues_scan = scan_text_for_issue(text)
-      prs_scan = scan_text_for_pr(text)
+    issues_scan = scan_text_for_issue(text)
+    prs_scan = scan_text_for_pr(text)
 
-      reply = load_issues_from_scan(issues_scan) <> "\n" <> load_prs_from_scan(prs_scan)
+    reply = load_issues_from_scan(issues_scan) <> "\n" <> load_prs_from_scan(prs_scan)
 
-      unless reply == "\n" do
-        Slack.post_message_to_channel(reply, channel)
-      end
+    unless reply == "\n" do
+      Slack.post_message_to_channel(reply, channel)
     end
   end
 
