@@ -10,8 +10,9 @@ defmodule Slax.Channel do
     timestamps()
   end
 
-  def changeset(model, params \\ %{}) do
-    model
-    |> cast(params, [:id, :name, :disabled])
+  def changeset(channel, params \\ %{}) do
+    channel
+      |> cast(params, [:channel_id, :name, :disabled])
+      |> unique_constraint(:channel_id)
   end
 end
