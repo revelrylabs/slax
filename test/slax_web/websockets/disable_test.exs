@@ -35,7 +35,7 @@ defmodule SlaxWeb.Disable.Test do
     }
 
     assert :ok == Disable.handle_payload(event)
-    assert Channels.disabled?(channel_id) == true
+    assert Channels.get_by_channel_id(channel_id).disabled == true
   end
 
   test "creates or updates a channel to be enabled", %{channel_id: channel_id, values: values} do
@@ -51,6 +51,6 @@ defmodule SlaxWeb.Disable.Test do
     }
 
     assert :ok == Disable.handle_payload(event)
-    assert Channels.disabled?(channel_id) == false
+    assert Channels.get_by_channel_id(channel_id).disabled == false
   end
 end
