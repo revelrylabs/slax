@@ -20,7 +20,13 @@ defmodule Slax.Channels do
     Repo.get_by(Channel, channel_id: channel_id)
   end
 
-  def disabled?(channel_id) do
-    Map.get(get_by_channel_id(channel_id), :disabled)
+  def disabled?(channel) do
+    channel.disabled
+  end
+
+  def get_disabled() do
+    Channel
+    |> where([c], c.disabled == true)
+    |> Repo.all()
   end
 end
