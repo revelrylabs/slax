@@ -74,10 +74,10 @@ The second modal is accessed by clicking Create Repo and lets you either select 
 To generate a fine grained access token go to https://github.com/settings/tokens?type=beta and fill out the form. Check `Only Select Repositories` and select the desired repo(s). Under Repository Permissions, give at least Read and write to `Issues` and Read only to `Pull Requests`. Extra setup video for Github Access tokens with different permissions: https://www.loom.com/share/43993db839d14fbd86a9ce344e17b7fb
 > **_NOTE:_**  For third party organizations, fine grained access tokens must be enabled.
 
-### /disable slax
+### / slax disable
 This is a slack shortcut that is an interactive modal to disable Slax Issue/PR lookup in a specific channel.
 
-### /enable slax
+### /slax enable
 This is a slack shortcut that is an interactive modal to enable Slax Issue/PR lookup in a specific channel.
 
 ### Issue & PR lookup

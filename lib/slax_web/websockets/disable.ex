@@ -10,7 +10,7 @@ defmodule SlaxWeb.Disable do
   def handle_payload(%{
         "trigger_id" => trigger_id,
         "type" => "shortcut",
-        "callback_id" => "disable_slax"
+        "callback_id" => "slax_disable"
       }) do
     view = build_disable_view(%{trigger_id: trigger_id})
 
@@ -20,84 +20,67 @@ defmodule SlaxWeb.Disable do
   def handle_payload(%{
         "trigger_id" => trigger_id,
         "type" => "shortcut",
-        "callback_id" => "enable_slax"
+        "callback_id" => "slax_enable"
       }) do
     view = build_enable_view()
 
     Slack.open_modal(%{trigger_id: trigger_id, view: view})
   end
 
-  def handle_payload(%{
-        "trigger_id" => _trigger_id,
-        "type" => "view_submission",
-        "view" => %{
-          "callback_id" => "disable_view",
-          "state" => %{
-            "values" => values
+  def handle_payload(
+        %{
+          "trigger_id" => _trigger_id,
+          "type" => "view_submission",
+          "view" => %{
+            "callback_id" => "disable_view"
           }
-        }
-      }) do
-    with %{
-           channel_id: channel_id,
-           name: name
-         } <-
-           parse_state_values(Map.values(values)) do
-      Channels.create_or_update_channel(channel_id, %{
-        name: name,
-        disabled: true
-      })
+        } = payload
+      ) do
+    values = payload["view"]["state"]["values"]
+    %{channel_id: channel_id, name: name} = parse_state_values(Map.values(values))
 
-      :ok
-    end
+    Channels.create_or_update_channel(channel_id, %{
+      name: name,
+      disabled: true
+    })
+
+    :ok
   end
 
-  def handle_payload(%{
-        "trigger_id" => _trigger_id,
-        "type" => "view_submission",
-        "view" => %{
-          "callback_id" => "enable_view",
-          "state" => %{
-            "values" => values
+  def handle_payload(
+        %{
+          "trigger_id" => _trigger_id,
+          "type" => "view_submission",
+          "view" => %{
+            "callback_id" => "enable_view"
           }
-        }
-      }) do
-    case parse_state_values(Map.values(values)) do
-      %{
-        channel_id: "invalid",
-        name: _
-      } ->
-        :invalid
+        } = payload
+      ) do
+    values = payload["view"]["state"]["values"]
+    %{channel_id: channel_id, name: name} = parse_state_values(Map.values(values))
 
-      %{
-        channel_id: channel_id,
-        name: name
-      } ->
-        Channels.create_or_update_channel(channel_id, %{
-          name: name,
-          disabled: false
-        })
+    Channels.create_or_update_channel(channel_id, %{
+      name: name,
+      disabled: false
+    })
 
-        :ok
-    end
+    :ok
   end
 
-  defp parse_state_values(values) do
-    with [
-           %{
-             "channel_select" => %{
-               "selected_option" => %{
-                 "text" => name,
-                 "value" => channel_id
-               },
-               "type" => "static_select"
+  defp parse_state_values([
+         %{
+           "channel_select" => %{
+             "selected_option" => %{
+               "text" => name,
+               "value" => channel_id
              }
            }
-         ] <- values do
-      Map.new(%{
-        name: name["text"],
-        channel_id: channel_id
-      })
-    end
+         }
+       ]) do
+    %{
+      channel_id: channel_id,
+      name: name["text"]
+    }
   end
 
   defp build_disable_view(%{trigger_id: trigger_id}) do
@@ -151,45 +134,69 @@ defmodule SlaxWeb.Disable do
   end
 
   defp build_enable_view() do
-    channels =
-      case Channels.get_disabled() do
-        [] ->
-          [%{name: "There are no disabled channels", channel_id: "invalid"}]
+    case Channels.get_disabled() do
+      [] ->
+        build_no_channels_view()
 
-        channels ->
-          channels
-      end
+      channels ->
+        %{
+          type: "modal",
+          callback_id: "enable_view",
+          submit: %{
+            type: "plain_text",
+            text: "Enable"
+          },
+          title: %{
+            type: "plain_text",
+            text: "Enable Slax"
+          },
+          blocks: [
+            %{
+              type: "input",
+              element: %{
+                type: "static_select",
+                action_id: "channel_select",
+                placeholder: %{
+                  type: "plain_text",
+                  text: "Select a Channel",
+                  emoji: true
+                },
+                options:
+                  Enum.map(channels, fn channel ->
+                    %{text: %{type: "plain_text", text: channel.name}, value: channel.channel_id}
+                  end)
+              },
+              label: %{
+                type: "plain_text",
+                text: "Channels",
+                emoji: true
+              }
+            }
+          ]
+        }
+    end
+  end
 
+  defp build_no_channels_view() do
     %{
       type: "modal",
       callback_id: "enable_view",
-      submit: %{
-        type: "plain_text",
-        text: "Enable"
-      },
       title: %{
         type: "plain_text",
-        text: "Enable Slax"
+        text: "My App",
+        emoji: true
+      },
+      close: %{
+        type: "plain_text",
+        text: "Close",
+        emoji: true
       },
       blocks: [
         %{
-          type: "input",
-          element: %{
-            type: "static_select",
-            action_id: "channel_select",
-            placeholder: %{
-              type: "plain_text",
-              text: "Select a Channel",
-              emoji: true
-            },
-            options:
-              Enum.map(channels, fn channel ->
-                %{text: %{type: "plain_text", text: channel.name}, value: channel.channel_id}
-              end)
-          },
-          label: %{
+          type: "section",
+          text: %{
             type: "plain_text",
-            text: "Channels",
+            text: "There are no disabled channels.",
             emoji: true
           }
         }

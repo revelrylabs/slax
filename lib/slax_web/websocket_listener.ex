@@ -131,11 +131,11 @@ defmodule SlaxWeb.WebsocketListener do
     Token.handle_payload(payload)
   end
 
-  defp determine_payload(%{"callback_id" => "disable_slax"} = payload) do
+  defp determine_payload(%{"callback_id" => "slax_disable"} = payload) do
     Disable.handle_payload(payload)
   end
 
-  defp determine_payload(%{"callback_id" => "enable_slax"} = payload) do
+  defp determine_payload(%{"callback_id" => "slax_enable"} = payload) do
     Disable.handle_payload(payload)
   end
 
