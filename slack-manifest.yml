@@ -9,13 +9,13 @@ features:
       type: global
       callback_id: access_token
       description: Register access token
-    - name: Disable Slax
+    - name: Slax Disable
       type: global
-      callback_id: disable_slax
+      callback_id: slax_disable
       description: Disable Slax in a specific channel
-    - name: Enable Slax
+    - name: Slax Enable
       type: global
-      callback_id: enable_slax
+      callback_id: slax_enable
       description: Enable Slax in a specific channel
   slash_commands:
     - command: /poker
