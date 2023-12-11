@@ -183,7 +183,7 @@ defmodule SlaxWeb.Disable do
       callback_id: "enable_view",
       title: %{
         type: "plain_text",
-        text: "My App",
+        text: "Enable Slax",
         emoji: true
       },
       close: %{
