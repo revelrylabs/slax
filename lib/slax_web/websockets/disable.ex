@@ -95,8 +95,9 @@ defmodule SlaxWeb.Disable do
 
     enabled_channels =
       all_channels
-      |> Enum.uniq_by(fn channel -> channel.channel_id end)
-      |> Enum.reject(fn channel -> channel.disabled end)
+      |> Enum.uniq_by(& &1.channel_id)
+      |> Enum.reject(& &1.disabled)
+      |> Enum.sort_by(& &1.name)
 
     %{
       type: "modal",
