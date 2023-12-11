@@ -7,21 +7,25 @@ defmodule SlaxWeb.Disable do
   alias Slax.Slack
   alias Slax.Channels
 
-  def handle_payload(%{
-        "trigger_id" => trigger_id,
-        "type" => "shortcut",
-        "callback_id" => "slax_disable"
-      }) do
+  def handle_payload(
+        %{
+          "type" => "shortcut",
+          "callback_id" => "slax_disable"
+        } = payload
+      ) do
+    trigger_id = payload["trigger_id"]
     view = build_disable_view(%{trigger_id: trigger_id})
 
     Slack.open_modal(%{trigger_id: trigger_id, view: view})
   end
 
-  def handle_payload(%{
-        "trigger_id" => trigger_id,
-        "type" => "shortcut",
-        "callback_id" => "slax_enable"
-      }) do
+  def handle_payload(
+        %{
+          "type" => "shortcut",
+          "callback_id" => "slax_enable"
+        } = payload
+      ) do
+    trigger_id = payload["trigger_id"]
     view = build_enable_view()
 
     Slack.open_modal(%{trigger_id: trigger_id, view: view})
@@ -29,7 +33,6 @@ defmodule SlaxWeb.Disable do
 
   def handle_payload(
         %{
-          "trigger_id" => _trigger_id,
           "type" => "view_submission",
           "view" => %{
             "callback_id" => "disable_view"
@@ -49,7 +52,6 @@ defmodule SlaxWeb.Disable do
 
   def handle_payload(
         %{
-          "trigger_id" => _trigger_id,
           "type" => "view_submission",
           "view" => %{
             "callback_id" => "enable_view"
