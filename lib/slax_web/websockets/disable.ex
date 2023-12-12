@@ -13,24 +13,27 @@ defmodule SlaxWeb.Disable do
           "callback_id" => "slax_disable"
         } = payload
       ) do
-    trigger_id = payload["trigger_id"]
+    Task.start_link(fn ->
+      trigger_id = payload["trigger_id"]
 
-    slack_channels =
-      Enum.map(Slack.get_channels(%{trigger_id: trigger_id}), fn channel ->
-        %{channel_id: channel["id"], name: channel["name"], disabled: false}
-      end)
+      slack_channels =
+        Enum.map(Slack.get_channels(%{trigger_id: trigger_id}), fn channel ->
+          %{channel_id: channel["id"], name: channel["name"], disabled: false}
+        end)
 
-    all_channels = Channels.get_all() ++ slack_channels
+      all_channels = Channels.get_all() ++ slack_channels
 
-    enabled_channels =
-      all_channels
-      |> Enum.uniq_by(& &1.channel_id)
-      |> Enum.reject(& &1.disabled)
-      |> Enum.sort_by(& &1.name)
+      enabled_channels =
+        all_channels
+        |> Enum.uniq_by(& &1.channel_id)
+        |> Enum.reject(& &1.disabled)
+        |> Enum.sort_by(& &1.name)
 
-    view = build_disable_view(enabled_channels)
+      view = build_disable_view(enabled_channels)
+      Slack.open_modal(%{trigger_id: trigger_id, view: view})
+    end)
 
-    Slack.open_modal(%{trigger_id: trigger_id, view: view})
+    :ok
   end
 
   def handle_payload(
