@@ -14,7 +14,21 @@ defmodule SlaxWeb.Disable do
         } = payload
       ) do
     trigger_id = payload["trigger_id"]
-    view = build_disable_view(%{trigger_id: trigger_id})
+
+    slack_channels =
+      Enum.map(Slack.get_channels(%{trigger_id: trigger_id}), fn channel ->
+        %{channel_id: channel["id"], name: channel["name"], disabled: false}
+      end)
+
+    all_channels = Channels.get_all() ++ slack_channels
+
+    enabled_channels =
+      all_channels
+      |> Enum.uniq_by(& &1.channel_id)
+      |> Enum.reject(& &1.disabled)
+      |> Enum.sort_by(& &1.name)
+
+    view = build_disable_view(enabled_channels)
 
     Slack.open_modal(%{trigger_id: trigger_id, view: view})
   end
@@ -85,20 +99,7 @@ defmodule SlaxWeb.Disable do
     }
   end
 
-  defp build_disable_view(%{trigger_id: trigger_id}) do
-    slack_channels =
-      Enum.map(Slack.get_channels(%{trigger_id: trigger_id}), fn channel ->
-        %{channel_id: channel["id"], name: channel["name"], disabled: false}
-      end)
-
-    all_channels = Channels.get_all() ++ slack_channels
-
-    enabled_channels =
-      all_channels
-      |> Enum.uniq_by(& &1.channel_id)
-      |> Enum.reject(& &1.disabled)
-      |> Enum.sort_by(& &1.name)
-
+  defp build_disable_view(channels) do
     %{
       type: "modal",
       callback_id: "disable_view",
@@ -122,7 +123,7 @@ defmodule SlaxWeb.Disable do
               emoji: true
             },
             options:
-              Enum.map(enabled_channels, fn channel ->
+              Enum.map(channels, fn channel ->
                 %{text: %{type: "plain_text", text: channel.name}, value: channel.channel_id}
               end)
           },
