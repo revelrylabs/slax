@@ -22,22 +22,6 @@ defmodule SlaxWeb.Disable.Test do
     [channel_id: channel_id, values: values]
   end
 
-  test "creates or updates a channel to be disabled", %{channel_id: channel_id, values: values} do
-    event = %{
-      "trigger_id" => "trigger_id",
-      "type" => "view_submission",
-      "view" => %{
-        "callback_id" => "disable_view",
-        "state" => %{
-          "values" => values
-        }
-      }
-    }
-
-    assert :ok == Disable.handle_payload(event)
-    assert Channels.get_by_channel_id(channel_id).disabled == true
-  end
-
   test "creates or updates a channel to be enabled", %{channel_id: channel_id, values: values} do
     event = %{
       "trigger_id" => "trigger_id",

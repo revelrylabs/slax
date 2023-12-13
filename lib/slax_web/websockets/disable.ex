@@ -13,27 +13,10 @@ defmodule SlaxWeb.Disable do
           "callback_id" => "slax_disable"
         } = payload
       ) do
-    Task.start_link(fn ->
-      trigger_id = payload["trigger_id"]
+    trigger_id = payload["trigger_id"]
 
-      slack_channels =
-        Enum.map(Slack.get_channels(%{trigger_id: trigger_id}), fn channel ->
-          %{channel_id: channel["id"], name: channel["name"], disabled: false}
-        end)
-
-      all_channels = Channels.get_all() ++ slack_channels
-
-      enabled_channels =
-        all_channels
-        |> Enum.uniq_by(& &1.channel_id)
-        |> Enum.reject(& &1.disabled)
-        |> Enum.sort_by(& &1.name)
-
-      view = build_disable_view(enabled_channels)
-      Slack.open_modal(%{trigger_id: trigger_id, view: view})
-    end)
-
-    :ok
+    view = build_disable_view()
+    Slack.open_modal(%{trigger_id: trigger_id, view: view})
   end
 
   def handle_payload(
@@ -56,15 +39,27 @@ defmodule SlaxWeb.Disable do
           }
         } = payload
       ) do
+    trigger_id = payload["trigger_id"]
     values = payload["view"]["state"]["values"]
-    %{channel_id: channel_id, name: name} = parse_state_values(Map.values(values))
+    %{name: name} = parse_state_values(Map.values(values))
 
-    Channels.create_or_update_channel(channel_id, %{
-      name: name,
-      disabled: true
-    })
+    valid_channel =
+      Enum.find(Slack.get_channels(%{trigger_id: trigger_id}), &(&1["name"] == name))
 
-    :ok
+    case valid_channel do
+      nil ->
+        :error
+
+      channel ->
+        channel_id = Map.get(channel, "id")
+
+        Channels.create_or_update_channel(channel_id, %{
+          name: name,
+          disabled: true
+        })
+
+        :ok
+    end
   end
 
   def handle_payload(
@@ -102,37 +97,53 @@ defmodule SlaxWeb.Disable do
     }
   end
 
-  defp build_disable_view(channels) do
+  defp parse_state_values([
+         %{
+           "channel_input" => %{
+             "value" => name
+           }
+         }
+       ]) do
+    %{
+      name: name
+    }
+  end
+
+  defp build_disable_view() do
     %{
       type: "modal",
       callback_id: "disable_view",
-      submit: %{
-        type: "plain_text",
-        text: "Disable"
-      },
       title: %{
         type: "plain_text",
-        text: "Disable Slax"
+        text: "Disable Slax",
+        emoji: true
+      },
+      submit: %{
+        type: "plain_text",
+        text: "Disable",
+        emoji: true
+      },
+      close: %{
+        type: "plain_text",
+        text: "Cancel",
+        emoji: true
       },
       blocks: [
         %{
           type: "input",
+          block_id: "channel_input",
           element: %{
-            type: "static_select",
-            action_id: "channel_select",
+            type: "plain_text_input",
             placeholder: %{
               type: "plain_text",
-              text: "Select a Channel",
+              text: "Enter the name of a channel (excluding #)",
               emoji: true
             },
-            options:
-              Enum.map(channels, fn channel ->
-                %{text: %{type: "plain_text", text: channel.name}, value: channel.channel_id}
-              end)
+            action_id: "channel_input"
           },
           label: %{
             type: "plain_text",
-            text: "Channels",
+            text: "Channel Name",
             emoji: true
           }
         }
