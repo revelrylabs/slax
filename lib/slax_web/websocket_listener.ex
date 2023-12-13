@@ -122,6 +122,11 @@ defmodule SlaxWeb.WebsocketListener do
         response = Jason.encode!(%{envelope_id: envelope_id})
         :gun.ws_send(pid, stream_ref, {:text, response})
 
+      :error ->
+        response = determine_error_response(payload, envelope_id)
+
+        :gun.ws_send(pid, stream_ref, {:text, response})
+
       _ ->
         nil
     end
@@ -153,5 +158,17 @@ defmodule SlaxWeb.WebsocketListener do
 
   defp determine_payload(%{"view" => %{"callback_id" => "enable_view"}} = payload) do
     Disable.handle_payload(payload)
+  end
+
+  defp determine_error_response(%{"view" => %{"callback_id" => "disable_view"}}, envelope_id) do
+    Jason.encode!(%{
+      envelope_id: envelope_id,
+      payload: %{
+        response_action: "errors",
+        errors: %{
+          channel_input: "This channel does not exist"
+        }
+      }
+    })
   end
 end
