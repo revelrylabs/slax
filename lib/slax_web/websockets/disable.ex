@@ -58,7 +58,7 @@ defmodule SlaxWeb.Disable do
           disabled: true
         })
 
-        :ok
+        build_disable_confirmation_view(name)
     end
   end
 
@@ -78,7 +78,7 @@ defmodule SlaxWeb.Disable do
       disabled: false
     })
 
-    :ok
+    build_enable_confirmation_view(name)
   end
 
   defp parse_state_values([
@@ -217,6 +217,98 @@ defmodule SlaxWeb.Disable do
             text: "There are no disabled channels.",
             emoji: true
           }
+        }
+      ]
+    }
+  end
+
+  defp build_disable_confirmation_view(name) do
+    %{
+      type: "modal",
+      callback_id: "disable_view",
+      title: %{
+        type: "plain_text",
+        text: "Confirmation",
+        emoji: true
+      },
+      close: %{
+        type: "plain_text",
+        text: "Close",
+        emoji: true
+      },
+      blocks: [
+        %{
+          type: "rich_text",
+          elements: [
+            %{
+              type: "rich_text_section",
+              elements: [
+                %{
+                  type: "text",
+                  text: "Slax has been disabled in "
+                },
+                %{
+                  type: "text",
+                  text: "#{name}  ",
+                  style: %{
+                    bold: true
+                  }
+                },
+                %{
+                  type: "emoji",
+                  name: "homer"
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    }
+  end
+
+  defp build_enable_confirmation_view(name) do
+    %{
+      type: "modal",
+      callback_id: "enable_view",
+      title: %{
+        type: "plain_text",
+        text: "Confirmation",
+        emoji: true
+      },
+      close: %{
+        type: "plain_text",
+        text: "Close",
+        emoji: true
+      },
+      blocks: [
+        %{
+          type: "rich_text",
+          elements: [
+            %{
+              type: "rich_text_section",
+              elements: [
+                %{
+                  type: "text",
+                  text: "Slax has been enabled in "
+                },
+                %{
+                  type: "text",
+                  text: "#{name}",
+                  style: %{
+                    bold: true
+                  }
+                },
+                %{
+                  type: "text",
+                  text: "!  "
+                },
+                %{
+                  type: "emoji",
+                  name: "reversehomer"
+                }
+              ]
+            }
+          ]
         }
       ]
     }
