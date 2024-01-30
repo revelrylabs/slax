@@ -67,15 +67,6 @@ config :slax, Slax.Slack,
     inspire: System.get_env("INSPIRE_SLACK_TOKEN")
   ]
 
-config :slax, Slax.Scheduler,
-  jobs: [
-    # schedule for 9:25 monday thru friday (14:30 UTC)
-    blockerbot: [
-      schedule: "25 14 * * 1,2,3,4,5",
-      task: {Slax.Scheduler, :start, []}
-    ]
-  ]
-
 config :slax, SlaxWeb.WebsocketListener, enabled: true
 
 config :slax, Oban,

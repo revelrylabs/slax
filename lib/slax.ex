@@ -9,7 +9,6 @@ defmodule Slax do
       [
         Slax.Repo,
         SlaxWeb.Endpoint,
-        Slax.Scheduler,
         {Oban, Application.fetch_env!(:slax, Oban)}
       ] ++ optional_children()
 
