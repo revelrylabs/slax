@@ -17,7 +17,7 @@ jobs:
           POSTGRES_USER: postgres
           POSTGRES_PASSWORD: postgres
           RAILS_ENV: test
-          TEUTEBERG_POSTGRES_HOST: localhost
+          POSTGRES_HOST: localhost
           POSTGRES_PORT: 5432
           POSTGRES_HOST_AUTH_METHOD: trust
         image: postgres:9.6
@@ -40,13 +40,15 @@ jobs:
           otp-version: ${{ env.OTP_VERSION_SPEC }}
           elixir-version: ${{ env.ELIXIR_VERSION_SPEC }}
 
-      - run: |
+      - name: Install Deps
+        run: |
           gem install coveralls-multi --no-document
           mix local.hex --force
           mix local.rebar --force
           mix deps.get
 
-      - run: |
+      - name: Run Tests
+        run: |
           mix format --check-formatted
           MIX_ENV=test mix test --no-compile --no-deps-check
           coveralls-multi
