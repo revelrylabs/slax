@@ -16,7 +16,6 @@ jobs:
           PGUSER: postgres
           POSTGRES_USER: postgres
           POSTGRES_PASSWORD: postgres
-          RAILS_ENV: test
           POSTGRES_HOST: localhost
           POSTGRES_PORT: 5432
           POSTGRES_HOST_AUTH_METHOD: trust
