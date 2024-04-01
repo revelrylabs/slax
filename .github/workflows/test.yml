@@ -47,7 +47,10 @@ jobs:
           mix deps.get
 
       - name: Run Tests
+        env:
+          MIX_ENV: test
         run: |
+          mix coveralls.json
           mix format --check-formatted
-          MIX_ENV=test mix test
+          mix test
           
