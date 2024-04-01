@@ -1,0 +1,51 @@
+
+name: Test
+
+on: push
+
+env:
+  OTP_VERSION_SPEC: "24.1"
+  ELIXIR_VERSION_SPEC: "1.12.3"
+
+jobs:
+  run-tests:
+    runs-on: ubuntu-20.04
+    services:
+      postgres:
+        env:
+          PGUSER: postgres
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: postgres
+          RAILS_ENV: test
+          TEUTEBERG_POSTGRES_HOST: localhost
+          POSTGRES_PORT: 5432
+          POSTGRES_HOST_AUTH_METHOD: trust
+        image: postgres:9.6
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd pg_isready --health-interval 10s
+          --health-timeout 5s --health-retries 5
+
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 16
+      - uses: erlef/setup-beam@v1
+        with:
+          otp-version: ${{ env.OTP_VERSION_SPEC }}
+          elixir-version: ${{ env.ELIXIR_VERSION_SPEC }}
+
+      - run: |
+          gem install coveralls-multi --no-document
+          mix local.hex --force
+          mix local.rebar --force
+          mix deps.get
+
+      - run: |
+          mix format --check-formatted
+          MIX_ENV=test mix test --no-compile --no-deps-check
+          coveralls-multi
+
+          
