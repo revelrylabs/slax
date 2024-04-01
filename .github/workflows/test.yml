@@ -49,7 +49,5 @@ jobs:
       - name: Run Tests
         run: |
           mix format --check-formatted
-          MIX_ENV=test mix test --no-compile --no-deps-check
-          coveralls-multi
-
+          MIX_ENV=test mix test
           
