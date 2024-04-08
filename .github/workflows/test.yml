@@ -28,9 +28,6 @@ jobs:
 
     steps:
       - uses: actions/checkout@v4
-      - uses: ruby/setup-ruby@v1
-        with:
-          ruby-version: '3.3'
       - uses: actions/setup-node@v4
         with:
           node-version: 16
@@ -41,7 +38,6 @@ jobs:
 
       - name: Install Deps
         run: |
-          gem install coveralls-multi --no-document
           mix local.hex --force
           mix local.rebar --force
           mix deps.get
@@ -50,7 +46,6 @@ jobs:
         env:
           MIX_ENV: test
         run: |
-          mix coveralls.json
           mix format --check-formatted
           mix test
           
