@@ -5,6 +5,8 @@ defmodule Slax.Github do
 
   alias Slax.Http
   alias Slax.Http.Error
+  alias Slax.ProjectRepos
+  alias Slax.Tentacat.Issues
 
   defp config() do
     Application.get_env(:slax, __MODULE__)
@@ -16,6 +18,17 @@ defmodule Slax.Github do
 
   defp oauth_url() do
     config()[:oauth_url]
+  end
+
+  defp default_org() do
+    config()[:org_name]
+  end
+
+  @doc """
+  Public function to allow other modules to use the default Github api key
+  """
+  def api_token() do
+    config()[:api_token]
   end
 
   @timeout_length 10_000
@@ -453,5 +466,109 @@ defmodule Slax.Github do
       "Content-Type": "application/json",
       "User-Agent": "Content Bot 1.0"
     ]
+  end
+
+  @doc """
+  Extract the the organization, repository and issue number from a string
+
+  ## Examples
+
+      iex> parse_repo_org_issue("revelrylabs/slax/1")
+      {"revelrylabs", "slax", "1"}
+      iex> parse_repo_org_issue("slax/1")
+      {"revelrylabs", "slax", "1"}
+      iex> parse_repo_org_issue("")
+      {:error, "Could not parse repo and issue, use repo/issue or org/repo/issue"}
+
+  """
+  def parse_repo_org_issue(string) do
+    string
+    |> String.split(["/", "#"])
+    |> case do
+      [org, repo, issue] -> {org, repo, issue}
+      [repo, issue] -> {default_org(), repo, issue}
+      _ -> {:error, "Could not parse repo and issue, use `repo#issue` or `org/repo#issue`"}
+    end
+  end
+
+  def parse_repo_org_pr(string) do
+    string
+    |> String.split(["/", "$"])
+    |> case do
+      [org, repo, pr] -> {org, repo, pr}
+      [repo, pr] -> {default_org(), repo, pr}
+      _ -> {:error, "Could not parse repo and PR, use `repo$PR` or `org/repo$PR`"}
+    end
+  end
+
+  def parse_repo_org(string) do
+    case String.split(string, "/") do
+      [org_name, repo_name] ->
+        {org_name, repo_name}
+
+      [repo_name] ->
+        {default_org(), repo_name}
+    end
+  end
+
+  @doc """
+  Loads specified issue returning informational errors
+  """
+  def load_issue(repo_and_issue) do
+    with {org, repo, issue} <- parse_repo_org_issue(repo_and_issue),
+         {token, warning_message} <- retrieve_token(repo),
+         client <- Tentacat.Client.new(%{access_token: token}),
+         {200, issue, _http_response} <- Issues.find(client, org, repo, issue) do
+      {:ok, issue, warning_message}
+    else
+      {:error, _message} = error ->
+        error
+
+      {_response_code, %{"message" => "Bad credentials"}, _http_response} ->
+        {:error, "Access token invalid for #{repo_and_issue}"}
+
+      {_response_code, %{"message" => error_message}, _http_response} ->
+        {:error, error_message}
+
+      nil ->
+        {:error, "No project repo set for #{repo_and_issue}"}
+
+      %{token: nil} ->
+        {:error, "No access token for #{repo_and_issue}"}
+    end
+  end
+
+  def load_pr(repo_and_pr) do
+    with {org, repo, pr} <- parse_repo_org_pr(repo_and_pr),
+         {token, warning_message} <- retrieve_token(repo),
+         client <- Tentacat.Client.new(%{access_token: token}),
+         {200, pr, _http_response} <- Tentacat.Pulls.find(client, org, repo, pr) do
+      {:ok, pr, warning_message}
+    else
+      {:error, _message} = error ->
+        error
+
+      {_response_code, %{"message" => "Bad credentials"}, _http_response} ->
+        {:error, "Access token invalid for #{repo_and_pr}"}
+
+      {_response_code, %{"message" => error_message}, _http_response} ->
+        {:error, error_message}
+
+      nil ->
+        {:error, "No project repo set for #{repo_and_pr}"}
+
+      %{token: nil} ->
+        {:error, "No access token for #{repo_and_pr}"}
+    end
+  end
+
+  defp retrieve_token(repo) do
+    case ProjectRepos.get_by_repo(repo) do
+      %{token: token} when not is_nil(token) ->
+        {token, ""}
+
+      _ ->
+        {api_token(), "(Please setup a fine grained access token with /token)"}
+    end
   end
 end

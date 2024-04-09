@@ -1,5 +1,3 @@
-![TravisCI Build Status](https://travis-ci.org/revelrylabs/slax.svg)
-[![Coverage Status](https://opencov.prod.revelry.net/projects/4/badge.svg)](https://opencov.prod.revelry.net/projects/4)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
 # Slax
@@ -11,15 +9,14 @@ A Phoenix app that supports the following slash commands from Slack:
 ```
 git clone https://github.com/revelrylabs/slax
 ./bin/setup
-./bin/server
 ```
 
 ## Configuration
 
 The [/bin/setup](https://github.com/revelrylabs/slax/blob/master/bin/setup) script should add a `config/dev.secret.exs` file. Use this to put secrets into.
-[/rel/config/prod_runtime_config.exs](https://github.com/revelrylabs/slax/blob/master/rel/config/prod_runtime_config.exs) is a good example of what secrets are needed as that file is used to setup secrets in produciton.
+[/config/runtime.exs](https://github.com/revelrylabs/slax/blob/master/config/runtime.exs) is a good example of what secrets are needed as that file is used to setup secrets in produciton. (only the configs listed in the following sections are needed for the currently used functionality)
 
-You will need to create a GitHub OAuth app in order to use the GitHub functionality, including authentication.
+You will need to create a GitHub OAuth app in order to use the GitHub functionality, including authentication, and a Slack workspace and app.
 
 ### Create Github OAuth App
 
@@ -42,9 +39,52 @@ config :slax, Slax.Github,
   org_teams: ["<my_org_team>"]
 ```
 
+### Create Slack App
+- Go to https://slack.com/get-started#/createnew and create a workspace for testing
+- Go to https://api.slack.com/apps
+- Click "Create New App" and select "From an app manifest"
+- Select your new Slack workspace
+- Copy slack-manifest.yml into the field and create the App
+- Click "Install to Workspace" and allow it in your workspace
+- Generate an app-level token with the "connections:write" scope and copy the generated token into `config/dev.secret.exs`
+- Go to the `Install App` menu and copy the Bot User OAuth Token into `config/dev.secret.exs`
+
+```elixir
+config :slax, Slax.Slack,
+  api_url: "https://slack.com/api",
+  api_token: "<bot_user_oauth_token>",
+  channel_name: "<default_post_channel>",
+  app_token: "<app_level_token>"
+```
+
 ## Usage / Commands
 
+```./bin/server```
 All commands provide usage details when executing them without any parameters.
+> **_NOTE:_** Issue / PR lookup and pokerbot require a fine grained access token be setup for the specified repos with the `/token` command
+
+### /token
+This is a slack shortcut that is an interactive series of modals to setup project repo connections in the database as well as store fine grained access tokens to enable issue lookup and poker functionality. **This is necessary** for proper functionality of Issue/PR lookup and Poker.
+
+The first modal you see lets you select a Repo and attach an access token and expiration date to it.
+The second modal is accessed by clicking Create Repo and lets you either select or create a new Project and attach a Repo to the Project
+
+To generate a fine grained access token go to https://github.com/settings/tokens?type=beta and fill out the form. Check `Only Select Repositories` and select the desired repo(s). Under Repository Permissions, give at least Read and write to `Issues` and Read only to `Pull Requests`. Extra setup video for Github Access tokens with different permissions: https://www.loom.com/share/43993db839d14fbd86a9ce344e17b7fb
+> **_NOTE:_**  For third party organizations, fine grained access tokens must be enabled.
+
+### /slax disable
+This is a slack shortcut that is an interactive modal to disable Slax Issue/PR lookup in a specific channel.
+
+### /slax enable
+This is a slack shortcut that is an interactive modal to enable Slax Issue/PR lookup in a specific channel.
+
+### Issue & PR lookup
+With the websocket connection slax parses every message for the specified patterns corresponding to an issue `org/repo#1` `repo#1` or a PR `org/repo$1` `repo$1`.
+
+### /poker
+This command is the interaction point for the poker feature and when just typing `/poker` it will respond with a help message on how to use it.
+
+### _The following commands have not been tested or used in a while_
 
 ### /auth
 

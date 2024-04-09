@@ -15,11 +15,7 @@ defmodule Slax.Slack.Test do
             %{
               status_code: 200,
               body: %{"ok" => true}
-            }} =
-             Slack.send_message("", %{
-               response_type: "in_channel",
-               text: "Hello"
-             })
+            }} = Slack.send_message("", "Hello")
   end
 
   def create_channel_setup(context) do
@@ -94,10 +90,65 @@ defmodule Slax.Slack.Test do
       end)
 
       assert :ok ==
-               Slack.post_message_to_channel(%{
+               Slack.post_message_to_channel("test message", "#channel")
+    end
+  end
+
+  def post_message_to_thread_setup(context) do
+    url = "/chat.postMessage"
+
+    {:ok, context |> Map.put(:url, url)}
+  end
+
+  describe "post_message_to_thread/1" do
+    setup [:post_message_to_channel_setup]
+
+    test "success" do
+      expect(Slax.HttpMock, :post, fn _, _, _, _ ->
+        {:ok, %HTTPoison.Response{status_code: 200, body: ~s<{"ok": true}>}}
+      end)
+
+      assert :ok ==
+               Slack.post_message_to_thread(%{
                  text: "test message",
-                 channel_name: "#channel"
+                 channel: "#channel",
+                 thread_ts: "thread_ts"
                })
+    end
+  end
+
+  def open_modal_setup(context) do
+    url = "/views.open"
+
+    {:ok, context |> Map.put(:url, url)}
+  end
+
+  describe "open_modal/1" do
+    setup [:open_modal_setup]
+
+    test "success" do
+      expect(Slax.HttpMock, :post, fn _, _, _, _ ->
+        {:ok, %HTTPoison.Response{status_code: 200, body: ~s<{"ok": true}>}}
+      end)
+
+      assert :ok == Slack.open_modal(%{trigger_id: "trigger_id", view: %{}})
+    end
+  end
+
+  def update_modal_setup(context) do
+    url = "/views.update"
+    {:ok, context |> Map.put(:url, url)}
+  end
+
+  describe "update_modal/1" do
+    setup [:update_modal_setup]
+
+    test "success" do
+      expect(Slax.HttpMock, :post, fn _, _, _, _ ->
+        {:ok, %HTTPoison.Response{status_code: 200, body: ~s<{"ok": true}>}}
+      end)
+
+      assert :ok == Slack.update_modal(%{trigger_id: "trigger_id", view: %{}, view_id: "view_id"})
     end
   end
 end

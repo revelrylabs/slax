@@ -9,10 +9,7 @@ defmodule SlaxWeb.InspireController do
       %HTTPoison.Response{body: inspiration} =
         HTTPoison.get!("https://inspirobot.me/api?generate=true")
 
-      Slack.post_message_to_channel(%{
-        channel_name: channel_name,
-        text: inspiration
-      })
+      Slack.post_message_to_channel(inspiration, channel_name)
     end
 
     send_resp(conn, 200, "")

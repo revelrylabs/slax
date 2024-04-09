@@ -2,15 +2,14 @@ defmodule SlaxWeb.TarponController do
   use SlaxWeb, :controller
   alias Slax.Slack
 
-  plug(Slax.Plugs.VerifySlackToken, token: :tarpon)
+  plug(Slax.Plugs.VerifySlackToken)
 
-  def start(conn, %{"text" => text, "channel_id" => channel_id, "timestamp" => timestamp}) do
-    if Regex.match?(~r/tarpon/i, text) do
-      Slack.add_reaction(%{
-        name: "fish",
-        channel_id: channel_id,
-        timestamp: timestamp
-      })
+  def start(conn, %{
+        "command" => command,
+        "response_url" => response_url
+      }) do
+    if Regex.match?(~r{/tarpon}i, command) do
+      Slack.send_message(response_url, "🐟")
     end
 
     send_resp(conn, 200, "")
