@@ -1,0 +1,63 @@
+name: Project automations
+on:
+  issues:
+    types:
+      - opened
+      - labeled
+  pull_request_target:
+    types:
+      - labeled
+jobs:
+  issue_opened:
+    name: issue_opened
+    runs-on: ubuntu-latest
+    if: github.event_name == 'issues' && github.event.action == 'opened' && !(contains(github.event.issue.labels.*.name, 'maintenance') || contains(github.event.issue.labels.*.name, 'needs investigation') || contains(github.event.issue.labels.*.name, 'approved'))
+    steps:
+      - name: Move new issues to Backlog
+        uses: leonsteinhaeuser/project-beta-automations@v2.1.0
+        with:
+          gh_token: ${{ secrets.GH_TOKEN }}
+          organization: revelrylabs
+          project_id: 13
+          resource_node_id: ${{ github.event.issue.node_id }}
+          status_value: Backlog # Target status
+  needs_investigation:
+    name: needs_investigation
+    runs-on: ubuntu-latest
+    if: github.event.action == 'labeled' && github.event.label.name == 'needs investigation'
+    steps:
+      - name: Move needs investigation labeled issues to Needs Investigation status
+        uses: leonsteinhaeuser/project-beta-automations@v2.1.0
+        with:
+          gh_token: ${{ secrets.GH_TOKEN }}
+          organization: revelrylabs
+          project_id: 13
+          resource_node_id: ${{ github.event.issue.node_id }}
+          status_value: Needs Investigation # Target status
+  ready_to_work:
+    name: ready_to_work
+    runs-on: ubuntu-latest
+    if: (github.event_name == 'pull_request' && contains(github.event.pull_request.labels.*.name, 'dependencies')) ||
+      (github.event.action == 'labeled' && github.event.label.name == 'approved')
+    steps:
+      - name: Move Dependabot PR or approved issues to Ready to work
+        uses: leonsteinhaeuser/project-beta-automations@v2.1.0
+        with:
+          gh_token: ${{ secrets.GH_TOKEN }}
+          organization: revelrylabs
+          project_id: 13
+          resource_node_id: ${{ github.event.pull_request.node_id }}${{ github.event.issue.node_id }}
+          status_value: Ready to Work # Target status
+  maintenance:
+    name: maintenance
+    runs-on: ubuntu-latest
+    if: github.event.action == 'labeled' && github.event.label.name == 'maintenance'
+    steps:
+      - name: Move maintenance labeled issues to Maintenance
+        uses: leonsteinhaeuser/project-beta-automations@v2.1.0
+        with:
+          gh_token: ${{ secrets.GH_TOKEN }}
+          organization: revelrylabs
+          project_id: 13
+          resource_node_id: ${{ github.event.issue.node_id }}
+          status_value: Maintenance # Target status
