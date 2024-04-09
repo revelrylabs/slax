@@ -2,10 +2,11 @@ defmodule SlaxWeb.WebsocketListener do
   use GenServer
   require Logger
 
-  alias Slax.Http
+  alias Slax.{Http, Channels}
   alias SlaxWeb.Issue
   alias SlaxWeb.Poker
   alias SlaxWeb.Token
+  alias SlaxWeb.Disable
 
   defp config() do
     Application.get_env(:slax, Slax.Slack)
@@ -74,15 +75,19 @@ defmodule SlaxWeb.WebsocketListener do
   defp handle_message(pid, stream_ref, %{
          "type" => "events_api",
          "envelope_id" => envelope_id,
-         "payload" => %{"event" => event}
+         "payload" => %{"event" => %{"channel" => channel} = event}
        }) do
-    Issue.handle_event(event)
+    channel = Channels.get_by_channel_id(channel)
 
-    with {:ok, response} <- Jason.encode(%{envelope_id: envelope_id}) do
-      :gun.ws_send(pid, stream_ref, {:text, response})
-    else
-      _ ->
-        nil
+    if is_nil(channel) or !channel.disabled do
+      Issue.handle_event(event)
+
+      with {:ok, response} <- Jason.encode(%{envelope_id: envelope_id}) do
+        :gun.ws_send(pid, stream_ref, {:text, response})
+      else
+        _ ->
+          nil
+      end
     end
   end
 
@@ -105,7 +110,7 @@ defmodule SlaxWeb.WebsocketListener do
          "envelope_id" => envelope_id,
          "payload" => payload
        }) do
-    with %{} = view <- Token.handle_payload(payload),
+    with %{} = view <- determine_payload(payload),
          {:ok, response} <-
            Jason.encode(%{
              envelope_id: envelope_id,
@@ -117,8 +122,53 @@ defmodule SlaxWeb.WebsocketListener do
         response = Jason.encode!(%{envelope_id: envelope_id})
         :gun.ws_send(pid, stream_ref, {:text, response})
 
+      :error ->
+        response = determine_error_response(payload, envelope_id)
+
+        :gun.ws_send(pid, stream_ref, {:text, response})
+
       _ ->
         nil
     end
+  end
+
+  defp determine_payload(%{"callback_id" => "access_token"} = payload) do
+    Token.handle_payload(payload)
+  end
+
+  defp determine_payload(%{"callback_id" => "slax_disable"} = payload) do
+    Disable.handle_payload(payload)
+  end
+
+  defp determine_payload(%{"callback_id" => "slax_enable"} = payload) do
+    Disable.handle_payload(payload)
+  end
+
+  defp determine_payload(%{"view" => %{"callback_id" => "token_view"}} = payload) do
+    Token.handle_payload(payload)
+  end
+
+  defp determine_payload(%{"view" => %{"callback_id" => "repo_view"}} = payload) do
+    Token.handle_payload(payload)
+  end
+
+  defp determine_payload(%{"view" => %{"callback_id" => "disable_view"}} = payload) do
+    Disable.handle_payload(payload)
+  end
+
+  defp determine_payload(%{"view" => %{"callback_id" => "enable_view"}} = payload) do
+    Disable.handle_payload(payload)
+  end
+
+  defp determine_error_response(%{"view" => %{"callback_id" => "disable_view"}}, envelope_id) do
+    Jason.encode!(%{
+      envelope_id: envelope_id,
+      payload: %{
+        response_action: "errors",
+        errors: %{
+          channel_input: "This channel does not exist"
+        }
+      }
+    })
   end
 end
