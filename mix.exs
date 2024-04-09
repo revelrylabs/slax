@@ -11,14 +11,7 @@ defmodule Slax.Mixfile do
       build_embedded: Mix.env() == :prod,
       start_permanent: Mix.env() == :prod,
       aliases: aliases(),
-      deps: deps(),
-      test_coverage: [tool: ExCoveralls],
-      preferred_cli_env: [
-        coveralls: :test,
-        "coveralls.detail": :test,
-        "coveralls.post": :test,
-        "coveralls.html": :test
-      ]
+      deps: deps()
     ]
   end
 
@@ -51,7 +44,6 @@ defmodule Slax.Mixfile do
       {:httpoison, "~> 1.5"},
       {:yaml_front_matter, "~> 1.0"},
       {:ex_doc, "~> 0.25", only: :dev, runtime: false},
-      {:excoveralls, "~> 0.8", only: :test},
       {:mox, "~> 0.3", only: :test},
       {:jason, "~> 1.1"},
       {:ex_machina, "~> 2.2", only: :test},

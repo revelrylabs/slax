@@ -17,6 +17,8 @@ config :slax, tentacat_issues: Slax.Tentacat.IssuesMock
 config :slax, Slax.Repo,
   database: "slax_test",
   hostname: "localhost",
+  username: "postgres",
+  password: "postgres",
   port: 5432,
   pool: Ecto.Adapters.SQL.Sandbox
 
