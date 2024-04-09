@@ -1,0 +1,42 @@
+display_information:
+  name: Slax
+features:
+  bot_user:
+    display_name: Slax
+    always_online: false
+  shortcuts:
+    - name: Token
+      type: global
+      callback_id: access_token
+      description: Register access token
+    - name: Slax Disable
+      type: global
+      callback_id: slax_disable
+      description: Disable Slax in a specific channel
+    - name: Slax Enable
+      type: global
+      callback_id: slax_enable
+      description: Enable Slax in a specific channel
+  slash_commands:
+    - command: /poker
+      description: poker
+      should_escape: false
+oauth_config:
+  scopes:
+    user:
+      - channels:history
+    bot:
+      - channels:history
+      - chat:write
+      - chat:write.public
+      - commands
+      - channels:read
+settings:
+  event_subscriptions:
+    user_events:
+      - message.channels
+  interactivity:
+    is_enabled: true
+  org_deploy_enabled: false
+  socket_mode_enabled: true
+  token_rotation_enabled: false

@@ -1,9 +1,10 @@
 defmodule Slax.Poker do
   use Slax.Context
-  alias Slax.{Github, Poker.Round}
+  alias Slax.{Github, Poker.Round, ProjectRepos}
 
   def start_round(channel_name, issue) do
-    repo_and_issue = Regex.replace(~r".*?(\w+)/(\w+)/issues/(\d+)$", issue["url"], "\\1/\\2/\\3")
+    repo_and_issue =
+      Regex.replace(~r".*/repos/(\S+)/(\S+)/issues/(\d+)$", issue["url"], "\\1/\\2/\\3")
 
     %Round{}
     |> Round.changeset(%{
@@ -63,14 +64,43 @@ defmodule Slax.Poker do
   def decide(round, score) do
     {org, repo, issue} = Github.parse_repo_org_issue(round.issue)
 
-    client = Tentacat.Client.new(%{access_token: Github.api_token()})
+    client =
+      case ProjectRepos.get_by_repo(repo) do
+        %{token: token} when not is_nil(token) ->
+          Tentacat.Client.new(%{access_token: token})
 
-    case Tentacat.Issues.update(client, org, repo, issue, %{labels: ["Points: #{score}"]}) do
-      {200, _issue, _http_response} ->
-        :ok
+        _ ->
+          Tentacat.Client.new(%{access_token: Github.api_token()})
+      end
 
+    with {200, labels, _http_response} <- Tentacat.Issues.Labels.list(client, org, repo, issue),
+         :ok <- maybe_delete_label(labels, client, org, repo, issue),
+         {200, _issue, _http_response} <-
+           Tentacat.Issues.Labels.add(client, org, repo, issue, ["Points: #{score}"]) do
+      :ok
+    else
       {_response_code, %{"message" => error_message}, _http_response} ->
         {:error, error_message}
+    end
+  end
+
+  defp maybe_delete_label(labels, client, org, repo, issue) do
+    label =
+      Enum.find(labels, fn
+        %{"name" => "Points: " <> _score} -> true
+        _label -> false
+      end)
+
+    if not is_nil(label) do
+      case Tentacat.Issues.Labels.remove(client, org, repo, issue, URI.encode(label["name"])) do
+        {200, _issue, _http_response} ->
+          :ok
+
+        {response_code, message, http_response} ->
+          {response_code, message, http_response}
+      end
+    else
+      :ok
     end
   end
 end

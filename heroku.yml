@@ -3,3 +3,7 @@ build:
     web: Dockerfile
 run:
   web: bin/slax start
+release:
+  image: web
+  command: 
+    - ./bin/slax eval Slax.Release.migrate
