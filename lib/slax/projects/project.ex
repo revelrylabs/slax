@@ -10,4 +10,8 @@ defmodule Slax.Project do
 
     timestamps()
   end
+
+  def changeset(params \\ %{}) do
+    cast(%__MODULE__{}, params, [:name])
+  end
 end

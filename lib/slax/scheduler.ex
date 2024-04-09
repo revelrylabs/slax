@@ -24,9 +24,6 @@ defmodule Slax.Scheduler do
         Application.get_env(:slax, Github)[:api_token]
       )
 
-    Slack.post_message_to_channel(%{
-      text: formatted_response,
-      channel_name: channel_name
-    })
+    Slack.post_message_to_channel(formatted_response, channel_name)
   end
 end

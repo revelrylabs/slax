@@ -3,7 +3,10 @@ import Config
 if config_env() == :prod do
   config :slax, Slax.Repo,
     url: System.get_env("DATABASE_URL"),
-    pool_size: String.to_integer(System.get_env("POOL_SIZE") || "10")
+    ssl: true,
+    ssl_opts: [verify: :verify_none, cacerts: :certifi.cacerts()],
+    pool_size: String.to_integer(System.get_env("POOL_SIZE") || "10"),
+    queue_target: String.to_integer(System.get_env("QUEUE_TARGET") || "5000")
 
   port = String.to_integer(System.get_env("PORT"))
 
@@ -40,6 +43,8 @@ if config_env() == :prod do
   config :slax, Slax.Slack,
     api_url: "https://slack.com/api",
     api_token: System.get_env("SLACK_TOKEN"),
+    channel_name: System.get_env("SLACK_CHANNEL_NAME"),
+    app_token: System.get_env("SLACK_APP_TOKEN"),
     tokens: [
       comment: System.get_env("COMMENT_SLACK_TOKEN"),
       issue: System.get_env("ISSUE_SLACK_TOKEN"),

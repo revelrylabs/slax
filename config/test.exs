@@ -11,11 +11,14 @@ config :logger, level: :warn
 
 config :slax, http_adapter: Slax.HttpMock
 config :slax, github_commands: Slax.Commands.GithubCommandsMock
+config :slax, tentacat_issues: Slax.Tentacat.IssuesMock
 
 # Configure your database
 config :slax, Slax.Repo,
   database: "slax_test",
   hostname: "localhost",
+  username: "postgres",
+  password: "postgres",
   port: 5432,
   pool: Ecto.Adapters.SQL.Sandbox
 
@@ -34,3 +37,7 @@ config :slax, Slax.Slack,
   ]
 
 config :slax, Slax.Github, org_name: "organization"
+
+config :slax, SlaxWeb.WebsocketListener, enabled: false
+
+config :slax, Oban, testing: :inline
