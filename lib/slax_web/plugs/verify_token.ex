@@ -13,7 +13,8 @@ defmodule Slax.Plugs.VerifySlackToken do
       base_sig = ~s{v0:#{timestamp}:#{body}}
 
       hashed_sig =
-        :crypto.hmac(
+        :crypto.mac(
+          :hmac,
           :sha256,
           Application.get_env(:slax, Slax.Slack)[:api_signing_secret],
           base_sig

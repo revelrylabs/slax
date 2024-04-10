@@ -57,8 +57,8 @@ defmodule SlaxWeb.PokerController do
              value: estimate,
              reason: reason
            }) do
-      has_have = if Enum.count(round.estimates) > 1, do: "have", else: "has"
       estimators = Enum.map(round.estimates, & &1.user) ++ [user]
+      has_have = if Enum.count(estimators) > 1, do: "have", else: "has"
 
       Slack.post_message_to_channel(
         "_#{Text.to_sentence(estimators)} #{has_have} estimated_",

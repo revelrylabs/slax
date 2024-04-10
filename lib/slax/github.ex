@@ -487,7 +487,17 @@ defmodule Slax.Github do
     |> case do
       [org, repo, issue] -> {org, repo, issue}
       [repo, issue] -> {default_org(), repo, issue}
-      _ -> {:error, "Could not parse repo and issue, use repo/issue or org/repo/issue"}
+      _ -> {:error, "Could not parse repo and issue, use `repo#issue` or `org/repo#issue`"}
+    end
+  end
+
+  def parse_repo_org_pr(string) do
+    string
+    |> String.split(["/", "$"])
+    |> case do
+      [org, repo, pr] -> {org, repo, pr}
+      [repo, pr] -> {default_org(), repo, pr}
+      _ -> {:error, "Could not parse repo and PR, use `repo$PR` or `org/repo$PR`"}
     end
   end
 
@@ -525,6 +535,30 @@ defmodule Slax.Github do
 
       %{token: nil} ->
         {:error, "No access token for #{repo_and_issue}"}
+    end
+  end
+
+  def load_pr(repo_and_pr) do
+    with {org, repo, pr} <- parse_repo_org_pr(repo_and_pr),
+         {token, warning_message} <- retrieve_token(repo),
+         client <- Tentacat.Client.new(%{access_token: token}),
+         {200, pr, _http_response} <- Tentacat.Pulls.find(client, org, repo, pr) do
+      {:ok, pr, warning_message}
+    else
+      {:error, _message} = error ->
+        error
+
+      {_response_code, %{"message" => "Bad credentials"}, _http_response} ->
+        {:error, "Access token invalid for #{repo_and_pr}"}
+
+      {_response_code, %{"message" => error_message}, _http_response} ->
+        {:error, error_message}
+
+      nil ->
+        {:error, "No project repo set for #{repo_and_pr}"}
+
+      %{token: nil} ->
+        {:error, "No access token for #{repo_and_pr}"}
     end
   end
 
