@@ -49,7 +49,7 @@ defmodule Slax.Mixfile do
       {:stream_data, "~> 0.6.0", only: :test},
       {:quantum, "~> 3.0"},
       {:timex, "~> 3.7"},
-      {:tentacat, "~> 1.6.0"},
+      {:tentacat, "~> 2.2.0"},
       {:inflex, "~> 2.0.0"},
       {:credo, "~> 1.5.0", only: [:dev, :test], runtime: false},
       {:gun, "~> 2.0.1"},
