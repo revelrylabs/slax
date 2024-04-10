@@ -7,18 +7,11 @@ defmodule Slax.Mixfile do
       version: "0.0.1",
       elixir: "~> 1.6",
       elixirc_paths: elixirc_paths(Mix.env()),
-      compilers: [:phoenix, :gettext] ++ Mix.compilers(),
+      compilers: [:phoenix] ++ Mix.compilers(),
       build_embedded: Mix.env() == :prod,
       start_permanent: Mix.env() == :prod,
       aliases: aliases(),
-      deps: deps(),
-      test_coverage: [tool: ExCoveralls],
-      preferred_cli_env: [
-        coveralls: :test,
-        "coveralls.detail": :test,
-        "coveralls.post": :test,
-        "coveralls.html": :test
-      ]
+      deps: deps()
     ]
   end
 
@@ -44,18 +37,16 @@ defmodule Slax.Mixfile do
       {:phoenix_pubsub, "~> 2.0"},
       {:phoenix_ecto, "~> 4.0"},
       {:ecto_sql, "~> 3.11.1"},
-      {:postgrex, ">= 0.0.0"},
-      {:gettext, "~> 0.18"},
+      {:postgrex, "~> 0.16"},
       {:plug_cowboy, "~> 2.5"},
-      {:plug, "~> 1.12.1"},
+      {:plug, "~> 1.13.3"},
       {:httpoison, "~> 1.5"},
       {:yaml_front_matter, "~> 1.0"},
       {:ex_doc, "~> 0.25", only: :dev, runtime: false},
-      {:excoveralls, "~> 0.8", only: :test},
-      {:mox, "~> 0.3", only: :test},
+      {:mox, "~> 1.1", only: :test},
       {:jason, "~> 1.1"},
       {:ex_machina, "~> 2.2", only: :test},
-      {:stream_data, "~> 0.4.3", only: :test},
+      {:stream_data, "~> 0.6.0", only: :test},
       {:quantum, "~> 3.0"},
       {:timex, "~> 3.7"},
       {:tentacat, "~> 1.6.0"},
