@@ -219,4 +219,24 @@ defmodule Slax.Slack do
         :ok
     end
   end
+
+  def get_channels(%{trigger_id: trigger_id}) do
+    response =
+      Http.get(
+        "#{api_url()}/conversations.list?exclude_archived=true&limit=999",
+        "Content-Type": "application/json",
+        Authorization: "Bearer #{api_token()}"
+      )
+
+    case response do
+      {:ok, %{body: %{"ok" => false, "error" => error}}} ->
+        Logger.error("Error for #{trigger_id}: #{error}")
+
+      {:error, error} ->
+        Logger.error("Error for #{trigger_id}: #{error}")
+
+      {_, %{body: %{"ok" => true} = body}} ->
+        body["channels"]
+    end
+  end
 end

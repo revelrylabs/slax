@@ -174,8 +174,7 @@ jobs:
             Given I am an Engineer
             - [ ] When I manually address dependency conflicts listed [here](https://github.com/revelrylabs/slax/security/dependabot)<!-- Link to project's dependabot alerts -->
             - [ ] Then I test by running locally
-            - [ ] And I merge to develop and test in staging
-            - [ ] And I merge to main and test in production
+            - [ ] And I merge to master and test in production
 
             ### QA / UAT Note
             Remember to add a comment when passing this forward with links to:
