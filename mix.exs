@@ -50,7 +50,7 @@ defmodule Slax.Mixfile do
       {:quantum, "~> 3.0"},
       {:timex, "~> 3.7"},
       {:tentacat, "~> 1.6.0"},
-      {:inflex, "~> 2.0.0"},
+      {:inflex, "~> 2.1.0"},
       {:credo, "~> 1.5.0", only: [:dev, :test], runtime: false},
       {:gun, "~> 2.0.1"},
       {:oban, "~> 2.13"},
