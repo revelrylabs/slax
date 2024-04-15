@@ -10,12 +10,14 @@ defmodule Slax.ProjectRepo do
     field(:repo_name, :string)
     field(:token, :string)
     field(:expiration_date, :date)
+    has_many(:default_channels, Slax.Channel, foreign_key: :default_project_repo_id)
 
     timestamps()
   end
 
   def changeset(params \\ %{}) do
     cast(%__MODULE__{}, params, [:org_name, :repo_name, :project_id])
+    |> cast_assoc(:default_channels)
   end
 
   def token_changeset(project_repo, token, expiration_date) do

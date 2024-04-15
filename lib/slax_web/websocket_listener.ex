@@ -7,6 +7,7 @@ defmodule SlaxWeb.WebsocketListener do
   alias SlaxWeb.Poker
   alias SlaxWeb.Token
   alias SlaxWeb.Disable
+  alias SlaxWeb.DefaultRepo
 
   defp config() do
     Application.get_env(:slax, Slax.Slack)
@@ -136,6 +137,10 @@ defmodule SlaxWeb.WebsocketListener do
     Token.handle_payload(payload)
   end
 
+  defp determine_payload(%{"callback_id" => "set_default_repo"} = payload) do
+    DefaultRepo.handle_payload(payload)
+  end
+
   defp determine_payload(%{"callback_id" => "slax_disable"} = payload) do
     Disable.handle_payload(payload)
   end
@@ -158,6 +163,10 @@ defmodule SlaxWeb.WebsocketListener do
 
   defp determine_payload(%{"view" => %{"callback_id" => "enable_view"}} = payload) do
     Disable.handle_payload(payload)
+  end
+
+  defp determine_payload(%{"view" => %{"callback_id" => "default_repo_view"}} = payload) do
+    DefaultRepo.handle_payload(payload)
   end
 
   defp determine_error_response(%{"view" => %{"callback_id" => "disable_view"}}, envelope_id) do
