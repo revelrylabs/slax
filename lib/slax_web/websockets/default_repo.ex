@@ -8,10 +8,10 @@ defmodule SlaxWeb.DefaultRepo do
   alias Slax.Slack
 
   def handle_payload(%{
-    "trigger_id" => trigger_id,
-    "type" => "shortcut",
-    "callback_id" => "set_default_repo"
-    }) do
+        "trigger_id" => trigger_id,
+        "type" => "shortcut",
+        "callback_id" => "set_default_repo"
+      }) do
     view = build_default_repo_view()
 
     Slack.open_modal(%{trigger_id: trigger_id, view: view})
@@ -28,12 +28,12 @@ defmodule SlaxWeb.DefaultRepo do
         }
       }) do
     with %{
-          "repo_select" => %{"selected_option" => %{"value" => selected_repo}},
+           "repo_select" => %{"selected_option" => %{"value" => selected_repo}},
            "channels_select_action" => %{"selected_channel" => channel_id}
          } <- parse_state_values(values) do
-
-      slack_channel = Slack.get_channels(%{trigger_id: trigger_id})
-      |> Enum.find(&(&1["id"] == channel_id))
+      slack_channel =
+        Slack.get_channels(%{trigger_id: trigger_id})
+        |> Enum.find(&(&1["id"] == channel_id))
 
       Channels.set_default_repo(slack_channel, %{default_project_repo_id: selected_repo})
     end
