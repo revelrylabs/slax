@@ -95,7 +95,7 @@ defmodule SlaxWeb.Issue do
               org_name = default_repo.org_name
               repo_name = default_repo.repo_name
               pr_number = String.slice(pr_number, 1..-1)
-              load_pr_from_github("#{org_name}/#{repo_name}##{pr_number}")
+              load_pr_from_github("#{org_name}/#{repo_name}$#{pr_number}")
           end
 
         _ ->
