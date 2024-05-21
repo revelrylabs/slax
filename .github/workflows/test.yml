@@ -42,6 +42,9 @@ jobs:
           mix local.rebar --force
           mix deps.get
 
+      - name: Security Check
+        run: mix sobelow --private --skip --exit
+
       - name: Run Tests
         env:
           MIX_ENV: test

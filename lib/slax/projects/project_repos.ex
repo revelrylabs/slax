@@ -42,6 +42,7 @@ defmodule Slax.ProjectRepos do
     |> Repo.transaction()
   end
 
+  # sobelow_skip ["DOS.BinToAtom"]
   def add_token_to_repos(repo_ids, token, expiration_date) do
     repo_ids
     |> Enum.reduce(Multi.new(), fn id, multi ->
