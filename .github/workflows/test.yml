@@ -6,6 +6,7 @@ on: push
 env:
   OTP_VERSION_SPEC: "24.1"
   ELIXIR_VERSION_SPEC: "1.12.3"
+  MIX_ENV: test
 
 jobs:
   run-tests:
@@ -46,8 +47,6 @@ jobs:
         run: mix sobelow --private --skip --exit
 
       - name: Run Tests
-        env:
-          MIX_ENV: test
         run: |
           mix format --check-formatted
           mix test
