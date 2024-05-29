@@ -48,7 +48,7 @@ defmodule Slax.ProjectRepos do
     |> Enum.reduce(Multi.new(), fn id, multi ->
       Multi.update(
         multi,
-        :"project_repo_#{id}",
+        {:project_repo, id},
         ProjectRepo.token_changeset(Repo.get(ProjectRepo, id), token, expiration_date)
       )
     end)
