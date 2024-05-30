@@ -38,7 +38,8 @@ defmodule Slax.Factory do
     %Channel{
       channel_id: "ABCDEFG",
       name: "test",
-      disabled: false
+      disabled: false,
+      default_project_repo: build(:project_repo)
     }
   end
 end
