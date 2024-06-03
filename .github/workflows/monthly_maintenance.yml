@@ -1,8 +1,9 @@
 name: Monthly Maintenence
-on: pull
+on:
+  schedule:
+    - cron: '0 0 1 * *'
 jobs:
   create_issue:
-    if: ${{ github.ref_name == 'gha-permissions' }}
     name: create_issue
     runs-on: ubuntu-latest
     steps:
