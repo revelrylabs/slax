@@ -6,8 +6,6 @@ jobs:
   create_issue:
     name: create_issue
     runs-on: ubuntu-latest
-    permissions:
-      issues: write
     steps:
       - name: Get current month and year
         id: date
