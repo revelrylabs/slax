@@ -8,6 +8,7 @@ jobs:
     runs-on: ubuntu-latest
     permissions:
       issues: write
+      pull-requests: read
     steps:
       - name: Get current month and year
         id: date
