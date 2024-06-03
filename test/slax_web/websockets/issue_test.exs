@@ -35,8 +35,6 @@ defmodule SlaxWeb.Issue.Test do
       "test #number",
       "test # number",
       "#number",
-      "#1",
-      "test #1",
       "/1",
       "test/1"
     ]

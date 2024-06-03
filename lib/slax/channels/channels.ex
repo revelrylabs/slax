@@ -35,4 +35,27 @@ defmodule Slax.Channels do
     |> where([c], c.disabled == false)
     |> Repo.all()
   end
+
+  def set_default_repo(%{"id" => channel_id, "name" => channel_name}, attrs) do
+    case get_by_channel_id(channel_id) do
+      nil -> %Channel{channel_id: channel_id, name: channel_name}
+      channel -> channel
+    end
+    |> Channel.changeset(attrs)
+    |> Repo.insert_or_update()
+  end
+
+  def maybe_get_default_repo(channel_id) do
+    channel = Repo.get_by(Channel, channel_id: channel_id)
+
+    case channel do
+      nil ->
+        nil
+
+      channel ->
+        channel
+        |> Ecto.assoc(:default_project_repo)
+        |> Repo.one()
+    end
+  end
 end

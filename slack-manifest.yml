@@ -9,6 +9,10 @@ features:
       type: global
       callback_id: access_token
       description: Register access token
+    - name: Set Default Repo
+      type: global
+      callback_id: set_default_repo
+      description: Set a default repository for a Slack Channel
     - name: Slax Disable
       type: global
       callback_id: slax_disable
