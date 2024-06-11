@@ -7,6 +7,7 @@ defmodule Slax.Github do
   alias Slax.Http.Error
   alias Slax.ProjectRepos
   alias Slax.Tentacat.Issues
+  alias Slax.Tentacat.Prs
 
   defp config() do
     Application.get_env(:slax, __MODULE__)
@@ -491,15 +492,15 @@ defmodule Slax.Github do
     end
   end
 
-  def parse_repo_org_pr(string) do
-    string
-    |> String.split(["/", "$"])
-    |> case do
-      [org, repo, pr] -> {org, repo, pr}
-      [repo, pr] -> {default_org(), repo, pr}
-      _ -> {:error, "Could not parse repo and PR, use `repo$PR` or `org/repo$PR`"}
-    end
-  end
+  # def parse_repo_org_pr(string) do
+  #   string
+  #   |> String.split(["/", "$"])
+  #   |> case do
+  #     [org, repo, pr] -> {org, repo, pr}
+  #     [repo, pr] -> {default_org(), repo, pr}
+  #     _ -> {:error, "Could not parse repo and PR, use `repo$PR` or `org/repo$PR`"}
+  #   end
+  # end
 
   def parse_repo_org(string) do
     case String.split(string, "/") do
@@ -514,12 +515,61 @@ defmodule Slax.Github do
   @doc """
   Loads specified issue returning informational errors
   """
-  def load_issue(repo_and_issue) do
+  # def load_issue(repo_and_issue) do
+  #   with {org, repo, issue} <- parse_repo_org_issue(repo_and_issue),
+  #        {token, warning_message} <- retrieve_token(repo),
+  #        client <- Tentacat.Client.new(%{access_token: token}),
+  #        {200, issue, _http_response} <- Issues.find(client, org, repo, issue) do
+  #     {:ok, issue, warning_message}
+  #   else
+  #     {:error, _message} = error ->
+  #       error
+
+  #     {_response_code, %{"message" => "Bad credentials"}, _http_response} ->
+  #       {:error, "Access token invalid for #{repo_and_issue}"}
+
+  #     {_response_code, %{"message" => error_message}, _http_response} ->
+  #       {:error, error_message}
+
+  #     nil ->
+  #       {:error, "No project repo set for #{repo_and_issue}"}
+
+  #     %{token: nil} ->
+  #       {:error, "No access token for #{repo_and_issue}"}
+  #   end
+  # end
+
+  # def load_pr(repo_and_pr) do
+  #   with {org, repo, pr} <- parse_repo_org_pr(repo_and_pr),
+  #        {token, warning_message} <- retrieve_token(repo),
+  #        client <- Tentacat.Client.new(%{access_token: token}),
+  #        {200, pr, _http_response} <- Prs.find(client, org, repo, pr) do
+  #     {:ok, pr, warning_message}
+  #   else
+  #     {:error, _message} = error ->
+  #       error
+
+  #     {_response_code, %{"message" => "Bad credentials"}, _http_response} ->
+  #       {:error, "Access token invalid for #{repo_and_pr}"}
+
+  #     {_response_code, %{"message" => error_message}, _http_response} ->
+  #       {:error, error_message}
+
+  #     nil ->
+  #       {:error, "No project repo set for #{repo_and_pr}"}
+
+  #     %{token: nil} ->
+  #       {:error, "No access token for #{repo_and_pr}"}
+  #   end
+  # end
+
+  def load_pr_or_issue(repo_and_issue) do
     with {org, repo, issue} <- parse_repo_org_issue(repo_and_issue),
          {token, warning_message} <- retrieve_token(repo),
          client <- Tentacat.Client.new(%{access_token: token}),
-         {200, issue, _http_response} <- Issues.find(client, org, repo, issue) do
-      {:ok, issue, warning_message}
+         {:ok, type, pr_or_issue} <- find_pr_or_issue(client, org, repo, issue) do
+        #  {200, issue, _http_response} <- Issues.find(client, org, repo, issue) do
+      {:ok, type, pr_or_issue, warning_message}
     else
       {:error, _message} = error ->
         error
@@ -535,30 +585,6 @@ defmodule Slax.Github do
 
       %{token: nil} ->
         {:error, "No access token for #{repo_and_issue}"}
-    end
-  end
-
-  def load_pr(repo_and_pr) do
-    with {org, repo, pr} <- parse_repo_org_pr(repo_and_pr),
-         {token, warning_message} <- retrieve_token(repo),
-         client <- Tentacat.Client.new(%{access_token: token}),
-         {200, pr, _http_response} <- Tentacat.Pulls.find(client, org, repo, pr) do
-      {:ok, pr, warning_message}
-    else
-      {:error, _message} = error ->
-        error
-
-      {_response_code, %{"message" => "Bad credentials"}, _http_response} ->
-        {:error, "Access token invalid for #{repo_and_pr}"}
-
-      {_response_code, %{"message" => error_message}, _http_response} ->
-        {:error, error_message}
-
-      nil ->
-        {:error, "No project repo set for #{repo_and_pr}"}
-
-      %{token: nil} ->
-        {:error, "No access token for #{repo_and_pr}"}
     end
   end
 

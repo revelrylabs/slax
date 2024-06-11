@@ -25,6 +25,7 @@ config :logger, :console,
 config :slax, http_adapter: HTTPoison
 config :slax, github_commands: Slax.Commands.GithubCommands
 config :slax, tentacat_issues: Tentacat.Issues
+config :slax, tentacat_prs: Tentacat.Pulls
 
 config :slax, :lintron,
   secret: System.get_env("LINTRON_SECRET"),
