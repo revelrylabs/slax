@@ -13,24 +13,20 @@ defmodule SlaxWeb.Issue do
 
   def handle_event(%{"thread_ts" => ts, "channel" => channel, "text" => text, "type" => "message"}) do
     issues_scan = scan_text_for_issue(text)
-    prs_scan = scan_text_for_pr(text)
 
-    reply =
-      load_issues_from_scan(issues_scan, channel) <> "\n" <> load_prs_from_scan(prs_scan, channel)
+    reply = load_prs_and_issues_from_scan(issues_scan, channel)
 
-    unless reply == "\n" do
+    unless reply == "" do
       Slack.post_message_to_thread(%{text: reply, channel: channel, thread_ts: ts})
     end
   end
 
   def handle_event(%{"channel" => channel, "text" => text, "type" => "message"}) do
     issues_scan = scan_text_for_issue(text)
-    prs_scan = scan_text_for_pr(text)
 
-    reply =
-      load_issues_from_scan(issues_scan, channel) <> "\n" <> load_prs_from_scan(prs_scan, channel)
+    reply = load_prs_and_issues_from_scan(issues_scan, channel)
 
-    unless reply == "\n" do
+    unless reply == "" do
       Slack.post_message_to_channel(reply, channel)
     end
   end
@@ -39,11 +35,7 @@ defmodule SlaxWeb.Issue do
     Regex.scan(~r{([\w-]+/)?([\w-]+)?(#[0-9]+)}, text)
   end
 
-  def scan_text_for_pr(text) do
-    Regex.scan(~r{([\w-]+/)?([\w-]+)?(\$[0-9]+)}, text)
-  end
-
-  defp load_issues_from_scan(repo_and_issues, channel) do
+  defp load_prs_and_issues_from_scan(repo_and_issues, channel) do
     repo_and_issues
     |> Enum.uniq()
     |> Enum.map(fn [repo_and_issue, _, repo_name, issue_number] ->
@@ -59,50 +51,27 @@ defmodule SlaxWeb.Issue do
               org_name = default_repo.org_name
               repo_name = default_repo.repo_name
               issue_number = String.slice(issue_number, 1..-1)
-              load_issue_from_github("#{org_name}/#{repo_name}##{issue_number}")
+              load_pr_or_issue_from_github("#{org_name}/#{repo_name}##{issue_number}")
           end
 
         _ ->
-          load_issue_from_github(repo_and_issue)
+          load_pr_or_issue_from_github(repo_and_issue)
       end
     end)
     |> Enum.join("\n")
   end
 
-  defp load_issue_from_github(repo_and_issue) do
+  defp load_pr_or_issue_from_github(repo_and_issue) do
     case Github.load_issue(repo_and_issue) do
+      {:ok, %{"pull_request" => _pr}, _warning_message} ->
+        load_pr_from_github(repo_and_issue)
+
       {:ok, issue, warning_message} ->
         "<#{issue["html_url"]}|#{repo_and_issue}>: #{issue["title"]} #{labels_for_issue(issue)} #{warning_message}"
 
       {:error, error} ->
         error
     end
-  end
-
-  defp load_prs_from_scan(repo_and_prs, channel) do
-    repo_and_prs
-    |> Enum.uniq()
-    |> Enum.map(fn [repo_and_pr, _, repo_name, pr_number] ->
-      case repo_name do
-        "" ->
-          default_repo = Channels.maybe_get_default_repo(channel)
-
-          case default_repo do
-            nil ->
-              "No default repo set for this channel"
-
-            _ ->
-              org_name = default_repo.org_name
-              repo_name = default_repo.repo_name
-              pr_number = String.slice(pr_number, 1..-1)
-              load_pr_from_github("#{org_name}/#{repo_name}$#{pr_number}")
-          end
-
-        _ ->
-          load_pr_from_github(repo_and_pr)
-      end
-    end)
-    |> Enum.join("\n")
   end
 
   defp load_pr_from_github(repo_and_pr) do
@@ -115,14 +84,14 @@ defmodule SlaxWeb.Issue do
     end
   end
 
-  defp labels_for_issue(issue) do
+  def labels_for_issue(issue) do
     column_label =
       cond do
         not is_nil(issue["closed_at"]) ->
           ["closed"]
 
-        Enum.empty?(issue["labels"]) ->
-          ["icebox"]
+        issue["draft"] == true ->
+          ["draft"]
 
         true ->
           []
@@ -134,6 +103,7 @@ defmodule SlaxWeb.Issue do
       |> Enum.concat(column_label)
       |> Enum.join(", ")
 
-    "(#{all_labels})"
+    IO.inspect(all_labels, label: "labels")
+    if all_labels == "", do: "", else: "(#{all_labels})"
   end
 end
