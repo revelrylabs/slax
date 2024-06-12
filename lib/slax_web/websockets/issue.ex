@@ -103,7 +103,6 @@ defmodule SlaxWeb.Issue do
       |> Enum.concat(column_label)
       |> Enum.join(", ")
 
-    IO.inspect(all_labels, label: "labels")
     if all_labels == "", do: "", else: "(#{all_labels})"
   end
 end
