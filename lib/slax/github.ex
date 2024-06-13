@@ -7,6 +7,7 @@ defmodule Slax.Github do
   alias Slax.Http.Error
   alias Slax.ProjectRepos
   alias Slax.Tentacat.Issues
+  alias Slax.Tentacat.Prs
 
   defp config() do
     Application.get_env(:slax, __MODULE__)
@@ -539,10 +540,10 @@ defmodule Slax.Github do
   end
 
   def load_pr(repo_and_pr) do
-    with {org, repo, pr} <- parse_repo_org_pr(repo_and_pr),
+    with {org, repo, pr} <- parse_repo_org_issue(repo_and_pr),
          {token, warning_message} <- retrieve_token(repo),
          client <- Tentacat.Client.new(%{access_token: token}),
-         {200, pr, _http_response} <- Tentacat.Pulls.find(client, org, repo, pr) do
+         {200, pr, _http_response} <- Prs.find(client, org, repo, pr) do
       {:ok, pr, warning_message}
     else
       {:error, _message} = error ->
