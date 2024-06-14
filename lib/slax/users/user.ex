@@ -1,4 +1,5 @@
 defmodule Slax.User do
+  @moduledoc false
   use SlaxWeb, :model
 
   schema "users" do

@@ -1,13 +1,17 @@
 defmodule Slax.Channels do
+  @moduledoc false
   use Slax.Context
 
   alias Slax.Channel
 
   def create_or_update_channel(channel_id, %{name: name} = attrs) do
-    case Repo.get_by(Channel, %{channel_id: channel_id, name: name}) do
-      nil -> %Channel{channel_id: channel_id, name: name}
-      channel -> channel
-    end
+    channel =
+      case Repo.get_by(Channel, %{channel_id: channel_id, name: name}) do
+        nil -> %Channel{channel_id: channel_id, name: name}
+        channel -> channel
+      end
+
+    channel
     |> Channel.changeset(attrs)
     |> Repo.insert_or_update()
   end
@@ -37,10 +41,13 @@ defmodule Slax.Channels do
   end
 
   def set_default_repo(%{"id" => channel_id, "name" => channel_name}, attrs) do
-    case get_by_channel_id(channel_id) do
-      nil -> %Channel{channel_id: channel_id, name: channel_name}
-      channel -> channel
-    end
+    channel =
+      case get_by_channel_id(channel_id) do
+        nil -> %Channel{channel_id: channel_id, name: channel_name}
+        channel -> channel
+      end
+
+    channel
     |> Channel.changeset(attrs)
     |> Repo.insert_or_update()
   end

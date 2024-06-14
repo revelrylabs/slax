@@ -1,4 +1,5 @@
 defmodule Slax.Poker do
+  @moduledoc false
   use Slax.Context
   alias Slax.{Github, Poker.Round, ProjectRepos}
 
@@ -39,11 +40,14 @@ defmodule Slax.Poker do
   Closes all open rounds for a channel
   """
   def end_current_round_for_channel(channel_name) do
-    from(
-      round in Round,
-      where: round.closed == false,
-      where: round.channel == ^channel_name
-    )
+    round =
+      from(
+        round in Round,
+        where: round.closed == false,
+        where: round.channel == ^channel_name
+      )
+
+    round
     |> Repo.update_all(set: [closed: true])
     |> case do
       {number_updated, _} -> {:ok, number_updated}
@@ -52,11 +56,14 @@ defmodule Slax.Poker do
   end
 
   def get_current_round_for_channel(channel_name) do
-    from(
-      round in Round,
-      where: round.closed == false,
-      where: round.channel == ^channel_name
-    )
+    round =
+      from(
+        round in Round,
+        where: round.closed == false,
+        where: round.channel == ^channel_name
+      )
+
+    round
     |> preload([:estimates])
     |> Repo.one()
   end
@@ -91,7 +98,9 @@ defmodule Slax.Poker do
         _label -> false
       end)
 
-    if not is_nil(label) do
+    if is_nil(label) do
+      :ok
+    else
       case Tentacat.Issues.Labels.remove(client, org, repo, issue, URI.encode(label["name"])) do
         {200, _issue, _http_response} ->
           :ok
@@ -99,8 +108,6 @@ defmodule Slax.Poker do
         {response_code, message, http_response} ->
           {response_code, message, http_response}
       end
-    else
-      :ok
     end
   end
 end

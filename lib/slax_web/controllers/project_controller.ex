@@ -46,7 +46,9 @@ defmodule SlaxWeb.ProjectController do
 
   def handle_new_project_request(github_access_token, repo, response_url) do
     formatted_response =
-      NewProject.new_project(String.trim(repo), github_access_token)
+      repo
+      |> String.trim()
+      |> NewProject.new_project(github_access_token)
       |> GithubCommands.format_results()
 
     Slack.send_message(response_url, %{
@@ -57,7 +59,9 @@ defmodule SlaxWeb.ProjectController do
 
   def handle_reuseable_stories_request(github_access_token, repo, response_url) do
     formatted_response =
-      ReuseableStories.reuseable_stories(String.trim(repo), github_access_token)
+      repo
+      |> String.trim()
+      |> ReuseableStories.reuseable_stories(github_access_token)
       |> GithubCommands.format_results()
 
     Slack.send_message(response_url, %{

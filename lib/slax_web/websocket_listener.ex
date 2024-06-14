@@ -1,4 +1,5 @@
 defmodule SlaxWeb.WebsocketListener do
+  @moduledoc false
   use GenServer
   require Logger
 
@@ -28,7 +29,7 @@ defmodule SlaxWeb.WebsocketListener do
 
     {:ok, pid} =
       :gun.open(:binary.bin_to_list("wss-primary.slack.com"), 443, %{
-        connect_timeout: 60000,
+        connect_timeout: 60_000,
         retry: 10,
         retry_timeout: 300,
         transport: :tls,
@@ -54,9 +55,10 @@ defmodule SlaxWeb.WebsocketListener do
   end
 
   def handle_info({_, pid, stream_ref, {:text, event}}, socket) do
-    with {:ok, decoded_event} <- Jason.decode(event) do
-      handle_message(pid, stream_ref, decoded_event)
-    else
+    case Jason.decode(event) do
+      {:ok, decoded_event} ->
+        handle_message(pid, stream_ref, decoded_event)
+
       _ ->
         nil
     end
@@ -83,11 +85,9 @@ defmodule SlaxWeb.WebsocketListener do
     if is_nil(channel) or !channel.disabled do
       Issue.handle_event(event)
 
-      with {:ok, response} <- Jason.encode(%{envelope_id: envelope_id}) do
-        :gun.ws_send(pid, stream_ref, {:text, response})
-      else
-        _ ->
-          nil
+      case Jason.encode(%{envelope_id: envelope_id}) do
+        {:ok, response} -> :gun.ws_send(pid, stream_ref, {:text, response})
+        _ -> nil
       end
     end
   end
@@ -97,12 +97,9 @@ defmodule SlaxWeb.WebsocketListener do
          "envelope_id" => envelope_id,
          "payload" => payload
        }) do
-    with {:ok, response} <-
-           Jason.encode(%{envelope_id: envelope_id, payload: Poker.start(payload)}) do
-      :gun.ws_send(pid, stream_ref, {:text, response})
-    else
-      _ ->
-        nil
+    case Jason.encode(%{envelope_id: envelope_id, payload: Poker.start(payload)}) do
+      {:ok, response} -> :gun.ws_send(pid, stream_ref, {:text, response})
+      _ -> nil
     end
   end
 

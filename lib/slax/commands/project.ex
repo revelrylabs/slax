@@ -65,7 +65,8 @@ defmodule Slax.Commands.NewProject do
            org_name: org_name
          }) do
       {:ok, repo_url} ->
-        Map.put(results, :github_repo, repo_url)
+        results
+        |> Map.put(:github_repo, repo_url)
         |> Map.update(:success, %{}, fn x ->
           Map.put(x, :github_repo, "Github Repo Found or Created: <#{repo_url}>")
         end)
@@ -86,7 +87,8 @@ defmodule Slax.Commands.NewProject do
         channel_id = channel["id"]
         formatted_channel_name = "<##{channel_id}|#{channel_name}>"
 
-        Map.put(results, :slack_channel, channel_name)
+        results
+        |> Map.put(:slack_channel, channel_name)
         |> Map.update(:success, %{}, fn x ->
           Map.put(x, :slack_channel, "Channel Created: #{formatted_channel_name}")
         end)
@@ -113,8 +115,7 @@ defmodule Slax.Commands.NewProject do
     results =
       if length(errors) > 0 do
         errors =
-          Enum.map(errors, fn {:error, team, message} -> "#{team}: #{message}" end)
-          |> Enum.join("\n")
+          Enum.map_join(errors, "\n", fn {:error, team, message} -> "#{team}: #{message}" end)
 
         Map.update(results, :errors, %{}, fn x -> Map.put(x, :github_org_teams, errors) end)
       else
@@ -123,7 +124,8 @@ defmodule Slax.Commands.NewProject do
 
     results =
       if length(team_ids) > 0 do
-        Map.put(results, :github_org_teams, true)
+        results
+        |> Map.put(:github_org_teams, true)
         |> Map.update(:success, %{}, fn x ->
           Map.put(x, :github_org_teams, "Github Teams Added")
         end)
@@ -164,7 +166,8 @@ defmodule Slax.Commands.NewProject do
        ) do
     case Github.create_webhook(params) do
       {:ok, _} ->
-        Map.put(results, webhook_key, true)
+        results
+        |> Map.put(webhook_key, true)
         |> Map.update(:success, %{}, fn x -> Map.put(x, webhook_key, success_message) end)
 
       {:error, message} ->

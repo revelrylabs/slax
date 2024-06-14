@@ -29,15 +29,17 @@ defmodule Slax.Commands.Latency do
     status_labels = ["in progress", "in review", "qa", "uat", "up next"]
 
     issue_events
-    |> Enum.filter(&Enum.member?(["labeled", "unlabeled"], &1["action"]))
-    |> Enum.filter(fn event ->
-      label_name =
-        event["label"]["name"]
-        |> String.downcase()
-        |> String.trim()
+    |> Enum.filter(
+      &(Enum.member?(["labeled", "unlabeled"], &1["action"]) &&
+          fn event ->
+            label_name =
+              event["label"]["name"]
+              |> String.downcase()
+              |> String.trim()
 
-      Enum.member?(status_labels, label_name)
-    end)
+            Enum.member?(status_labels, label_name)
+          end)
+    )
   end
 
   defp add_events_to_issues(issues, issues_events) do
@@ -62,8 +64,7 @@ defmodule Slax.Commands.Latency do
     formatted_list =
       results
       |> Enum.filter(&issue_is_latent/1)
-      |> Enum.map(&format_issue(&1))
-      |> Enum.join("")
+      |> Enum.map_join("", &format_issue(&1))
 
     date = DateTime.utc_now()
 
@@ -129,23 +130,27 @@ defmodule Slax.Commands.Latency do
           |> Map.get("created_at")
       end
 
-    update_status_from_new_event = fn event, status ->
-      case event["action"] do
-        "labeled" ->
-          [event["label"]["name"], event["created_at"]]
-
-        "unlabeled" ->
-          [old_status, _] = status
-
-          if old_status == event["label"]["name"] do
-            [nil, event["created_at"]]
-          else
-            status
-          end
-      end
+    status = fn event, status ->
+      maybe_update_status_from_new_event(event, status)
     end
 
     events
-    |> Enum.reduce([nil, first_timestamp], update_status_from_new_event)
+    |> Enum.reduce([nil, first_timestamp], status)
+  end
+
+  defp maybe_update_status_from_new_event(event, status) do
+    case event["action"] do
+      "labeled" ->
+        [event["label"]["name"], event["created_at"]]
+
+      "unlabeled" ->
+        [old_status, _] = status
+
+        if old_status == event["label"]["name"] do
+          [nil, event["created_at"]]
+        else
+          status
+        end
+    end
   end
 end

@@ -1,4 +1,5 @@
 defmodule Slax.ProjectRepos do
+  @moduledoc false
   use Slax.Context
 
   alias Slax.{ProjectRepo, ProjectChannel, Projects}
