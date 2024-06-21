@@ -1,5 +1,5 @@
 defmodule Slax.Helpers.Text do
-  @doc """
+  @moduledoc """
   Takes in a list and joins the elements by comma and the word and
 
   ## Examples

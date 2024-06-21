@@ -158,17 +158,7 @@ defmodule Slax.Github do
         end)
 
       {:error, %{status_code: 301, body: _body, headers: headers}} ->
-        location =
-          headers
-          |> Enum.find_value(fn {header, value} ->
-            case header do
-              "Location" ->
-                value
-
-              _ ->
-                false
-            end
-          end)
+        location = find_header_value(headers)
 
         fetch_issues_from_url(location, params)
 
@@ -561,6 +551,19 @@ defmodule Slax.Github do
       %{token: nil} ->
         {:error, "No access token for #{repo_and_pr}"}
     end
+  end
+
+  defp find_header_value(headers) do
+    headers
+    |> Enum.find_value(fn {header, value} ->
+      case header do
+        "Location" ->
+          value
+
+        _ ->
+          false
+      end
+    end)
   end
 
   defp retrieve_token(repo) do

@@ -32,7 +32,8 @@ defmodule SlaxWeb.DefaultRepo do
            "channels_select_action" => %{"selected_channel" => channel_id}
          } <- parse_state_values(values) do
       slack_channel =
-        Slack.get_channels(%{trigger_id: trigger_id})
+        %{trigger_id: trigger_id}
+        |> Slack.get_channels()
         |> Enum.find(&(&1["id"] == channel_id))
 
       Channels.set_default_repo(slack_channel, %{default_project_repo_id: selected_repo})

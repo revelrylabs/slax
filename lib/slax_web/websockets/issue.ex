@@ -1,4 +1,5 @@
 defmodule SlaxWeb.Issue do
+  @moduledoc false
   require Logger
   alias Slax.Channels
   alias Slax.{Github, Slack}
@@ -38,27 +39,30 @@ defmodule SlaxWeb.Issue do
   defp load_prs_and_issues_from_scan(repo_and_issues, channel) do
     repo_and_issues
     |> Enum.uniq()
-    |> Enum.map(fn [repo_and_issue, _, repo_name, issue_number] ->
+    |> Enum.map_join("\n", fn [repo_and_issue, _, repo_name, issue_number] ->
       case repo_name do
         "" ->
           default_repo = Channels.maybe_get_default_repo(channel)
 
-          case default_repo do
-            nil ->
-              "No default repo set for this channel"
-
-            _ ->
-              org_name = default_repo.org_name
-              repo_name = default_repo.repo_name
-              issue_number = String.slice(issue_number, 1..-1)
-              load_pr_or_issue_from_github("#{org_name}/#{repo_name}##{issue_number}")
-          end
+          maybe_load_from_default_repo(default_repo, issue_number)
 
         _ ->
           load_pr_or_issue_from_github(repo_and_issue)
       end
     end)
-    |> Enum.join("\n")
+  end
+
+  defp maybe_load_from_default_repo(default_repo, issue_number) do
+    case default_repo do
+      nil ->
+        "No default repo set for this channel"
+
+      _ ->
+        org_name = default_repo.org_name
+        repo_name = default_repo.repo_name
+        issue_number = String.slice(issue_number, 1..-1)
+        load_pr_or_issue_from_github("#{org_name}/#{repo_name}##{issue_number}")
+    end
   end
 
   defp load_pr_or_issue_from_github(repo_and_issue) do

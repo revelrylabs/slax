@@ -26,19 +26,15 @@ defmodule SlaxWeb.SprintController do
 
             {_year, week} = :calendar.iso_week_number()
 
-            Sprints.create_sprint_commitment(%{
-              repo: repo,
-              issue_numbers: issue_numbers,
-              week: week,
-              user: conn.assigns.current_user
-            })
-            |> case do
-              {:error, messages, _} ->
-                text(conn, Enum.join(messages, "\n"))
-
-              {:ok, _, _} ->
-                text(conn, "Sprint commitment set for week #{week}.")
-            end
+            maybe_handle_sprint_commitment_errors(
+              %{
+                repo: repo,
+                issue_numbers: issue_numbers,
+                week: week,
+                user: conn.assigns.current_user
+              },
+              conn
+            )
         end
     end
   end
@@ -48,5 +44,15 @@ defmodule SlaxWeb.SprintController do
     *Sprint commands:*
     /sprint commitment <issue numbers separated by spaces> - Create a new sprint commitment
     """)
+  end
+
+  defp maybe_handle_sprint_commitment_errors(params, conn) do
+    case Sprints.create_sprint_commitment(params) do
+      {:error, messages, _} ->
+        text(conn, Enum.join(messages, "\n"))
+
+      {:ok, _, _} ->
+        text(conn, "Sprint commitment set for week #{params[:week]}.")
+    end
   end
 end

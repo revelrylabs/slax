@@ -1,4 +1,5 @@
 defmodule Slax.Tentacat.Issues do
+  @moduledoc false
   def find(client, org, repo, issue) do
     tentacat().find(client, org, repo, issue)
   end

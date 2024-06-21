@@ -1,4 +1,5 @@
 defmodule Slax.Factory do
+  @moduledoc false
   alias Slax.{User, ProjectRepo, Project, ProjectChannel, Repo, Channel}
   use ExMachina.Ecto, repo: Repo
 

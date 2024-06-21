@@ -1,4 +1,5 @@
 defmodule SlaxWeb.Poker do
+  @moduledoc false
   alias Slax.{Github, Poker, Slack}
   alias Slax.Poker.Estimates
   alias Slax.Helpers.Text

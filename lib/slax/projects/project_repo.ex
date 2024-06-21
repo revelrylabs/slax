@@ -16,7 +16,8 @@ defmodule Slax.ProjectRepo do
   end
 
   def changeset(params \\ %{}) do
-    cast(%__MODULE__{}, params, [:org_name, :repo_name, :project_id])
+    %__MODULE__{}
+    |> cast(params, [:org_name, :repo_name, :project_id])
     |> cast_assoc(:default_channels)
   end
 

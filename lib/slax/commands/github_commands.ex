@@ -24,7 +24,8 @@ defmodule Slax.Commands.GithubCommands do
   def parse_project_name(results, text) do
     case Regex.run(~r/^[a-zA-Z0-9\-_]{3,21}$/, text) do
       [project_name] ->
-        Map.put(results, :project_name, project_name)
+        results
+        |> Map.put(:project_name, project_name)
         |> Map.update(:success, %{}, fn x -> Map.put(x, :project_name, "Project Name Parsed") end)
 
       _ ->
@@ -36,7 +37,7 @@ defmodule Slax.Commands.GithubCommands do
 
   @doc """
   Pulls all issue templates from a story repo that are included in `story_paths`.
-  It  then uses these templates to create issues in a newly created github repository,
+  It then uses these templates to create issues in a newly created github repository,
   If there is no github repository the function will exit early. The sleep avoids github rate limit abuse err.
   """
   def create_reusable_stories(
@@ -60,26 +61,9 @@ defmodule Slax.Commands.GithubCommands do
 
         errors = tree_errors ++ parse_errors ++ github_errors
 
-        results =
-          if length(errors) > 0 do
-            errors =
-              Enum.map(errors, fn {:error, path, message} -> "#{path}: #{message}" end)
-              |> Enum.join("\n")
+        results = update_results_with_errors(errors, results)
 
-            Map.update(results, :errors, %{}, fn x -> Map.put(x, :reusable_stories, errors) end)
-          else
-            results
-          end
-
-        results =
-          if length(issue_ids) > 0 do
-            Map.put(results, :reusable_stories, true)
-            |> Map.update(:success, %{}, fn x ->
-              Map.put(x, :reusable_stories, "Reuseable Stories Created")
-            end)
-          else
-            results
-          end
+        results = update_results_with_issues(issue_ids, results)
 
         results
 
@@ -90,10 +74,36 @@ defmodule Slax.Commands.GithubCommands do
 
   def create_reusable_stories(results, _, _, _, _), do: results
 
+  defp update_results_with_errors(errors, results) do
+    if length(errors) > 0 do
+      errors =
+        Enum.map_join(errors, "\n", fn {:error, path, message} -> "#{path}: #{message}" end)
+
+      Map.update(results, :errors, %{}, fn x -> Map.put(x, :reusable_stories, errors) end)
+    else
+      results
+    end
+  end
+
+  defp update_results_with_issues(issue_ids, results) do
+    if length(issue_ids) > 0 do
+      results
+      |> Map.put(:reusable_stories, true)
+      |> Map.update(:success, %{}, fn x ->
+        Map.put(x, :reusable_stories, "Reuseable Stories Created")
+      end)
+    else
+      results
+    end
+  end
+
   defp process_tree(data, story_repo, story_paths, github_access_token) do
-    Map.get(data, "tree", [])
-    |> Enum.filter(fn x -> x["type"] == "blob" && String.ends_with?(x["path"], ".md") end)
-    |> Enum.filter(fn x -> String.starts_with?(x["path"], Keyword.values(story_paths)) end)
+    data
+    |> Map.get("tree", [])
+    |> Enum.filter(fn x ->
+      x["type"] == "blob" && String.ends_with?(x["path"], ".md") &&
+        String.starts_with?(x["path"], Keyword.values(story_paths))
+    end)
     |> Enum.map(fn x ->
       case Github.fetch_blob(%{
              access_token: github_access_token,
@@ -164,8 +174,7 @@ defmodule Slax.Commands.GithubCommands do
   @spec format_results(map) :: binary
   def format_results(results) do
     @steps
-    |> Enum.map(&format_result(results, &1))
-    |> Enum.join("\n")
+    |> Enum.map_join("\n", &format_result(results, &1))
   end
 
   defp format_result(results, key) do

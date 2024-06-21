@@ -18,8 +18,7 @@ defmodule Slax.EventSink do
   def fetch_issues_events(params, issues) when is_list(issues) do
     issue_ids =
       issues
-      |> Enum.map(& &1["number"])
-      |> Enum.join(",")
+      |> Enum.map_join(",", & &1["number"])
 
     signature =
       :crypto.hash(
