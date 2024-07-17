@@ -128,7 +128,7 @@ defmodule SlaxWeb.Poker do
     end
   end
 
-  def start(_, _) do
+  def start(_unknown_entry) do
     %{text: "Unknown command, try again"}
   end
 end
