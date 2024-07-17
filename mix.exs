@@ -7,7 +7,7 @@ defmodule Slax.Mixfile do
       version: "0.0.1",
       elixir: "~> 1.6",
       elixirc_paths: elixirc_paths(Mix.env()),
-      compilers: [:phoenix] ++ Mix.compilers(),
+      compilers: Mix.compilers(),
       build_embedded: Mix.env() == :prod,
       start_permanent: Mix.env() == :prod,
       aliases: aliases(),
@@ -56,7 +56,8 @@ defmodule Slax.Mixfile do
       {:gun, "~> 2.0.1"},
       {:oban, "~> 2.13"},
       {:certifi, "~> 2.8.0"},
-      {:castore, "~> 1.0"}
+      {:castore, "~> 1.0"},
+      {:phoenix_view, "~> 2.0"}
     ]
   end
 
