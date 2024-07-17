@@ -7,6 +7,7 @@ defmodule Slax.Github do
   alias Slax.Http.Error
   alias Slax.ProjectRepos
   alias Slax.Tentacat.Issues
+  alias Slax.Tentacat.Prs
 
   defp config() do
     Application.get_env(:slax, __MODULE__)
@@ -157,17 +158,7 @@ defmodule Slax.Github do
         end)
 
       {:error, %{status_code: 301, body: _body, headers: headers}} ->
-        location =
-          headers
-          |> Enum.find_value(fn {header, value} ->
-            case header do
-              "Location" ->
-                value
-
-              _ ->
-                false
-            end
-          end)
+        location = find_header_value(headers)
 
         fetch_issues_from_url(location, params)
 
@@ -539,10 +530,10 @@ defmodule Slax.Github do
   end
 
   def load_pr(repo_and_pr) do
-    with {org, repo, pr} <- parse_repo_org_pr(repo_and_pr),
+    with {org, repo, pr} <- parse_repo_org_issue(repo_and_pr),
          {token, warning_message} <- retrieve_token(repo),
          client <- Tentacat.Client.new(%{access_token: token}),
-         {200, pr, _http_response} <- Tentacat.Pulls.find(client, org, repo, pr) do
+         {200, pr, _http_response} <- Prs.find(client, org, repo, pr) do
       {:ok, pr, warning_message}
     else
       {:error, _message} = error ->
@@ -560,6 +551,19 @@ defmodule Slax.Github do
       %{token: nil} ->
         {:error, "No access token for #{repo_and_pr}"}
     end
+  end
+
+  defp find_header_value(headers) do
+    headers
+    |> Enum.find_value(fn {header, value} ->
+      case header do
+        "Location" ->
+          value
+
+        _ ->
+          false
+      end
+    end)
   end
 
   defp retrieve_token(repo) do

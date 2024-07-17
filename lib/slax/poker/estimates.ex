@@ -1,4 +1,5 @@
 defmodule Slax.Poker.Estimates do
+  @moduledoc false
   use Slax.Context
   alias Slax.Poker.Estimate
 
@@ -14,10 +15,13 @@ defmodule Slax.Poker.Estimates do
   end
 
   def create_or_update_estimate(round_id, %{user: user} = attrs) do
-    case Repo.get_by(Estimate, %{round_id: round_id, user: user}) do
-      nil -> %Estimate{round_id: round_id}
-      estimate -> estimate
-    end
+    estimate =
+      case Repo.get_by(Estimate, %{round_id: round_id, user: user}) do
+        nil -> %Estimate{round_id: round_id}
+        estimate -> estimate
+      end
+
+    estimate
     |> Estimate.changeset(attrs)
     |> Repo.insert_or_update()
   end

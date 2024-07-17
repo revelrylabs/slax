@@ -29,4 +29,11 @@ defmodule Slax.ProjectRepos.Test do
       assert length(repos) == 2
     end
   end
+
+  describe "get all repos by token" do
+    test "get_all_with_token/0" do
+      repos_with_token = ProjectRepos.get_all_with_token()
+      assert length(repos_with_token) == 1
+    end
+  end
 end

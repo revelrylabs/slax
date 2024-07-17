@@ -1,4 +1,5 @@
 defmodule SlaxWeb.Poker do
+  @moduledoc false
   alias Slax.{Github, Poker, Slack}
   alias Slax.Poker.Estimates
   alias Slax.Helpers.Text
@@ -127,7 +128,7 @@ defmodule SlaxWeb.Poker do
     end
   end
 
-  def start(_, _) do
+  def start(_unknown_entry) do
     %{text: "Unknown command, try again"}
   end
 end

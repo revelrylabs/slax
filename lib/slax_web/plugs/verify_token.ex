@@ -1,4 +1,5 @@
 defmodule Slax.Plugs.VerifySlackToken do
+  @moduledoc false
   import Phoenix.Controller, only: [text: 2]
   import Plug.Conn, only: [halt: 1, get_req_header: 2]
 
@@ -29,14 +30,14 @@ defmodule Slax.Plugs.VerifySlackToken do
           conn
 
         false ->
-          text(conn, "Invalid slack signing secret.") |> halt
+          conn |> text("Invalid slack signing secret.") |> halt
       end
     else
       _token when token == :auth ->
         conn
 
       _ ->
-        text(conn, "Invalid params.") |> halt
+        conn |> text("Invalid params.") |> halt
     end
   end
 

@@ -1,4 +1,5 @@
 defmodule Slax.Commands.GithubCommands.Behaviour do
+  @moduledoc false
   @typep results :: map()
   @typep github_access_token :: String.t()
   @typep org_name :: String.t()

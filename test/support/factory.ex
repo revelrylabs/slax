@@ -1,4 +1,5 @@
 defmodule Slax.Factory do
+  @moduledoc false
   alias Slax.{User, ProjectRepo, Project, ProjectChannel, Repo, Channel}
   use ExMachina.Ecto, repo: Repo
 
@@ -38,7 +39,8 @@ defmodule Slax.Factory do
     %Channel{
       channel_id: "ABCDEFG",
       name: "test",
-      disabled: false
+      disabled: false,
+      default_project_repo: build(:project_repo)
     }
   end
 end

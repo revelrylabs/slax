@@ -1,4 +1,5 @@
 defmodule Slax.Http.Behaviour do
+  @moduledoc false
   @typep url :: binary()
   @typep body :: {:form, [{atom(), any()}]}
   @typep headers :: [{atom, binary}] | [{binary, binary}] | %{binary => binary}

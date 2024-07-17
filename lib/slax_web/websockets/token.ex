@@ -65,21 +65,21 @@ defmodule SlaxWeb.Token do
           }
         }
       }) do
-    with %{
-           "project_name_input" => %{"value" => nil},
-           "repo_name_input" => repo_name_input,
-           "project_select" => project_select
-         } <-
-           parse_state_values(values) do
-      # don't create project, create repo and attach it to project
-      {org_name, repo_name} = Github.parse_repo_org(repo_name_input["value"])
+    case parse_state_values(values) do
+      %{
+        "project_name_input" => %{"value" => nil},
+        "repo_name_input" => repo_name_input,
+        "project_select" => project_select
+      } ->
+        # don't create project, create repo and attach it to project
+        {org_name, repo_name} = Github.parse_repo_org(repo_name_input["value"])
 
-      ProjectRepos.create(%{
-        org_name: org_name,
-        repo_name: repo_name,
-        project_id: String.to_integer(project_select["selected_option"]["value"])
-      })
-    else
+        ProjectRepos.create(%{
+          org_name: org_name,
+          repo_name: repo_name,
+          project_id: String.to_integer(project_select["selected_option"]["value"])
+        })
+
       %{
         "project_name_input" => %{"value" => project_name},
         "repo_name_input" => repo_name_input,

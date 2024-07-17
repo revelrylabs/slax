@@ -1,4 +1,5 @@
 defmodule Slax.Http do
+  @moduledoc false
   def post(url, body, headers \\ [], options \\ []) do
     url
     |> http_adapter().post(body, headers, options)
@@ -66,9 +67,8 @@ defmodule Slax.Http do
     do: {:error, reason}
 
   defp parse_body(body) do
-    with {:ok, body} <- Jason.decode(body) do
-      body
-    else
+    case Jason.decode(body) do
+      {:ok, decoded_body} -> decoded_body
       _ -> body
     end
   end

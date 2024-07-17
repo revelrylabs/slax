@@ -85,11 +85,10 @@ defmodule Slax.Sprints do
   Note: This downloads all milestones for a repo and can be slow
   """
   def find_milestone_by_title(repo, title, user) do
-    Github.fetch_milestones(%{
-      repo: repo,
-      access_token: user.github_access_token
-    })
-    |> case do
+    case Github.fetch_milestones(%{
+           repo: repo,
+           access_token: user.github_access_token
+         }) do
       {:ok, milestones} ->
         Enum.find(milestones, &(Map.get(&1, "title") == title))
 

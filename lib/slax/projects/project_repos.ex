@@ -1,8 +1,10 @@
 defmodule Slax.ProjectRepos do
+  @moduledoc false
   use Slax.Context
 
   alias Slax.{ProjectRepo, ProjectChannel, Projects}
   alias Ecto.Multi
+  alias Ecto.Query
 
   def get_blockerbot_repos() do
     ProjectRepo
@@ -47,7 +49,7 @@ defmodule Slax.ProjectRepos do
     |> Enum.reduce(Multi.new(), fn id, multi ->
       Multi.update(
         multi,
-        :"project_repo_#{id}",
+        {:project_repo, id},
         ProjectRepo.token_changeset(Repo.get(ProjectRepo, id), token, expiration_date)
       )
     end)
@@ -62,6 +64,12 @@ defmodule Slax.ProjectRepos do
 
   def get_all() do
     Repo.all(ProjectRepo)
+  end
+
+  def get_all_with_token() do
+    ProjectRepo
+    |> Query.where([pr], not is_nil(pr.token))
+    |> Repo.all()
   end
 
   def get_by_repo(repo_name) do
