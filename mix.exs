@@ -39,7 +39,7 @@ defmodule Slax.Mixfile do
       {:ecto_sql, "~> 3.11.1"},
       {:postgrex, "~> 0.16"},
       {:plug_cowboy, "~> 2.5"},
-      {:plug, "~> 1.15.3"},
+      {:plug, "~> 1.16.1"},
       {:httpoison, "~> 1.5"},
       {:yaml_front_matter, "~> 1.0"},
       {:ex_doc, "~> 0.25", only: :dev, runtime: false},
