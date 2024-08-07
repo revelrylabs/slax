@@ -68,13 +68,18 @@ defmodule SlaxWeb.DefaultRepo do
           type: "input",
           block_id: "channel",
           element: %{
-            type: "channels_select",
+            type: "multi_conversations_select",
             placeholder: %{
               type: "plain_text",
               text: "Select channel",
               emoji: true
             },
-            action_id: "channels_select_action"
+            action_id: "channels_select_action",
+            filter: %{
+              include: ["public", "private"],
+              exclude_external_shared_channels: true,
+              exclude_bot_users: true
+            }
           },
           label: %{
             type: "plain_text",
