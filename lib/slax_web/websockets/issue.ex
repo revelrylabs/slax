@@ -55,7 +55,7 @@ defmodule SlaxWeb.Issue do
   defp maybe_load_from_default_repo(default_repo, issue_number) do
     case default_repo do
       nil ->
-        "No default repo set for this channel"
+        "Use the format 'org/repo##{issue_number}' or set a default repo for this channel with '/slax'."
 
       _ ->
         org_name = default_repo.org_name
