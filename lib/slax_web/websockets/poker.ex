@@ -89,7 +89,7 @@ defmodule SlaxWeb.Poker do
         estimates =
           round.estimates
           |> Enum.sort_by(& &1.value)
-          |> Enum.map(&"#{&1.user} (#{&1.value})#{if &1.reason, do: ': #{&1.reason}'}")
+          |> Enum.map(&"#{&1.user} (#{&1.value})#{if &1.reason, do: ~c": #{&1.reason}"}")
 
         message = "Estimates for round:\n---\n#{Enum.join(estimates, "\n")}"
 
