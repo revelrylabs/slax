@@ -35,6 +35,8 @@ oauth_config:
       - chat:write.public
       - commands
       - channels:read
+      - groups:read # for private channels
+      - groups:history # for private channels
 settings:
   event_subscriptions:
     user_events:
