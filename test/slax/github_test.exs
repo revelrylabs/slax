@@ -545,9 +545,27 @@ defmodule Slax.Github.Test do
 
   def load_issue_setup(context) do
     project = insert(:project)
-    insert(:project_repo, project: project, token: "success", repo_name: "success", org_name: "owner")
-    insert(:project_repo, project: project, token: "failure", repo_name: "failure", org_name: "owner")
-    insert(:project_repo, project: project, token: nil, repo_name: "nil", org_name: "owner")
+
+    insert(:project_repo,
+      project: project,
+      token: "success",
+      repo_name: "success",
+      org_name: "owner"
+    )
+
+    insert(:project_repo,
+      project: project,
+      token: "failure",
+      repo_name: "failure",
+      org_name: "owner"
+    )
+
+    insert(:project_repo,
+      project: project,
+      token: nil,
+      repo_name: "nil",
+      org_name: "owner"
+    )
 
     params = %{
       repo_and_issue_success: "owner/success/1",
