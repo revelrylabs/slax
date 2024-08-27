@@ -545,15 +545,15 @@ defmodule Slax.Github.Test do
 
   def load_issue_setup(context) do
     project = insert(:project)
-    insert(:project_repo, project: project, token: "success", repo_name: "success")
-    insert(:project_repo, project: project, token: "failure", repo_name: "failure")
-    insert(:project_repo, project: project, token: nil, repo_name: "nil")
+    insert(:project_repo, project: project, token: "success", repo_name: "success", org_name: "owner")
+    insert(:project_repo, project: project, token: "failure", repo_name: "failure", org_name: "owner")
+    insert(:project_repo, project: project, token: nil, repo_name: "nil", org_name: "owner")
 
     params = %{
-      repo_and_issue_success: "success/1",
-      repo_and_issue_failure: "failure/1",
-      repo_and_issue_nil: "nil/1",
-      repo_and_issue_na: "na/1"
+      repo_and_issue_success: "owner/success/1",
+      repo_and_issue_failure: "owner/failure/1",
+      repo_and_issue_nil: "owner/nil/1",
+      repo_and_issue_na: "owner/na/1"
     }
 
     {:ok, context |> Map.put(:params, params)}

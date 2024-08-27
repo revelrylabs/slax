@@ -72,8 +72,8 @@ defmodule Slax.ProjectRepos do
     |> Repo.all()
   end
 
-  def get_by_repo(repo_name) do
-    Repo.get_by(ProjectRepo, repo_name: repo_name)
+  def get_by_repo(repo_name, org_name) do
+    Repo.get_by(ProjectRepo, repo_name: repo_name, org_name: org_name)
   end
 
   def list_needs_reminder_message() do

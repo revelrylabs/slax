@@ -72,7 +72,7 @@ defmodule Slax.Poker do
     {org, repo, issue} = Github.parse_repo_org_issue(round.issue)
 
     client =
-      case ProjectRepos.get_by_repo(repo) do
+      case ProjectRepos.get_by_repo(repo, org) do
         %{token: token} when not is_nil(token) ->
           Tentacat.Client.new(%{access_token: token})
 
