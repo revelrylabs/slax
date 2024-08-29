@@ -566,7 +566,7 @@ defmodule Slax.Github do
   end
 
   defp retrieve_token(repo, org) do
-    case ProjectRepos.get_by_repo(repo, org) do
+    case ProjectRepos.get_by_repo_and_org(repo, org) do
       %{token: token} when not is_nil(token) ->
         {token, ""}
 
