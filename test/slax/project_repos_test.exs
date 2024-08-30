@@ -36,4 +36,12 @@ defmodule Slax.ProjectRepos.Test do
       assert length(repos_with_token) == 1
     end
   end
+
+  describe "get one by repo_name and org_name" do
+    test "get_by_repo_and_org/2" do
+      repo = ProjectRepos.get_by_repo_and_org("girl u know its TRUE", "miLIVAnili")
+      assert repo.org_name == "milivanili"
+      assert repo.repo_name == "girl u know its true"
+    end
+  end
 end
