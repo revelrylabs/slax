@@ -36,7 +36,7 @@ defmodule Slax.Mixfile do
       {:phoenix, "~> 1.7.14", override: true},
       {:phoenix_pubsub, "~> 2.0"},
       {:phoenix_ecto, "~> 4.0"},
-      {:ecto_sql, "~> 3.11.1"},
+      {:ecto_sql, "~> 3.12.1"},
       {:postgrex, "~> 0.16"},
       {:plug_cowboy, "~> 2.5"},
       {:plug, "~> 1.15.3"},
