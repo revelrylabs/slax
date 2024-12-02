@@ -79,7 +79,7 @@ This is a slack shortcut that is an interactive modal to disable Slax Issue/PR l
 This is a slack shortcut that is an interactive modal to enable Slax Issue/PR lookup in a specific channel.
 
 ### Issue & PR lookup
-With the websocket connection slax parses every message for the specified patterns corresponding to an issue `org/repo#1` `repo#1` or a PR `org/repo$1` `repo$1`.
+With the websocket connection slax parses every message for the specified patterns corresponding to an issue or a PR: `org/repo#1` `repo#1`.
 
 ### /poker
 This command is the interaction point for the poker feature and when just typing `/poker` it will respond with a help message on how to use it.
