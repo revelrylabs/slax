@@ -4,8 +4,8 @@ name: Test
 on: push
 
 env:
-  OTP_VERSION_SPEC: "24.1"
-  ELIXIR_VERSION_SPEC: "1.12.3"
+  OTP_VERSION_SPEC: "26.2.4"
+  ELIXIR_VERSION_SPEC: "1.16.2"
   MIX_ENV: test
 
 jobs:

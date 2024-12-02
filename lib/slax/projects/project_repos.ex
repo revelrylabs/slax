@@ -72,8 +72,19 @@ defmodule Slax.ProjectRepos do
     |> Repo.all()
   end
 
-  def get_by_repo(repo_name) do
-    Repo.get_by(ProjectRepo, repo_name: repo_name)
+  def get_by_repo_and_org(repo_name, org_name) do
+    lower_repo_name = String.downcase(repo_name)
+    lower_org_name = String.downcase(org_name)
+
+    query =
+      from(
+        p in ProjectRepo,
+        where:
+          fragment("lower(?)", p.repo_name) == ^lower_repo_name and
+            fragment("lower(?)", p.org_name) == ^lower_org_name
+      )
+
+    Repo.one(query)
   end
 
   def list_needs_reminder_message() do

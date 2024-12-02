@@ -2,7 +2,6 @@ defmodule Slax.Github do
   @moduledoc """
   Functions for working with the Github API
   """
-
   alias Slax.Http
   alias Slax.Http.Error
   alias Slax.ProjectRepos
@@ -507,7 +506,7 @@ defmodule Slax.Github do
   """
   def load_issue(repo_and_issue) do
     with {org, repo, issue} <- parse_repo_org_issue(repo_and_issue),
-         {token, warning_message} <- retrieve_token(repo),
+         {token, warning_message} <- retrieve_token(repo, org),
          client <- Tentacat.Client.new(%{access_token: token}),
          {200, issue, _http_response} <- Issues.find(client, org, repo, issue) do
       {:ok, issue, warning_message}
@@ -531,7 +530,7 @@ defmodule Slax.Github do
 
   def load_pr(repo_and_pr) do
     with {org, repo, pr} <- parse_repo_org_issue(repo_and_pr),
-         {token, warning_message} <- retrieve_token(repo),
+         {token, warning_message} <- retrieve_token(repo, org),
          client <- Tentacat.Client.new(%{access_token: token}),
          {200, pr, _http_response} <- Prs.find(client, org, repo, pr) do
       {:ok, pr, warning_message}
@@ -566,8 +565,8 @@ defmodule Slax.Github do
     end)
   end
 
-  defp retrieve_token(repo) do
-    case ProjectRepos.get_by_repo(repo) do
+  defp retrieve_token(repo, org) do
+    case ProjectRepos.get_by_repo_and_org(repo, org) do
       %{token: token} when not is_nil(token) ->
         {token, ""}
 
