@@ -1,5 +1,5 @@
 # Set the Docker image you want to base your image off.
-FROM hexpm/elixir:1.12.3-erlang-24.1.7-debian-buster-20210902 as builder
+FROM hexpm/elixir:1.16.2-erlang-26.2.4-debian-bullseye-20240423-slim as builder
 
 # Install other stable dependencies that don't change often
 RUN apt-get update && \
@@ -27,7 +27,7 @@ RUN mix do compile, release
 # END BUILDER
 #
 
-FROM debian:buster-slim
+FROM debian:bullseye-slim
 
 RUN apt-get -qq update
 RUN apt-get -qq install -y locales locales-all openssl
