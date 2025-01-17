@@ -60,7 +60,7 @@ defmodule SlaxWeb.Issue do
       _ ->
         org_name = default_repo.org_name
         repo_name = default_repo.repo_name
-        issue_number = String.slice(issue_number, 1..-1)
+        issue_number = String.slice(issue_number, 1..-1//1)
         load_pr_or_issue_from_github("#{org_name}/#{repo_name}##{issue_number}")
     end
   end
