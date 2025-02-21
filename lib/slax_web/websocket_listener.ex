@@ -83,7 +83,9 @@ defmodule SlaxWeb.WebsocketListener do
     channel = Channels.get_by_channel_id(channel)
 
     if is_nil(channel) or !channel.disabled do
-      Issue.handle_event(event)
+      Task.Supervisor.start_child(Slax.TaskSupervisor, fn ->
+        Issue.handle_event(event)
+      end)
 
       case Jason.encode(%{envelope_id: envelope_id}) do
         {:ok, response} -> :gun.ws_send(pid, stream_ref, {:text, response})
