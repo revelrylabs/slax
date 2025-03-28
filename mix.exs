@@ -47,7 +47,7 @@ defmodule Slax.Mixfile do
       {:jason, "~> 1.1"},
       {:ex_machina, "~> 2.2", only: :test},
       {:sobelow, "~> 0.13", only: [:dev, :test], runtime: false},
-      {:stream_data, "~> 1.1.1", only: :test},
+      {:stream_data, "~> 1.2.0", only: :test},
       {:quantum, "~> 3.0"},
       {:timex, "~> 3.7"},
       {:tentacat, "~> 2.2.0"},
