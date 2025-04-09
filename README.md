@@ -84,6 +84,12 @@ With the websocket connection slax parses every message for the specified patter
 ### /poker
 This command is the interaction point for the poker feature and when just typing `/poker` it will respond with a help message on how to use it.
 
+-   /poker start [repo/123] -- _Start a new round of planning poker for issue 123 of the repo repo._
+-   /poker estimate [1|2|3|5|8|13] (reason) -- _Provide your complexity points for the current issue._
+-   /poker reveal -- _Reveal the estimates for the current issue._
+-   /poker decide [1|2|3|5|8|13] -- _Finalize the points for the current issue._
+-   /poker quit -- _Ends the current round of poker_
+
 ### _The following commands have not been tested or used in a while_
 
 ### /auth
