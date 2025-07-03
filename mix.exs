@@ -35,11 +35,11 @@ defmodule Slax.Mixfile do
     [
       {:phoenix, "~> 1.7.14", override: true},
       {:phoenix_pubsub, "~> 2.0"},
-      {:phoenix_ecto, "~> 4.0"},
-      {:ecto_sql, "~> 3.12.1"},
+      {:phoenix_ecto, "~> 4.6"},
+      {:ecto_sql, "~> 3.13.2"},
       {:postgrex, "~> 0.16"},
       {:plug_cowboy, "~> 2.5"},
-      {:plug, "~> 1.17.0"},
+      {:plug, "~> 1.18.1"},
       {:httpoison, "~> 1.5"},
       {:yaml_front_matter, "~> 1.0"},
       {:ex_doc, "~> 0.25", only: :dev, runtime: false},
@@ -56,7 +56,7 @@ defmodule Slax.Mixfile do
       {:gun, "~> 2.0.1"},
       {:oban, "~> 2.13"},
       {:certifi, "~> 2.8.0"},
-      {:castore, "~> 1.0"},
+      {:castore, "~> 1.0.14"},
       {:phoenix_view, "~> 2.0"}
     ]
   end
