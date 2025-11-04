@@ -53,11 +53,11 @@ jobs:
     runs-on: ubuntu-latest
     if: github.event.action == 'labeled' && github.event.label.name == 'maintenance'
     steps:
-      - name: Move maintenance labeled issues to Maintenance
+      - name: Move maintenance labeled issues to Ready to Work
         uses: leonsteinhaeuser/project-beta-automations@v2.1.0
         with:
           gh_token: ${{ secrets.GH_TOKEN }}
           organization: revelrylabs
           project_id: 13
           resource_node_id: ${{ github.event.issue.node_id }}
-          status_value: Maintenance # Target status
+          status_value: Ready to Work # Target status
