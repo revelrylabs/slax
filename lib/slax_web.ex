@@ -28,7 +28,7 @@ defmodule SlaxWeb do
 
   def controller do
     quote do
-      use Phoenix.Controller, namespace: SlaxWeb
+      use Phoenix.Controller, formats: [:json]
 
       alias Slax.Repo
       import Ecto
