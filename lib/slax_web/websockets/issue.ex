@@ -81,12 +81,17 @@ defmodule SlaxWeb.Issue do
   defp load_pr_from_github(repo_and_pr) do
     case Github.load_pr(repo_and_pr) do
       {:ok, pr, warning_message} ->
-        "<#{pr["html_url"]}|#{repo_and_pr}>: [PR] #{pr["title"]} (#{pr["state"]}) #{warning_message}"
+        %{"html_url" => url, "title" => title, "state" => state} = pr
+        "<#{url}|#{repo_and_pr}>: [PR] #{title} #{pr_slack_emoji(state)} #{warning_message}"
 
       {:error, error} ->
         error
     end
   end
+
+  defp pr_slack_emoji("open"), do: ":pr:"
+  defp pr_slack_emoji("closed"), do: ":pr-merged:"
+  defp pr_slack_emoji(state), do: "(#{state})"
 
   def labels_for_issue(issue) do
     column_label =
