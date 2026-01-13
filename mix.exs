@@ -33,16 +33,16 @@ defmodule Slax.Mixfile do
   # Type `mix help deps` for examples and options.
   defp deps do
     [
-      {:phoenix, "~> 1.8.1", override: true},
+      {:phoenix, "~> 1.8.3", override: true},
       {:phoenix_pubsub, "~> 2.0"},
-      {:phoenix_ecto, "~> 4.6"},
-      {:ecto_sql, "~> 3.13.2"},
+      {:phoenix_ecto, "~> 4.7"},
+      {:ecto_sql, "~> 3.13.4"},
       {:postgrex, "~> 0.21.1"},
-      {:plug_cowboy, "~> 2.5"},
-      {:plug, "~> 1.18.1"},
+      {:plug_cowboy, "~> 2.7.5"},
+      {:plug, "~> 1.19.1"},
       {:httpoison, "~> 1.5"},
       {:yaml_front_matter, "~> 1.0"},
-      {:ex_doc, "~> 0.39.0", only: :dev, runtime: false},
+      {:ex_doc, "~> 0.39.3", only: :dev, runtime: false},
       {:mox, "~> 1.1", only: :test},
       {:jason, "~> 1.1"},
       {:ex_machina, "~> 2.2", only: :test},
@@ -51,12 +51,12 @@ defmodule Slax.Mixfile do
       {:quantum, "~> 3.0"},
       {:timex, "~> 3.7"},
       {:tentacat, "~> 2.2.0"},
-      {:credo, "~> 1.7.5", only: [:dev, :test], runtime: false},
+      {:credo, "~> 1.7.15", only: [:dev, :test], runtime: false},
       {:inflex, "~> 2.1.0"},
       {:gun, "~> 2.0.1"},
-      {:oban, "~> 2.20.1"},
+      {:oban, "~> 2.20.2"},
       {:certifi, "~> 2.8.0"},
-      {:castore, "~> 1.0.15"},
+      {:castore, "~> 1.0.17"},
       {:phoenix_view, "~> 2.0"}
     ]
   end
