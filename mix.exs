@@ -42,7 +42,7 @@ defmodule Slax.Mixfile do
       {:plug, "~> 1.19.1"},
       {:httpoison, "~> 1.5"},
       {:yaml_front_matter, "~> 1.0"},
-      {:ex_doc, "~> 0.39.3", only: :dev, runtime: false},
+      {:ex_doc, "~> 0.40.0", only: :dev, runtime: false},
       {:mox, "~> 1.1", only: :test},
       {:jason, "~> 1.1"},
       {:ex_machina, "~> 2.2", only: :test},
