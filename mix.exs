@@ -54,7 +54,7 @@ defmodule Slax.Mixfile do
       {:credo, "~> 1.7.15", only: [:dev, :test], runtime: false},
       {:inflex, "~> 2.1.0"},
       {:gun, "~> 2.0.1"},
-      {:oban, "~> 2.20.2"},
+      {:oban, "~> 2.21.0"},
       {:certifi, "~> 2.8.0"},
       {:castore, "~> 1.0.17"},
       {:phoenix_view, "~> 2.0"}
