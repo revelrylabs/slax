@@ -6,3 +6,9 @@ updates:
     interval: daily
     time: "11:00"
   open-pull-requests-limit: 10
+# Keep the SHA-pinned GitHub Actions current. Dependabot reads the
+# "# vX.Y.Z" comment next to each pinned SHA and opens PRs to advance the pin.
+- package-ecosystem: github-actions
+  directory: "/"
+  schedule:
+    interval: weekly

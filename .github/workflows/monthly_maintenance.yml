@@ -30,7 +30,7 @@ jobs:
           } >> "$GITHUB_OUTPUT"
       - name: Get open alerts
         id: open_alerts
-        uses: octokit/request-action@v2.1.9
+        uses: octokit/request-action@89697eb6635e52c6e1e5559f15b5c91ba5100cb0 # v2.1.9
         env:
           GITHUB_TOKEN: ${{ secrets.MONTHLY_AUTOMATION }}
         with:
@@ -52,56 +52,56 @@ jobs:
             fi
       - name: Build objects for open alerts
         id: open_objects
-        uses: edwardgeorge/jq-action@main
+        uses: edwardgeorge/jq-action@aa5526c42ec65275c6f703333120eee7fc20fe33 # main @ 2021-05-17 (unmaintained, no version tags)
         with:
           input: ${{ steps.open_input.outputs.alerts }}
           script: '[.[0] as $times | .[1] as $severities | .[2] as $urls | foreach range(0; $times|length) as $i  ( {}; . = { "time": $times[$i], "severity": $severities[$i], "url": $urls[$i] } )]'
       - name: Get new open alerts
         id: new_open_alerts
-        uses: edwardgeorge/jq-action@main
+        uses: edwardgeorge/jq-action@aa5526c42ec65275c6f703333120eee7fc20fe33 # main @ 2021-05-17 (unmaintained, no version tags)
         with:
           input: ${{ steps.open_objects.outputs.output }}
           script: 'map(select(.time >= "${{ steps.prevdate.outputs.prevdate }}"))'
       - name: Get urls
         id: urls
-        uses: edwardgeorge/jq-action@main
+        uses: edwardgeorge/jq-action@aa5526c42ec65275c6f703333120eee7fc20fe33 # main @ 2021-05-17 (unmaintained, no version tags)
         with:
           input: ${{ steps.new_open_alerts.outputs.output }}
           script: '.[].url'
           raw-output: "true"
       - name: Get number of new alerts
         id: total_open_alerts
-        uses: edwardgeorge/jq-action@main
+        uses: edwardgeorge/jq-action@aa5526c42ec65275c6f703333120eee7fc20fe33 # main @ 2021-05-17 (unmaintained, no version tags)
         with:
           input: ${{ steps.new_open_alerts.outputs.output }}
           script: 'length'
       - name: Get number of critical alerts
         id: open_critical_alerts
-        uses: edwardgeorge/jq-action@main
+        uses: edwardgeorge/jq-action@aa5526c42ec65275c6f703333120eee7fc20fe33 # main @ 2021-05-17 (unmaintained, no version tags)
         with:
           input: ${{ steps.new_open_alerts.outputs.output }}
           script: 'map(select(.severity == "critical")) | length'
       - name: Get number of high alerts
         id: open_high_alerts
-        uses: edwardgeorge/jq-action@main
+        uses: edwardgeorge/jq-action@aa5526c42ec65275c6f703333120eee7fc20fe33 # main @ 2021-05-17 (unmaintained, no version tags)
         with:
           input: ${{ steps.new_open_alerts.outputs.output }}
           script: 'map(select(.severity == "high")) | length'
       - name: Get number of moderate alerts
         id: open_moderate_alerts
-        uses: edwardgeorge/jq-action@main
+        uses: edwardgeorge/jq-action@aa5526c42ec65275c6f703333120eee7fc20fe33 # main @ 2021-05-17 (unmaintained, no version tags)
         with:
           input: ${{ steps.new_open_alerts.outputs.output }}
           script: 'map(select(.severity == "medium")) | length'
       - name: Get number of low alerts
         id: open_low_alerts
-        uses: edwardgeorge/jq-action@main
+        uses: edwardgeorge/jq-action@aa5526c42ec65275c6f703333120eee7fc20fe33 # main @ 2021-05-17 (unmaintained, no version tags)
         with:
           input: ${{ steps.new_open_alerts.outputs.output }}
           script: 'map(select(.severity == "low")) | length'
       - name: Get fixed alerts
         id: fixed_alerts
-        uses: octokit/request-action@v2.1.9
+        uses: octokit/request-action@89697eb6635e52c6e1e5559f15b5c91ba5100cb0 # v2.1.9
         env:
           GITHUB_TOKEN: ${{ secrets.MONTHLY_AUTOMATION }}
         with:
@@ -123,48 +123,48 @@ jobs:
             fi
       - name: Build objects for fixed alerts
         id: fixed_objects
-        uses: edwardgeorge/jq-action@main
+        uses: edwardgeorge/jq-action@aa5526c42ec65275c6f703333120eee7fc20fe33 # main @ 2021-05-17 (unmaintained, no version tags)
         with:
           input: ${{ steps.fixed_input.outputs.alerts }}
           script: '[.[0] as $times | .[1] as $severities | foreach range(0; $times|length) as $i  ( {}; . = { "time": $times[$i], "severity": $severities[$i] } )]'
       - name: Get new fixed alerts
         id: new_fixed_alerts
-        uses: edwardgeorge/jq-action@main
+        uses: edwardgeorge/jq-action@aa5526c42ec65275c6f703333120eee7fc20fe33 # main @ 2021-05-17 (unmaintained, no version tags)
         with:
           input: ${{ steps.fixed_objects.outputs.output }}
           script: 'map(select(.time >= "${{ steps.prevdate.outputs.prevdate }}"))'
       - name: Get number of new fixed alerts
         id: total_fixed_alerts
-        uses: edwardgeorge/jq-action@main
+        uses: edwardgeorge/jq-action@aa5526c42ec65275c6f703333120eee7fc20fe33 # main @ 2021-05-17 (unmaintained, no version tags)
         with:
           input: ${{ steps.new_fixed_alerts.outputs.output }}
           script: 'length'
       - name: Get number of critical alerts
         id: fixed_critical_alerts
-        uses: edwardgeorge/jq-action@main
+        uses: edwardgeorge/jq-action@aa5526c42ec65275c6f703333120eee7fc20fe33 # main @ 2021-05-17 (unmaintained, no version tags)
         with:
           input: ${{ steps.new_fixed_alerts.outputs.output }}
           script: 'map(select(.severity == "critical")) | length'
       - name: Get number of high alerts
         id: fixed_high_alerts
-        uses: edwardgeorge/jq-action@main
+        uses: edwardgeorge/jq-action@aa5526c42ec65275c6f703333120eee7fc20fe33 # main @ 2021-05-17 (unmaintained, no version tags)
         with:
           input: ${{ steps.new_fixed_alerts.outputs.output }}
           script: 'map(select(.severity == "high")) | length'
       - name: Get number of moderate alerts
         id: fixed_moderate_alerts
-        uses: edwardgeorge/jq-action@main
+        uses: edwardgeorge/jq-action@aa5526c42ec65275c6f703333120eee7fc20fe33 # main @ 2021-05-17 (unmaintained, no version tags)
         with:
           input: ${{ steps.new_fixed_alerts.outputs.output }}
           script: 'map(select(.severity == "medium")) | length'
       - name: Get number of low alerts
         id: fixed_low_alerts
-        uses: edwardgeorge/jq-action@main
+        uses: edwardgeorge/jq-action@aa5526c42ec65275c6f703333120eee7fc20fe33 # main @ 2021-05-17 (unmaintained, no version tags)
         with:
           input: ${{ steps.new_fixed_alerts.outputs.output }}
           script: 'map(select(.severity == "low")) | length'
       - name: Create monthly maintenence issue
-        uses: imjohnbo/issue-bot@v3
+        uses: imjohnbo/issue-bot@3188c6ce06249206709d3b1f274d0d4c5a521601 # v3.4.5
         with:
           labels: "dependencies, maintenance"
           title: 'Slax - Maintenance - ${{ steps.date.outputs.date }}'
