@@ -30,7 +30,7 @@ jobs:
           } >> "$GITHUB_OUTPUT"
       - name: Get open alerts
         id: open_alerts
-        uses: octokit/request-action@89697eb6635e52c6e1e5559f15b5c91ba5100cb0 # v2.1.9
+        uses: octokit/request-action@b91aabaa861c777dcdb14e2387e30eddf04619ae # v3.0.0
         env:
           GITHUB_TOKEN: ${{ secrets.MONTHLY_AUTOMATION }}
         with:
@@ -101,7 +101,7 @@ jobs:
           script: 'map(select(.severity == "low")) | length'
       - name: Get fixed alerts
         id: fixed_alerts
-        uses: octokit/request-action@89697eb6635e52c6e1e5559f15b5c91ba5100cb0 # v2.1.9
+        uses: octokit/request-action@b91aabaa861c777dcdb14e2387e30eddf04619ae # v3.0.0
         env:
           GITHUB_TOKEN: ${{ secrets.MONTHLY_AUTOMATION }}
         with:
