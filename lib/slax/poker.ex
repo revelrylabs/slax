@@ -3,10 +3,6 @@ defmodule Slax.Poker do
   use Slax.Context
   alias Slax.{Github, Poker.Round, ProjectRepos}
 
-  # Slack closes the socket-mode connection (1009) when a frame exceeds 20 KiB,
-  # so the issue body cannot be echoed in full.
-  @max_body_chars 3_000
-
   def start_round(channel_name, issue) do
     repo_and_issue =
       Regex.replace(~r".*/repos/(\S+)/(\S+)/issues/(\d+)$", issue["url"], "\\1/\\2/\\3")
@@ -26,7 +22,7 @@ defmodule Slax.Poker do
       ---
       #{pr}#{issue["number"]}: #{issue["title"]} (#{labels})
       ---
-      #{truncate_body(issue["body"])}
+      #{issue["body"]}
       #{issue["html_url"]}
       This issue has #{issue["comments"]} #{Inflex.inflect("comment", issue["comments"])}
 
@@ -38,17 +34,6 @@ defmodule Slax.Poker do
     """
 
     {:ok, response}
-  end
-
-  @doc false
-  def truncate_body(nil), do: ""
-
-  def truncate_body(body) do
-    if String.length(body) <= @max_body_chars do
-      body
-    else
-      String.slice(body, 0, @max_body_chars) <> "\n_[body truncated, see the issue link]_"
-    end
   end
 
   @doc """

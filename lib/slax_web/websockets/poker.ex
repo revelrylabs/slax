@@ -26,10 +26,13 @@ defmodule SlaxWeb.Poker do
     with {:ok, issue, warning_message} <- Github.load_issue(repo_and_issue),
          {:ok, _} <- Poker.end_current_round_for_channel(channel_name),
          {:ok, response} <- Poker.start_round(channel_name, issue) do
-      %{
-        response_type: "in_channel",
-        text: response <> warning_message
-      }
+      # The socket-mode ack frame is capped at 20 KiB and must go out within
+      # 3 seconds, so the issue text is posted separately and asynchronously.
+      Task.Supervisor.start_child(Slax.TaskSupervisor, fn ->
+        Slack.post_long_message_to_channel(response <> warning_message, channel_name)
+      end)
+
+      %{}
     else
       {:error, message} ->
         %{text: message}
