@@ -2,7 +2,19 @@ defmodule Slax.Poker do
   @moduledoc false
   use Slax.Context
   alias Slax.{Github, Poker.Round, ProjectRepos}
+  alias Slax.Helpers.Markdown
 
+  @reminder "Reminder: all of the work counts for the complexity score. " <>
+              "Getting clarity on the issue, project management, development, writing tests, " <>
+              "design, QA, UAT, release to production, and any other work all count " <>
+              "for the complexity score!"
+
+  @doc """
+  Opens a round for the channel and builds the Slack announcement.
+
+  The issue title, labels, and body come from the GitHub API. The body is
+  GitHub-flavored Markdown, so it's converted to Slack `mrkdwn` before posting.
+  """
   def start_round(channel_name, issue) do
     repo_and_issue =
       Regex.replace(~r".*/repos/(\S+)/(\S+)/issues/(\d+)$", issue["url"], "\\1/\\2/\\3")
@@ -14,23 +26,30 @@ defmodule Slax.Poker do
     })
     |> Repo.insert()
 
-    labels = Enum.map_join(issue["labels"], ", ", & &1["name"])
+    labels =
+      case Enum.map_join(issue["labels"], ", ", &Markdown.escape(&1["name"])) do
+        "" -> ""
+        labels -> " (#{labels})"
+      end
+
     pr = if Map.has_key?(issue, "pull_request"), do: "(PR) "
 
-    response = """
-      Planning poker for #{repo_and_issue}.
-      ---
-      #{pr}#{issue["number"]}: #{issue["title"]} (#{labels})
-      ---
-      #{issue["body"]}
-      #{issue["html_url"]}
-      This issue has #{issue["comments"]} #{Inflex.inflect("comment", issue["comments"])}
+    body =
+      case Markdown.to_slack(issue["body"]) do
+        "" -> "_No description._"
+        body -> body
+      end
 
-      ---
-      Reminder: all of the work counts for the complexity score. Getting
-      clarity on the issue, project management, development, writing tests,
-      design, QA, UAT, release to production, and any other work all count
-      for the complexity score!
+    response = """
+    *Planning poker for #{repo_and_issue}*
+    *#{pr}#{issue["number"]}: #{Markdown.escape(issue["title"])}*#{labels}
+    ---
+    #{body}
+    ---
+    #{issue["html_url"]}
+    This issue has #{issue["comments"]} #{Inflex.inflect("comment", issue["comments"])}
+
+    _#{@reminder}_
     """
 
     {:ok, response}
