@@ -52,6 +52,13 @@ config :slax, Slax.Github,
   org_teams: System.get_env("GITHUB_ORG_TEAMS"),
   api_token: System.get_env("GITHUB_API_TOKEN")
 
+# NOTE: hackney 1 spoke HTTP/1.1 only. hackney 4 negotiates HTTP/2 by default, and
+# its HTTP/2 path answers :protocol_error for a header value with leading or
+# trailing whitespace, such as "Bearer " when a token is unset, where HTTP/1.1
+# sends the request and the API replies. Keep HTTP/1.1 for this upgrade. Remove
+# the line to enable HTTP/2 after checking the Slack and GitHub call paths.
+config :hackney, default_protocols: [:http1]
+
 config :slax, Slax.Slack,
   api_url: "https://slack.com/api",
   channel_name: System.get_env("SLACK_CHANNEL_NAME"),

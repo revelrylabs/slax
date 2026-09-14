@@ -12,7 +12,12 @@ defmodule SlaxWeb.Issue do
 
   def handle_event(%{"bot_id" => bot_id}) when not is_nil(bot_id), do: nil
 
-  def handle_event(%{"thread_ts" => ts, "channel" => channel, "text" => text, "type" => "message"}) do
+  def handle_event(%{
+        "thread_ts" => ts,
+        "channel" => channel,
+        "text" => text,
+        "type" => "message"
+      }) do
     issues_scan = scan_text_for_issue(text)
 
     reply = load_prs_and_issues_from_scan(issues_scan, channel)

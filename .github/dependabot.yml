@@ -12,3 +12,8 @@ updates:
   directory: "/"
   schedule:
     interval: weekly
+# The Dockerfile pins dated hexpm/elixir and debian tags. Dependabot advances them.
+- package-ecosystem: docker
+  directory: "/"
+  schedule:
+    interval: weekly

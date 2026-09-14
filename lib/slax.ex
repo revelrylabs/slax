@@ -1,6 +1,7 @@
 defmodule Slax do
   @moduledoc false
   use Application
+  require Logger
 
   # See http://elixir-lang.org/docs/stable/elixir/Application.html
   # for more information on OTP Applications
@@ -25,10 +26,24 @@ defmodule Slax do
   end
 
   defp optional_children() do
-    if Application.get_env(:slax, SlaxWeb.WebsocketListener, [])[:enabled] do
-      [SlaxWeb.WebsocketListener]
-    else
-      []
+    enabled? = Application.get_env(:slax, SlaxWeb.WebsocketListener, [])[:enabled]
+    app_token = Application.get_env(:slax, Slax.Slack, [])[:app_token]
+
+    cond do
+      !enabled? ->
+        []
+
+      app_token in [nil, ""] ->
+        Logger.warning(
+          "SlaxWeb.WebsocketListener is enabled but Slax.Slack has no app_token. " <>
+            "Starting without the Slack socket listener. " <>
+            "In dev, set app_token in config/dev.secret.exs to connect to Slack."
+        )
+
+        []
+
+      true ->
+        [SlaxWeb.WebsocketListener]
     end
   end
 end

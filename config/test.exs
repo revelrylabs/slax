@@ -7,7 +7,7 @@ config :slax, SlaxWeb.Endpoint,
   server: false
 
 # Print only warnings and errors during test
-config :logger, level: :warn
+config :logger, level: :warning
 
 config :slax, http_adapter: Slax.HttpMock
 config :slax, github_commands: Slax.Commands.GithubCommandsMock

@@ -20,5 +20,5 @@ defmodule SlaxWeb.GetText do
 
   See the [Gettext Docs](https://hexdocs.pm/gettext) for detailed usage.
   """
-  use Gettext, otp_app: :slax
+  use Gettext.Backend, otp_app: :slax
 end
