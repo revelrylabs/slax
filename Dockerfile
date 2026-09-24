@@ -27,7 +27,7 @@ RUN mix do compile, release
 # END BUILDER
 #
 
-FROM debian:trixie-20260824-slim
+FROM debian:trixie-20260918-slim
 
 RUN apt-get -qq update
 RUN apt-get -qq install -y locales locales-all openssl
