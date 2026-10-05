@@ -108,6 +108,48 @@ defmodule Slax.Slack do
     end
   end
 
+  # Slack collapses messages past ~4,000 characters and drops anything over
+  # 40,000, so long text goes out as a series of messages.
+  @max_message_chars 4_000
+
+  def post_long_message_to_channel(text, channel_name \\ default_channel()) do
+    text
+    |> chunk_message()
+    |> Enum.each(&post_message_to_channel(&1, channel_name))
+  end
+
+  @doc false
+  def chunk_message(""), do: []
+
+  def chunk_message(text) do
+    text
+    |> String.split("\n")
+    |> Enum.flat_map(&split_long_line/1)
+    |> Enum.reduce([], fn
+      line, [] ->
+        [line]
+
+      line, [current | rest] ->
+        if String.length(current) + String.length(line) + 1 <= @max_message_chars do
+          [current <> "\n" <> line | rest]
+        else
+          [line, current | rest]
+        end
+    end)
+    |> Enum.reverse()
+  end
+
+  defp split_long_line(line) do
+    if String.length(line) <= @max_message_chars do
+      [line]
+    else
+      line
+      |> String.graphemes()
+      |> Enum.chunk_every(@max_message_chars)
+      |> Enum.map(&Enum.join/1)
+    end
+  end
+
   @doc """
     Posts text to a given channel and thread
   """
